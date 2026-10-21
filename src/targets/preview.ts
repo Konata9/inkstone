@@ -2,13 +2,13 @@
  * Static preview page.
  *
  * Everything is inlined: no fonts, no scripts from the network, no build step
- * in the browser. Open preview/index.html and the two flavors render side by
- * side with real code, a terminal, a diff and a Markdown pane.
+ * in the browser. Open preview/index.html and all four flavors render with real
+ * code, a terminal, a diff and a Markdown pane.
  */
 
 import { alpha, contrast, formatRatio, luminance } from '../color.ts';
 import { nameOf } from '../palette/data.ts';
-import { flavors } from '../palette/index.ts';
+import { flavorFamilies, flavors, flavorName } from '../palette/index.ts';
 import type { Flavor } from '../palette/types.ts';
 import { ANSI_NAMES } from '../palette/types.ts';
 
@@ -69,7 +69,7 @@ function cssVars(f: Flavor): string {
 /* Code samples                                                        */
 /* ------------------------------------------------------------------ */
 
-const tsLines = [
+const tsLines = (f: Flavor) => [
   '<span class="cm">// 墨观 Inkstone · 把传统色写进代码</span>',
   '<span class="kw">import</span> { <span class="fn">named</span> } <span class="kw">from</span> <span class="str">"./palette"</span>;',
   '',
@@ -78,8 +78,8 @@ const tsLines = [
   '  <span class="prop">hex</span>: <span class="str">`#${string}`</span>;',
   '}',
   '',
-  '<span class="kw">const</span> <span class="var">玄墨</span>: <span class="type">Ink</span> = {',
-  '  <span class="prop">name</span>: <span class="str">"玄墨"</span>, <span class="prop">hex</span>: <span class="str">"#14131a"</span>,',
+  '<span class="kw">const</span> <span class="var">墨色</span>: <span class="type">Ink</span> = {',
+  `  <span class="prop">name</span>: <span class="str">"${f.meta.zh}"</span>, <span class="prop">hex</span>: <span class="str">"${f.surface.base}"</span>,`,
   '};',
   '',
   '<span class="cm">/** 计算 WCAG 对比度 */</span>',
@@ -102,24 +102,27 @@ const tsLines = [
   '}',
 ];
 
-const terminalLines = [
+const terminalLines = (f: Flavor) => [
   '<span class="t-dim">~/projects/inkstone</span> <span class="t-branch">main</span>',
   '<span class="t-prompt">❯</span> pnpm build',
-  '  <span class="t-gold">526</span> colors → <span class="t-gold">6</span> files',
+  '  <span class="t-gold">526</span> colors → <span class="t-gold">14</span> files',
   '<span class="t-prompt">❯</span> git status --short',
-  ' <span class="t-red">M</span> packages/vscode/themes/xuanmo.json',
+  ` <span class="t-red">M</span> packages/vscode/themes/${f.meta.id}.json`,
   ' <span class="t-green">A</span> preview/index.html',
   '<span class="t-prompt">❯</span> echo <span class="t-str">"青山横北郭，白水绕东城"</span>',
   '<span class="t-blue">青山横北郭，白水绕东城</span>',
   '<span class="cursor"></span>',
 ];
 
-const diffLines = [
-  { kind: 'del', html: '<span class="sign">-</span> <span class="kw">const</span> <span class="var">canvas</span> = <span class="str">"#ffffff"</span>;' },
-  { kind: 'add', html: '<span class="sign">+</span> <span class="kw">const</span> <span class="var">canvas</span> = <span class="str">"#14131a"</span>;' },
-  { kind: 'add', html: '<span class="sign">+</span> <span class="kw">const</span> <span class="var">keyword</span> = <span class="fn">named</span>(<span class="str">"海棠红"</span>);' },
-  { kind: 'ctx', html: '<span class="sign"> </span> <span class="kw">const</span> <span class="var">comment</span> = <span class="str">"#85809e"</span>;' },
-];
+function diffLines(f: Flavor) {
+  const keywordName = nameOf(f.syntax.keyword) ?? '传统色';
+  return [
+    { kind: 'del', html: '<span class="sign">-</span> <span class="kw">const</span> <span class="var">canvas</span> = <span class="str">"#ffffff"</span>;' },
+    { kind: 'add', html: `<span class="sign">+</span> <span class="kw">const</span> <span class="var">canvas</span> = <span class="str">"${f.surface.base}"</span>;` },
+    { kind: 'add', html: `<span class="sign">+</span> <span class="kw">const</span> <span class="var">keyword</span> = <span class="fn">named</span>(<span class="str">"${keywordName}"</span>);` },
+    { kind: 'ctx', html: `<span class="sign"> </span> <span class="kw">const</span> <span class="var">comment</span> = <span class="str">"${f.syntax.comment}"</span>;` },
+  ];
+}
 
 function codeBlock(lines: string[], options: { active?: number; selected?: number; start?: number } = {}) {
   const start = options.start ?? 1;
@@ -258,7 +261,7 @@ function editorMock(f: Flavor) {
           <div class="tab">kaku.lua</div>
         </div>
         <div class="breadcrumb"><span>src</span><i>›</i><span>theme.ts</span><i>›</i><span>contrast</span></div>
-        <div class="code">${codeBlock(tsLines, { active: 14, selected: 9 })}</div>
+        <div class="code">${codeBlock(tsLines(f), { active: 14, selected: 9 })}</div>
         <div class="statusbar">
           <span class="sb-left"><b>main*</b><span class="sb-sep">|</span>0 errors<span class="sb-sep">|</span>1 warning</span>
           <span class="sb-right">TypeScript<span class="sb-sep">|</span>墨观 · ${f.meta.zh}<span class="sb-sep">|</span>UTF-8</span>
@@ -276,17 +279,17 @@ function terminalMock(f: Flavor) {
       <span class="terminal-badge">${f.meta.zh}</span>
     </div>
     <div class="terminal-body">
-      ${terminalLines.join('\n')}
+      ${terminalLines(f).join('\n')}
     </div>
   </div>`;
 }
 
-function diffMock() {
+function diffMock(f: Flavor) {
   return `
   <div class="mini-card diff">
     <div class="mini-title">theme.ts · diff</div>
     <div class="diff-body">
-      ${diffLines
+      ${diffLines(f)
         .map((line) => `<div class="diff-line ${line.kind}">${line.html}</div>`)
         .join('\n')}
     </div>
@@ -294,17 +297,18 @@ function diffMock() {
 }
 
 function markdownMock(f: Flavor) {
+  const keywordName = nameOf(f.syntax.keyword) ?? '传统色';
   return `
   <div class="mini-card markdown">
     <div class="mini-title">README.md · preview</div>
     <div class="md-body">
-      <h3>玄墨 Xuanmo</h3>
-      <p>以<strong>松烟墨</strong>为底，取<em>朱砂</em>为批；矿物颜料层层罩染，落在同一张宣纸上。</p>
+      <h3>${flavorName(f, 'zh')} ${flavorName(f, 'en')}</h3>
+      <p>${esc(f.meta.description.zh)}</p>
       <blockquote>「知其白，守其黑，为天下式。」</blockquote>
-      <p><code>named("海棠红")</code> → <code>${f.syntax.keyword}</code>，对比度 <strong>${formatRatio(
+      <p><code>named("${esc(keywordName)}")</code> → <code>${f.syntax.keyword}</code>，对比度 <strong>${formatRatio(
         contrast(f.syntax.keyword, f.surface.base),
       )}</strong>。</p>
-      <ul><li>关键字 · 朱批</li><li>字符串 · 铜绿</li><li>注释 · 螺甸紫</li></ul>
+      <ul><li>关键字 · ${esc(keywordName)}</li><li>字符串 · ${esc(nameOf(f.syntax.string) ?? '辅色')}</li><li>注释 · ${esc(nameOf(f.syntax.comment) ?? '弱化')}</li></ul>
     </div>
   </div>`;
 }
@@ -315,12 +319,13 @@ function flavorSection(f: Flavor) {
       .map((hex) => nameOf(hex))
       .filter((name): name is string => Boolean(name)),
   ).size;
+  const tone = f.meta.appearance === 'dark' ? 'DARK' : f.meta.family === 'sea' ? 'COOL LIGHT' : 'WARM LIGHT';
   return `
   <section class="flavor f-${f.meta.id}" style="${cssVars(f)}">
     <header class="flavor-head">
       <div>
-        <div class="eyebrow">${f.meta.appearance === 'dark' ? 'DARK' : 'WARM LIGHT'} · ${f.meta.en.toUpperCase()}</div>
-        <h2>${f.meta.zh}<span>${f.meta.en}</span></h2>
+        <div class="eyebrow">${tone}${f.meta.dimmed ? ' · DIMMED' : ''} · ${f.meta.en.toUpperCase()}</div>
+        <h2>${f.meta.zh}<span>${flavorName(f, 'en')}</span></h2>
         <p class="flavor-desc">${f.meta.description.zh}</p>
       </div>
       <div class="flavor-stat">
@@ -348,7 +353,7 @@ function flavorSection(f: Flavor) {
       ${editorMock(f)}
       <div class="showcase-side">
         ${terminalMock(f)}
-        ${diffMock()}
+        ${diffMock(f)}
         ${markdownMock(f)}
       </div>
     </div>
@@ -410,7 +415,7 @@ export function renderPreview(): string {
   .pill { border: 1px solid var(--page-line); color: var(--page-dim); border-radius: 999px; padding: 3px 12px; font-size: 12px; letter-spacing: .06em; }
   .pill b { color: var(--page-fg); font-weight: 500; }
 
-  .toolbar { display: flex; align-items: center; gap: 10px; margin: 0 0 30px; }
+  .toolbar { display: flex; align-items: center; gap: 10px; margin: 0 0 30px; flex-wrap: wrap; }
   .toolbar .label { color: var(--page-dim); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; margin-right: 6px; }
   .toolbar button {
     background: transparent; border: 1px solid var(--page-line); color: var(--page-dim);
@@ -420,10 +425,19 @@ export function renderPreview(): string {
   .toolbar button.on { background: #22212c; border-color: #3d3a4b; color: var(--page-fg); }
 
   .flavors { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
-  body[data-view="xuanmo"] .flavors { grid-template-columns: 1fr; max-width: 900px; margin: 0 auto; }
-  body[data-view="xuanzhi"] .flavors { grid-template-columns: 1fr; max-width: 900px; margin: 0 auto; }
-  body[data-view="xuanmo"] .f-xuanzhi { display: none; }
-  body[data-view="xuanzhi"] .f-xuanmo { display: none; }
+  .flavor-group { margin-bottom: 36px; }
+  .flavor-group:last-child { margin-bottom: 0; }
+  .group-label { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--page-dim); margin: 0 0 14px; }
+  .group-label span { color: var(--page-fg); margin-right: 10px; }
+  body:not([data-view="all"]) .flavor-group { margin-bottom: 0; }
+  body:not([data-view="all"]) .group-label { display: none; }
+  ${flavors
+    .map(
+      (f) => `  body[data-view="${f.meta.id}"] .flavors { grid-template-columns: 1fr; max-width: 900px; margin: 0 auto; }
+  body[data-view="${f.meta.id}"] .flavor { display: none; }
+  body[data-view="${f.meta.id}"] .f-${f.meta.id} { display: block; }`,
+    )
+    .join('\n')}
 
   .flavor {
     background: var(--bg); color: var(--fg);
@@ -576,8 +590,9 @@ export function renderPreview(): string {
     <div class="seal">墨</div>
     <div class="hero-copy">
       <h1>墨观 Inkstone<span>中国传统色彩主题</span></h1>
-      <p>从 526 个中国传统颜色中取色，以墨为底、以矿物颜料为彩。暗色「玄墨」与暖色「宣纸」共用同一套色相骨架，切换时像同一幅画换了光线。</p>
+      <p>从 526 个中国传统颜色中取色。墨纸组有玄墨 / 宣纸与各自的 Dimmed；海瓷组有沧海 / 青瓷。六个变体共用同一套色相骨架，切换时像同一幅画换了光线。</p>
       <div class="hero-meta">
+        <span class="pill"><b>6</b> 个变体</span>
         <span class="pill"><b>${totalNamed}</b> 种传统色</span>
         <span class="pill"><b>526</b> 色原始色板</span>
         <span class="pill">VS Code / Cursor</span>
@@ -591,13 +606,21 @@ export function renderPreview(): string {
   <div class="toolbar">
     <span class="label">Compare</span>
     <button data-filter="all" class="on">并排</button>
-    <button data-filter="xuanmo">只看玄墨</button>
-    <button data-filter="xuanzhi">只看宣纸</button>
+    ${flavors
+      .map((f) => `<button data-filter="${f.meta.id}">${flavorName(f, 'zh')}</button>`)
+      .join('\n    ')}
   </div>
 
-  <div class="flavors">
-    ${flavors.map(flavorSection).join('\n')}
-  </div>
+  ${flavorFamilies
+    .map(
+      (family) => `<div class="flavor-group">
+    <div class="group-label"><span>${family.zh}</span>${family.en.toUpperCase()}</div>
+    <div class="flavors">
+      ${family.flavors.map(flavorSection).join('\n')}
+    </div>
+  </div>`,
+    )
+    .join('\n')}
 
   <footer class="foot">
     <span>色值来源：zhongguose.com · 526 个中国传统颜色（作者 Perchouli）／同名 Figma 社区色谱</span>

@@ -8,7 +8,7 @@
 
 import { contrast, formatRatio, isValidHex, luminance, normalizeHex } from './color.ts';
 import { findByName, findByHex, traditionalColors } from './palette/data.ts';
-import { flavors } from './palette/index.ts';
+import { flavors, flavorName } from './palette/index.ts';
 import type { Flavor } from './palette/types.ts';
 
 interface Rule {
@@ -216,7 +216,7 @@ export function audit(options: { silent?: boolean } = {}): AuditReport {
       );
       const worst = [...textRows].sort((a, b) => a.ratio - b.ratio)[0];
       console.log(
-        `${bold(flavor.meta.zh)} ${gray(flavor.meta.en)}  ${gray(`${rows.length} checks`)}  ` +
+        `${bold(flavorName(flavor, 'zh'))} ${gray(flavorName(flavor, 'en'))}  ${gray(`${rows.length} checks`)}  ` +
           (failures.some((failure) => failure.flavor === flavor.meta.id) ? red('FAIL') : green('PASS')) +
           (worst ? gray(`  lowest text ${formatRatio(worst.ratio)} (${worst.label})`) : ''),
       );

@@ -1,8 +1,8 @@
 {
   "name": "inkstone",
   "displayName": "墨观 Inkstone · 中国传统色彩",
-  "description": "A traditional Chinese color theme for VS Code, Cursor and friends. Dark 玄墨 and warm paper 宣纸, built from the 526-color zhongguose palette.",
-  "version": "0.1.0",
+  "description": "A traditional Chinese color theme for VS Code, Cursor and friends. Ink-and-paper 玄墨 / 宣纸, their Dimmed variants, and the blue-green 沧海 / 青瓷, built from the 526-color zhongguose palette.",
+  "version": "0.3.0",
   "publisher": "moguan",
   "license": "MIT",
   "engines": {
@@ -15,7 +15,12 @@
     "theme",
     "dark theme",
     "light theme",
+    "dimmed",
+    "blue theme",
     "warm",
+    "cool",
+    "ocean",
+    "celadon",
     "chinese",
     "traditional chinese colors",
     "zhongguose",
@@ -23,6 +28,10 @@
     "inkstone",
     "moguan",
     "墨观",
+    "玄墨",
+    "宣纸",
+    "沧海",
+    "青瓷",
     "中国传统色",
     "国潮"
   ],
@@ -46,9 +55,29 @@
         "path": "./themes/xuanmo-color-theme.json"
       },
       {
+        "label": "墨观 · 玄墨 Dimmed (Inkstone Xuanmo Dimmed)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/xuanmo-dimmed-color-theme.json"
+      },
+      {
         "label": "墨观 · 宣纸 (Inkstone Xuanzhi)",
         "uiTheme": "vs",
         "path": "./themes/xuanzhi-color-theme.json"
+      },
+      {
+        "label": "墨观 · 宣纸 Dimmed (Inkstone Xuanzhi Dimmed)",
+        "uiTheme": "vs",
+        "path": "./themes/xuanzhi-dimmed-color-theme.json"
+      },
+      {
+        "label": "墨观 · 沧海 (Inkstone Canghai)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/canghai-color-theme.json"
+      },
+      {
+        "label": "墨观 · 青瓷 (Inkstone Qingci)",
+        "uiTheme": "vs",
+        "path": "./themes/qingci-color-theme.json"
       }
     ],
     "configurationDefaults": {

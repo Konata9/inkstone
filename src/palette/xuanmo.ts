@@ -16,6 +16,7 @@ export const xuanmo: Flavor = {
     zh: '玄墨',
     en: 'Xuanmo',
     appearance: 'dark',
+    family: 'ink',
     description: {
       zh: '以松烟墨为底，朱砂为批，矿物颜料层层罩染。',
       en: 'Pine-soot ink ground, cinnabar annotations, mineral pigments layered on top.',

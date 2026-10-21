@@ -6,7 +6,7 @@
  */
 
 import { alpha, mix } from '../color.ts';
-import { flavors } from '../palette/index.ts';
+import { flavors, flavorName } from '../palette/index.ts';
 import type { Flavor } from '../palette/types.ts';
 
 interface TokenSpec {
@@ -45,7 +45,7 @@ function lift(flavor: Flavor, color: string, amount = 0.14): string {
 }
 
 function shadow(flavor: Flavor, opacity: number): string {
-  return alpha(flavor.meta.appearance === 'dark' ? '#000000' : '#2a2723', opacity);
+  return alpha(flavor.meta.appearance === 'dark' ? '#000000' : flavor.text.primary, opacity);
 }
 
 function workbench(flavor: Flavor): Record<string, string> {
@@ -106,9 +106,9 @@ function workbench(flavor: Flavor): Record<string, string> {
     'editor.rangeHighlightBackground': alpha(y.keyword, 0.08),
     'editor.symbolHighlightBackground': alpha(y.function, 0.2),
     'editorLink.activeForeground': y.function,
-    'editorWhitespace.foreground': dark ? '#3a3646' : '#d9d0c1',
-    'editorIndentGuide.background1': dark ? '#262430' : '#e3dacb',
-    'editorIndentGuide.activeBackground1': dark ? '#3f3c4c' : '#c9bea9',
+    'editorWhitespace.foreground': b.normal,
+    'editorIndentGuide.background1': dark ? b.subtle : b.normal,
+    'editorIndentGuide.activeBackground1': b.strong,
     'editorRuler.foreground': b.subtle,
     'editorCodeLens.foreground': t.muted,
     'editorBracketMatch.background': alpha(y.keyword, 0.12),
@@ -824,9 +824,11 @@ function semanticColors(f: Flavor): ThemeFile['semanticTokenColors'] {
 }
 
 export function buildTheme(flavor: Flavor): ThemeFile {
+  const zh = flavorName(flavor, 'zh');
+  const en = flavorName(flavor, 'en');
   return {
     $schema: 'vscode://schemas/color-theme',
-    name: `墨观 · ${flavor.meta.zh} Inkstone ${flavor.meta.en}`,
+    name: flavor.meta.dimmed ? `墨观 · ${zh} (Inkstone ${en})` : `墨观 · ${zh} Inkstone ${en}`,
     type: flavor.meta.appearance,
     semanticHighlighting: true,
     colors: workbench(flavor),

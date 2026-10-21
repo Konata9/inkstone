@@ -1,5 +1,5 @@
 /**
- * Build every target from the two semantic palettes.
+ * Build every target from the six semantic palettes.
  *
  *   pnpm build
  *
@@ -7,6 +7,7 @@
  *   packages/vscode/themes/*.json
  *   dist/ghostty/Inkstone *
  *   dist/kaku/*.lua
+ *   dist/opencode/*.json
  *   preview/index.html
  *   docs/palette.md
  */
@@ -21,6 +22,7 @@ import { flavors } from './palette/index.ts';
 import { renderPaletteDoc } from './targets/docs.ts';
 import { generateGhostty } from './targets/ghostty.ts';
 import { generateKaku } from './targets/kaku.ts';
+import { generateOpencode } from './targets/opencode.ts';
 import { renderPreview } from './targets/preview.ts';
 import { generateVscode } from './targets/vscode.ts';
 
@@ -43,6 +45,7 @@ const files = [
   ...generateVscode(),
   ...generateGhostty(),
   ...generateKaku(),
+  ...generateOpencode(),
   { path: 'preview/index.html', content: renderPreview() },
   { path: 'docs/palette.md', content: renderPaletteDoc() },
 ];
@@ -56,5 +59,7 @@ for (const file of files) {
 
 console.log(
   `\nBuilt ${files.length} files for ${flavors.length} flavors ` +
-    `(${report.checks} contrast checks, 2 VS Code themes, 2 Ghostty themes, 2 Kaku schemes).\n`,
+    `(${report.checks} contrast checks, ${flavors.length} VS Code themes, ` +
+    `${flavors.length} Ghostty themes, ${flavors.length} Kaku schemes, ` +
+    `${flavors.length} OpenCode themes).\n`,
 );

@@ -16,6 +16,7 @@ export const xuanzhi: Flavor = {
     zh: '宣纸',
     en: 'Xuanzhi',
     appearance: 'light',
+    family: 'ink',
     description: {
       zh: '生宣的暖白底色，松烟写字，青绿设色。',
       en: 'Raw xuan paper, pine-soot ink, blue-green mineral washes.',

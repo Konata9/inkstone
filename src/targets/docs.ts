@@ -5,7 +5,7 @@
 
 import { contrast, formatRatio } from '../color.ts';
 import { nameOf, traditionalColors } from '../palette/data.ts';
-import { flavors } from '../palette/index.ts';
+import { flavorFamilies, flavorName, flavors } from '../palette/index.ts';
 import type { Flavor } from '../palette/types.ts';
 import { ANSI_NAMES } from '../palette/types.ts';
 
@@ -73,15 +73,15 @@ const statusLabels: Record<keyof Flavor['status'], string> = {
   renamed: '重命名',
 };
 
-const accentRows: Array<[string, keyof Flavor['syntax'], keyof Flavor['syntax']]> = [
-  ['关键字', 'keyword', 'keyword'],
-  ['函数', 'function', 'function'],
-  ['字符串', 'string', 'string'],
-  ['数字', 'number', 'number'],
-  ['类型', 'type', 'type'],
-  ['常量 / 正则', 'regexp', 'regexp'],
-  ['装饰器', 'decorator', 'decorator'],
-  ['标签', 'tag', 'tag'],
+const accentRows: Array<[string, keyof Flavor['syntax']]> = [
+  ['关键字', 'keyword'],
+  ['函数', 'function'],
+  ['字符串', 'string'],
+  ['数字', 'number'],
+  ['类型', 'type'],
+  ['常量 / 正则', 'regexp'],
+  ['装饰器', 'decorator'],
+  ['标签', 'tag'],
 ];
 
 function colorCell(hex: string): string {
@@ -105,11 +105,14 @@ function table(rows: Array<[string, string, number]>): string {
 
 function flavorSection(flavor: Flavor): string {
   const base = flavor.surface.base;
+  const appearance =
+    flavor.meta.appearance === 'dark' ? '暗色' : flavor.meta.family === 'sea' ? '冷色亮色' : '暖色亮色';
+  const variant = flavor.meta.dimmed ? '（Dimmed）' : '';
   const rows = (entries: Array<[string, string]>) =>
     entries.map(([label, hex]) => [label, hex, contrast(hex, base)] as [string, string, number]);
 
   return [
-    `## ${flavor.meta.zh} ${flavor.meta.en} · ${flavor.meta.appearance === 'dark' ? '暗色' : '暖色亮色'}`,
+    `## ${flavor.meta.zh} ${flavor.meta.en} · ${appearance}${variant}`,
     '',
     `> ${flavor.meta.description.zh}`,
     '',
@@ -149,8 +152,6 @@ function flavorSection(flavor: Flavor): string {
 }
 
 export function renderPaletteDoc(): string {
-  const [dark, light] = flavors as [Flavor, Flavor];
-
   return [
     '# 墨观 Inkstone · 色板',
     '',
@@ -164,21 +165,27 @@ export function renderPaletteDoc(): string {
     '',
     '## 设计原则',
     '',
-    '1. **以墨为底**：暗色画布沿用「暗龙胆紫」的色相压暗，亮色画布直接使用「鱼肚白」。',
-    '2. **以矿物颜料为彩**：关键字取朱砂系、字符串取铜绿、类型取姜黄或桔梗紫，颜色名称本身可追溯。',
-    '3. **同一骨架**：两个变体的色相顺序一致（红 → 蓝 → 绿 → 橙 → 黄 → 青 → 紫 → 绛），切换时只换光线。',
-    '4. **可读性优先**：正文 ≥ 7:1，语法色 ≥ 4.5:1，注释与标点 ≥ 3:1；终端黄色/白色按纸面特性单独放宽。',
+    '1. **三组光线**：墨纸组以墨与纸为底，海瓷组以深海与青瓷釉为底；Dimmed 是墨纸组的低饱和版本。',
+    '2. **以矿物颜料为彩**：关键字取朱砂系、字符串取铜绿或竹绿、类型取姜黄或桔梗紫，颜色名称本身可追溯。',
+    '3. **同一骨架**：六个变体的色相顺序一致（红 → 蓝 → 绿 → 橙 → 黄 → 青 → 紫 → 绛），切换时只换光线与饱和度。',
+    '4. **可读性优先**：正文 ≥ 7:1，语法色 ≥ 4.5:1，注释与标点 ≥ 3:1；终端黄色/白色按纸面特性单独放宽。Dimmed 不降低这套阈值。',
     '',
     '## 色相骨架',
     '',
-    '| 角色 | 玄墨 | 宣纸 |',
-    '| --- | --- | --- |',
-    ...accentRows.map(([label, darkKey, lightKey]) => {
-      const a = dark.syntax[darkKey];
-      const b = light.syntax[lightKey];
-      return `| ${label} | \`${a}\` ${nameOf(a) ?? '派生'} | \`${b}\` ${nameOf(b) ?? '派生'} |`;
-    }),
-    '',
+    ...flavorFamilies.flatMap((family) => [
+      `### ${family.zh} · ${family.en}`,
+      '',
+      `| 角色 | ${family.flavors.map((flavor) => flavorName(flavor, 'zh')).join(' | ')} |`,
+      `| --- | ${family.flavors.map(() => '---').join(' | ')} |`,
+      ...accentRows.map(([label, key]) => {
+        const cells = family.flavors.map((flavor) => {
+          const hex = flavor.syntax[key];
+          return `\`${hex}\` ${nameOf(hex) ?? '派生'}`;
+        });
+        return `| ${label} | ${cells.join(' | ')} |`;
+      }),
+      '',
+    ]),
     '## 审计阈值',
     '',
     '| 项目 | 最低对比度 |',

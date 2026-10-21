@@ -1,20 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Install the two Inkstone themes into Ghostty's user theme directory.
+# Install all six Inkstone themes into Ghostty's user theme directory.
 # Usage: pnpm install:ghostty
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 target="${XDG_CONFIG_HOME:-$HOME/.config}/ghostty/themes"
 
 mkdir -p "$target"
-cp "$root/dist/ghostty/Inkstone Xuanmo" "$target/"
-cp "$root/dist/ghostty/Inkstone Xuanzhi" "$target/"
+for name in \
+  "Inkstone Xuanmo" "Inkstone Xuanmo Dimmed" \
+  "Inkstone Xuanzhi" "Inkstone Xuanzhi Dimmed" \
+  "Inkstone Canghai" "Inkstone Qingci"; do
+  cp "$root/dist/ghostty/$name" "$target/"
+done
 
 echo "Installed to $target"
 echo
-echo "Add this line to ~/.config/ghostty/config:"
+echo "Add one of these lines to ~/.config/ghostty/config:"
 echo
 echo "  theme = light:Inkstone Xuanzhi,dark:Inkstone Xuanmo"
+echo "  theme = light:Inkstone Xuanzhi Dimmed,dark:Inkstone Xuanmo Dimmed"
+echo "  theme = light:Inkstone Qingci,dark:Inkstone Canghai"
 echo
 echo "Then reload Ghostty (Cmd+Shift+, on macOS)."

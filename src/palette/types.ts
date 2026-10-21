@@ -1,5 +1,8 @@
 export type Appearance = 'dark' | 'light';
 
+/** Grouping used by the docs and the preview page. */
+export type FlavorFamily = 'ink' | 'sea';
+
 export interface FlavorMeta {
   /** Stable id used for file names and CSS classes. */
   id: string;
@@ -8,6 +11,10 @@ export interface FlavorMeta {
   /** English flavor name, e.g. Xuanmo. */
   en: string;
   appearance: Appearance;
+  /** True for the low-saturation Dimmed variants. */
+  dimmed?: boolean;
+  /** Ink-and-paper family or the blue-green sea family. */
+  family: FlavorFamily;
   /** One-line description shown in docs and the preview. */
   description: { zh: string; en: string };
 }
@@ -106,8 +113,16 @@ export interface Flavor {
 export interface FlavorSet {
   /** Dark flavor. */
   xuanmo: Flavor;
+  /** Muted dark flavor. */
+  xuanmoDimmed: Flavor;
   /** Warm light flavor. */
   xuanzhi: Flavor;
+  /** Muted warm-light flavor. */
+  xuanzhiDimmed: Flavor;
+  /** Deep-sea dark flavor. */
+  canghai: Flavor;
+  /** Celadon light flavor. */
+  qingci: Flavor;
 }
 
 export const ANSI_NAMES = [
