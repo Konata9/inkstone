@@ -1,0 +1,34 @@
+{
+  "name": "inkstone",
+  "version": "0.1.0",
+  "private": true,
+  "description": "墨观 Inkstone — a traditional Chinese color theme for editors and terminals",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@10.18.3",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsx src/build.ts",
+    "validate": "tsx src/validate.ts",
+    "test": "pnpm validate",
+    "typecheck": "tsc --noEmit",
+    "preview": "pnpm build && open preview/index.html",
+    "package:vscode": "pnpm build && node scripts/package-vscode.mjs",
+    "install:ghostty": "pnpm build && bash scripts/install-ghostty.sh",
+    "install:kaku": "pnpm build && bash scripts/install-kaku.sh"
+  },
+  "devDependencies": {
+    "@types/luaparse": "^0.2.13",
+    "@types/node": "^22.10.2",
+    "luaparse": "^0.3.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

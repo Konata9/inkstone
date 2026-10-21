@@ -1,0 +1,61 @@
+{
+  "name": "inkstone",
+  "displayName": "墨观 Inkstone · 中国传统色彩",
+  "description": "A traditional Chinese color theme for VS Code, Cursor and friends. Dark 玄墨 and warm paper 宣纸, built from the 526-color zhongguose palette.",
+  "version": "0.1.0",
+  "publisher": "moguan",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Themes"
+  ],
+  "keywords": [
+    "theme",
+    "dark theme",
+    "light theme",
+    "warm",
+    "chinese",
+    "traditional chinese colors",
+    "zhongguose",
+    "ink",
+    "inkstone",
+    "moguan",
+    "墨观",
+    "中国传统色",
+    "国潮"
+  ],
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#14131a",
+    "theme": "dark"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Konata9/inkstone"
+  },
+  "bugs": {
+    "url": "https://github.com/Konata9/inkstone/issues"
+  },
+  "contributes": {
+    "themes": [
+      {
+        "label": "墨观 · 玄墨 (Inkstone Xuanmo)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/xuanmo-color-theme.json"
+      },
+      {
+        "label": "墨观 · 宣纸 (Inkstone Xuanzhi)",
+        "uiTheme": "vs",
+        "path": "./themes/xuanzhi-color-theme.json"
+      }
+    ],
+    "configurationDefaults": {
+      "editor.semanticHighlighting.enabled": true
+    }
+  },
+  "scripts": {
+    "package": "vsce package --no-dependencies"
+  }
+}
