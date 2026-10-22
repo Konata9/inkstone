@@ -1,7 +1,6 @@
 # Changelog
 
-## Unreleased
-
+## 0.3.2
 - **Palette comfort pass**: the audit now checks contrast bands and OKLCH chroma budgets, not just minimum ratios. Body text moves from 13.5–14.3:1 to ≈11.5:1, and syntax colors above 9:1 are brought back into range.
 - **Cinnabar, softened**: the red family keeps its traditional hue and lightness but drops to C≈0.165 (errors 0.18), so 海棠红 / 银朱 / 鹤顶红 / 尖晶玉红 read as pigment instead of neon. `soften()` records the source color for the docs.
 - **Cursor decoupled from keywords**: a new `text.cursor` token uses each flavor's cool interaction color (羽扇豆蓝 / 涧石蓝 / 玉鈫蓝) instead of the annotation red.
