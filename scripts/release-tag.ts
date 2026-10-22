@@ -12,11 +12,17 @@
  * `--tag "$GITHUB_REF_NAME"`.
  */
 
-import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { hasUnreleasedEntries, hasVersionSection } from './changelog.ts';
+import {
+  branchName,
+  git,
+  localTagExists,
+  remoteTagExists,
+  workingTreeStatus,
+} from './git.ts';
 import { findGeneratedDrift, readRootPkg, releaseTag, root } from './versioning.ts';
 
 const args = new Set(process.argv.slice(2));
@@ -28,14 +34,6 @@ function fail(message: string): never {
   process.exit(1);
 }
 
-function git(...command: string[]): string {
-  return execFileSync('git', command, {
-    cwd: root,
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe'],
-  }).trim();
-}
-
 function warn(message: string): void {
   console.warn(`  ! ${message}`);
 }
@@ -43,12 +41,12 @@ function warn(message: string): void {
 const version = String(readRootPkg().version);
 const tag = releaseTag(version);
 
-const status = git('status', '--porcelain');
+const status = workingTreeStatus();
 if (status.length > 0) {
   fail(`the working tree is not clean; commit or stash these changes first:\n\n${status}`);
 }
 
-const branch = git('rev-parse', '--abbrev-ref', 'HEAD');
+const branch = branchName();
 if (branch !== 'main' && !force) {
   fail(`refusing to tag on branch "${branch}"; switch to main or pass --force`);
 }
@@ -65,23 +63,15 @@ if (hasUnreleasedEntries(changelog)) {
   );
 }
 
-let localTagExists = false;
-try {
-  git('rev-parse', '--verify', '--quiet', `refs/tags/${tag}`);
-  localTagExists = true;
-} catch {
-  // Expected: the tag does not exist yet.
-}
-if (localTagExists) {
+if (localTagExists(tag)) {
   fail(`tag ${tag} already exists locally; bump the version or delete the old tag`);
 }
 
-try {
-  const remoteTag = git('ls-remote', '--tags', 'origin', `refs/tags/${tag}`);
-  if (remoteTag.length > 0) {
-    fail(`tag ${tag} already exists on origin; bump the version instead of reusing it`);
-  }
-} catch {
+const remoteTag = remoteTagExists(tag);
+if (remoteTag === true) {
+  fail(`tag ${tag} already exists on origin; bump the version instead of reusing it`);
+}
+if (remoteTag === undefined) {
   warn('could not query origin for existing tags; continuing (a push will still fail on a conflict)');
 }
 

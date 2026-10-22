@@ -44,8 +44,7 @@ import {
 } from '../src/targets/naming.ts';
 import { argValue } from './args.ts';
 import { extractReleaseNotes, hasUnreleasedEntries } from './changelog.ts';
-import { vsixFileName } from './packaging.ts';
-import type { PackageJson } from './packaging.ts';
+import { repoUrl, vsixFileName } from './packaging.ts';
 import {
   assertTagMatchesVersion,
   readRootPkg,
@@ -70,14 +69,6 @@ interface ThemeManifest {
 function fail(message: string): never {
   console.error(`\nRelease packaging failed: ${message}\n`);
   process.exit(1);
-}
-
-function repoUrl(pkg: PackageJson): string {
-  const raw = pkg.repository?.url ?? 'https://github.com/Konata9/inkstone';
-  return raw
-    .replace(/^git\+/, '')
-    .replace(/\.git$/, '')
-    .replace(/^git@github\.com:/, 'https://github.com/');
 }
 
 function assertFile(path: string): void {

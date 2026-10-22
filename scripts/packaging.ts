@@ -22,6 +22,15 @@ export function readJson<T>(path: string | URL): T {
   return JSON.parse(readFileSync(path, 'utf8')) as T;
 }
 
+/** Web URL for the repository, accepting the usual git remote spellings. */
+export function repoUrl(pkg: PackageJson): string {
+  const raw = pkg.repository?.url ?? 'https://github.com/Konata9/inkstone';
+  return raw
+    .replace(/^git\+/, '')
+    .replace(/\.git$/, '')
+    .replace(/^git@github\.com:/, 'https://github.com/');
+}
+
 /** VSIX asset name, e.g. `moguan.inkstone-0.3.1.vsix`. */
 export function vsixFileName(pkg: PackageJson): string {
   if (!pkg.publisher) throw new Error(`${pkg.name} has no publisher; cannot name the VSIX`);

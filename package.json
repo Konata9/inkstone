@@ -25,6 +25,7 @@
     "preview": "pnpm build && open preview/index.html",
     "package:vscode": "pnpm build && tsx scripts/package-vscode.ts",
     "package:release": "tsx scripts/package-release.ts",
+    "release": "tsx scripts/release.ts",
     "release:check": "tsx scripts/check-release.ts",
     "release:tag": "tsx scripts/release-tag.ts",
     "install:ghostty": "pnpm build && bash scripts/install-ghostty.sh",
