@@ -7,7 +7,7 @@
  */
 
 import { alpha, contrast, formatRatio, luminance } from '../color.ts';
-import { nameOf } from '../palette/data.ts';
+import { colorLabel, nameOf } from '../palette/data.ts';
 import { flavorFamilies, flavors, flavorName } from '../palette/index.ts';
 import type { Flavor } from '../palette/types.ts';
 import { ANSI_NAMES } from '../palette/types.ts';
@@ -41,6 +41,7 @@ function cssVars(f: Flavor): string {
     `--fg-3:${t.muted}`,
     `--fg-4:${t.faint}`,
     `--inverse:${t.inverse}`,
+    `--cursor:${t.cursor}`,
     `--kw:${y.keyword}`,
     `--st:${y.storage}`,
     `--fn:${y.function}`,
@@ -115,7 +116,7 @@ const terminalLines = (f: Flavor) => [
 ];
 
 function diffLines(f: Flavor) {
-  const keywordName = nameOf(f.syntax.keyword) ?? '传统色';
+  const keywordName = colorLabel(f.syntax.keyword) ?? '传统色';
   return [
     { kind: 'del', html: '<span class="sign">-</span> <span class="kw">const</span> <span class="var">canvas</span> = <span class="str">"#ffffff"</span>;' },
     { kind: 'add', html: `<span class="sign">+</span> <span class="kw">const</span> <span class="var">canvas</span> = <span class="str">"${f.surface.base}"</span>;` },
@@ -160,7 +161,7 @@ const accentRoles: Array<[keyof Flavor['syntax'], string, string]> = [
 ];
 
 function swatch(hex: string, label: string, sub: string) {
-  const name = nameOf(hex) ?? '派生色';
+  const name = colorLabel(hex) ?? '派生色';
   const ink = luminance(hex) > 0.42 ? '#2a2723' : '#f7f4ed';
   return (
     `<div class="chip">` +
@@ -188,6 +189,7 @@ function surfaces(f: Flavor) {
       ${swatch(t.primary, '正文', `${formatRatio(contrast(t.primary, s.base))}`)}
       ${swatch(t.secondary, '次要文字', `${formatRatio(contrast(t.secondary, s.base))}`)}
       ${swatch(t.muted, '弱化文字', `${formatRatio(contrast(t.muted, s.base))}`)}
+      ${swatch(t.cursor, '光标', `${formatRatio(contrast(t.cursor, s.base))}`)}
     </div>`;
 }
 
@@ -297,7 +299,7 @@ function diffMock(f: Flavor) {
 }
 
 function markdownMock(f: Flavor) {
-  const keywordName = nameOf(f.syntax.keyword) ?? '传统色';
+  const keywordName = colorLabel(f.syntax.keyword) ?? '传统色';
   return `
   <div class="mini-card markdown">
     <div class="mini-title">README.md · preview</div>
@@ -543,7 +545,7 @@ export function renderPreview(): string {
   .t-green { color: var(--ansi-2); }
   .t-blue { color: var(--ansi-4); }
   .t-str { color: var(--ansi-6); }
-  .cursor { display: inline-block; width: 7px; height: 13px; background: var(--kw); vertical-align: -2px; animation: blink 1.2s steps(1) infinite; }
+  .cursor { display: inline-block; width: 7px; height: 13px; background: var(--cursor); vertical-align: -2px; animation: blink 1.2s steps(1) infinite; }
   @keyframes blink { 50% { opacity: 0; } }
 
   .mini-card { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--bg); }

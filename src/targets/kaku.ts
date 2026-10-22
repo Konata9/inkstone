@@ -52,9 +52,9 @@ return {
   foreground = ${quote(t.primary)},
   background = ${quote(s.base)},
 
-  cursor_bg = ${quote(y.keyword)},
+  cursor_bg = ${quote(t.cursor)},
   cursor_fg = ${quote(s.base)},
-  cursor_border = ${quote(y.keyword)},
+  cursor_border = ${quote(t.cursor)},
 
   selection_bg = ${quote(s.selection)},
   selection_fg = ${quote(t.primary)},

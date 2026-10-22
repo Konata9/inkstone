@@ -59,7 +59,7 @@ for (const file of files) {
 
 console.log(
   `\nBuilt ${files.length} files for ${flavors.length} flavors ` +
-    `(${report.checks} contrast checks, ${flavors.length} VS Code themes, ` +
+    `(${report.checks} palette checks, ${flavors.length} VS Code themes, ` +
     `${flavors.length} Ghostty themes, ${flavors.length} Kaku schemes, ` +
     `${flavors.length} OpenCode themes).\n`,
 );

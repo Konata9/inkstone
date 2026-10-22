@@ -12,14 +12,14 @@ Six variants share one hue skeleton, so switching feels like the same painting u
 
 | Variant | Mode | Canvas | Keywords | Strings | Types |
 | --- | --- | --- | --- | --- | --- |
-| **玄墨 Xuanmo** | Dark | `#14131a` | 海棠红 `#f03752` | 铜绿 `#2bae85` | 姜黄 `#e2c027` |
-| **玄墨 Dimmed** | Dark | `#1b1a20` | 山黎豆红 `#c27c88` | 松霜绿 `#83a78d` | 土黄 `#d6a01d` |
-| **宣纸 Xuanzhi** | Light | `#f7f4ed` | 鹤顶红 `#d42517` | 荷叶绿 `#1a6840` | 桔梗紫 `#813c85` |
-| **宣纸 Dimmed** | Light | `#e9e2d4` | 石板灰 `#624941` | 绿灰 `#314a43` | 紫灰 `#5d3f51` |
-| **沧海 Canghai** | Dark | `#0d1822` | 银朱 `#f43e06` | 竹绿 `#1ba784` | 淡牵牛紫 `#d1c2d3` |
-| **青瓷 Qingci** | Light | `#e8f0ec` | 尖晶玉红 `#cc163a` | 荷叶绿 `#1a6840` | 桔梗紫 `#813c85` |
+| **玄墨 Xuanmo** | Dark | `#14131a` | 海棠红 · softened `#da5761` | 铜绿 `#2bae85` | 土黄 `#d6a01d` |
+| **玄墨 Dimmed** | Dark | `#19181e` | 山黎豆红 `#c27c88` | 梧枝绿 `#69a794` | 土黄 `#d6a01d` |
+| **宣纸 Xuanzhi** | Light | `#f7f4ed` | 鹤顶红 · softened `#c34435` | 荷叶绿 `#1a6840` | 桔梗紫 `#813c85` |
+| **宣纸 Dimmed** | Light | `#e9e2d4` | 烟红 `#894e54` | 荷叶绿 `#1a6840` | 野菊紫 `#525288` |
+| **沧海 Canghai** | Dark | `#0d1822` | 银朱 · softened `#dc5e41` | 竹绿 `#1ba784` | 萝兰紫 `#c08eaf` |
+| **青瓷 Qingci** | Light | `#e8f0ec` | 尖晶玉红 · softened `#bc3a46` | 荷叶绿 `#1a6840` | 桔梗紫 `#813c85` |
 
-- **墨与纸** — 玄墨 uses pine-soot ink and cinnabar annotations; 宣纸 uses raw xuan paper and mineral pigments. The Dimmed variants lower saturation without lowering contrast floors.
+- **墨与纸** — 玄墨 uses pine-soot ink and cinnabar annotations; 宣纸 uses raw xuan paper and mineral pigments. The Dimmed variants lower the ambient light while keeping ink at ≥10.5:1 and pigments recognisable.
 - **海与瓷** — 沧海 takes deep-sea twilight and blue-green minerals; 青瓷 takes moon-white celadon glaze and grey ink.
 - Every variant includes full workbench colors, TextMate scopes, semantic tokens and a matching terminal ANSI palette.
 
@@ -45,9 +45,10 @@ Works in VS Code 1.85+, Cursor, Windsurf, VSCodium and other VS Code-compatible 
 
 ## Design notes
 
-- **Contrast is audited at build time** — body text ≥ 7:1, syntax and comments ≥ 4.5:1. All six variants pass the same thresholds; 480 checks per build.
+- **Contrast is a band, not a floor** — body text 10.5–12.5:1, syntax 4.5–9:1. All six variants pass the same 846 checks, including OKLCH chroma budgets.
+- **Cinnabar without the glare** — print-ink reds keep their hue and lightness but drop to C≈0.165, so they read as pigment rather than neon. The caret uses the cool interaction color instead.
 - **No visual noise** — comments stay upright, there are no gradients, no glass effects and no italic comments.
-- **Traditional colors are traceable** — accents keep their original zhongguose hex where possible; derived neutrals are documented in the [palette reference](https://github.com/Konata9/inkstone/blob/main/docs/palette.md).
+- **Traditional colors are traceable** — accents keep their original zhongguose hex where possible; softened pigments and derived neutrals are documented in the [palette reference](https://github.com/Konata9/inkstone/blob/main/docs/palette.md).
 - **One skeleton, six lights** — hue order stays the same across variants (cinnabar → blue → green → orange → purple → cyan → crimson).
 
 ## Links

@@ -7,7 +7,7 @@
  * rest of the set.
  */
 
-import { named } from './data.ts';
+import { named, soften } from './data.ts';
 import type { Flavor } from './types.ts';
 
 export const qingci: Flavor = {
@@ -32,7 +32,7 @@ export const qingci: Flavor = {
     sunken: '#f2f8f4',
     input: '#edf4ef',
     // 海青 thinned into the glaze.
-    selection: '#cbdcd2',
+    selection: '#c7d9cf',
     selectionInactive: '#dfe9e2',
     hover: '#e2ebe5',
     active: '#d7e2da',
@@ -52,15 +52,17 @@ export const qingci: Flavor = {
     muted: '#5f6b67',
     faint: '#7d8983',
     inverse: '#f2f8f4',
+    cursor: named('玉鈫蓝'),
   },
 
   syntax: {
     // 战舰灰 — the dimmest note that still clears 4.5:1 on glaze.
     comment: named('战舰灰'),
-    keyword: named('尖晶玉红'),
-    storage: named('尖晶玉红'),
+    // 尖晶玉红 kept as the seal, compressed to screen chroma.
+    keyword: soften('尖晶玉红', 0.165),
+    storage: soften('尖晶玉红', 0.165),
     function: named('玉鈫蓝'),
-    method: named('苍蓝'),
+    method: named('海涛蓝'),
     string: named('荷叶绿'),
     number: named('驼色'),
     boolean: named('驼色'),
@@ -70,8 +72,8 @@ export const qingci: Flavor = {
     parameter: named('紫灰'),
     property: '#3f4a46',
     operator: '#5f6b67',
-    punctuation: '#74817b',
-    decorator: named('龙睛鱼紫'),
+    punctuation: '#6a7771',
+    decorator: named('紫灰'),
     tag: named('芓紫'),
     attribute: named('潭水绿'),
     regexp: named('苍蓝'),
@@ -93,7 +95,7 @@ export const qingci: Flavor = {
 
   ansi: [
     '#4f5b5a', // black
-    named('尖晶玉红'), // red
+    soften('尖晶玉红', 0.18), // red
     named('荷叶绿'), // green
     named('驼色'), // yellow
     named('玉鈫蓝'), // blue

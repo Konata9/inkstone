@@ -2,12 +2,13 @@
  * 玄墨 Xuanmo — the dark flavor.
  *
  * The canvas is a deep ink black with a violet cast, picked by extending the
- * hue of 暗龙胆紫 (#22202e) down in lightness. Every accent below is an exact
- * value from the 526-color traditional palette; the only derived colors are
- * the neutral UI shades and a handful of dimmed foregrounds, marked as such.
+ * hue of 暗龙胆紫 (#22202e) down in lightness. Accents are exact values from
+ * the 526-color traditional palette, except where a pigment is chroma-
+ * compressed for screen comfort (`soften`): those keep the source's hue and
+ * lightness and are documented as 「降彩」.
  */
 
-import { named } from './data.ts';
+import { named, soften } from './data.ts';
 import type { Flavor } from './types.ts';
 
 export const xuanmo: Flavor = {
@@ -32,7 +33,7 @@ export const xuanmo: Flavor = {
     sunken: '#0f0e14',
     input: '#1e1d27',
     // A wash of 青莲 thinned into the ink.
-    selection: '#3b3752',
+    selection: '#332f46',
     selectionInactive: '#2a2836',
     hover: '#24222e',
     active: '#302e3c',
@@ -46,56 +47,62 @@ export const xuanmo: Flavor = {
   },
 
   text: {
-    // 宣纸 white pulled slightly warm so long sessions stay soft.
-    primary: '#e8e2d6',
-    secondary: '#b8b0a3',
-    muted: '#918a9e',
+    // 宣纸 white pulled slightly warm, then held inside the 10.5–12.5:1 band:
+    // bright enough to read, soft enough to stare at for a whole day.
+    primary: '#d4cec4',
+    secondary: '#ada599',
+    muted: '#8b8597',
     faint: '#6f6979',
     inverse: '#14131a',
+    // 羽扇豆蓝 — a cool caret keeps the blinking element away from the
+    // annotation red without becoming a second syntax colour.
+    cursor: named('羽扇豆蓝'),
   },
 
   syntax: {
     // 螺甸紫 — the muted violet of inlaid shell, used for prose annotations.
     // Lightened from #74759b to keep comments above 4.5:1 on the ink canvas.
     comment: '#85809e',
-    keyword: named('海棠红'),
-    storage: named('海棠红'),
+    // 海棠红 is a print-ink red; keep its hue and lightness, compress the
+    // chroma so it reads as pigment instead of neon on a dark canvas.
+    keyword: soften('海棠红', 0.165),
+    storage: soften('海棠红', 0.165),
     function: named('羽扇豆蓝'),
     method: named('晴山蓝'),
     string: named('铜绿'),
     number: named('杏黄'),
     boolean: named('杏黄'),
-    type: named('姜黄'),
+    type: named('土黄'),
     constant: named('杏黄'),
-    variable: '#e8e2d6', // 宣纸 white
-    parameter: named('凤信紫'),
-    property: '#d8d1c4', // 宣纸 white, dimmed
-    operator: '#a9a2b6',
+    variable: '#d4cec4', // 宣纸 white, softened
+    parameter: named('萝兰紫'),
+    property: '#c9c3b9', // 宣纸 white, dimmed
+    operator: '#9a94a4',
     punctuation: '#8f899e',
-    decorator: named('凤信紫'),
-    tag: named('山茶红'),
-    attribute: named('姜黄'),
+    decorator: named('萝兰紫'),
+    tag: soften('山茶红', 0.165),
+    attribute: named('土黄'),
     regexp: named('石绿'),
     escape: named('石绿'),
-    // 银朱, the classic vermilion pigment.
-    invalid: named('银朱'),
+    // 银朱, the classic vermilion pigment — the one role allowed to shout.
+    invalid: soften('银朱', 0.18),
     deprecated: '#8a8175',
   },
 
   status: {
-    error: named('银朱'),
+    error: soften('银朱', 0.18),
     warning: named('杏黄'),
     info: named('羽扇豆蓝'),
     success: named('铜绿'),
-    modified: named('姜黄'),
+    modified: named('土黄'),
     added: named('铜绿'),
-    deleted: named('海棠红'),
+    deleted: soften('海棠红', 0.165),
     renamed: named('羽扇豆蓝'),
   },
 
   ansi: [
     '#3a3646', // black (lifted so it is visible on the ink canvas)
-    named('海棠红'), // red
+    soften('海棠红', 0.18), // red
     named('铜绿'), // green
     named('姜黄'), // yellow
     named('羽扇豆蓝'), // blue
@@ -103,7 +110,7 @@ export const xuanmo: Flavor = {
     named('石绿'), // cyan
     '#cfc8bb', // white
     '#6b6478', // bright black
-    named('山茶红'), // bright red
+    soften('山茶红', 0.18), // bright red
     named('蛙绿'), // bright green
     named('秋葵黄'), // bright yellow
     named('晴山蓝'), // bright blue

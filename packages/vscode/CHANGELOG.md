@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Softer body-text contrast and OKLCH chroma limits: no more neon cinnabar, no more 14:1 glare.
+- Insertion caret now uses the flavor's cool interaction color instead of the keyword red.
+- Dimmed variants deepen the canvas instead of washing it grey; ink stays at ≥10.5:1 and pigments keep their hue.
+
 ## 0.3.0
 
 - New blue-green family: **沧海 Canghai** (dark) and **青瓷 Qingci** (cool light), inspired by 青绿山水, 海青 / 霁青 and celadon glaze.

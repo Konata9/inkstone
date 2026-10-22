@@ -56,6 +56,8 @@ export interface TextTokens {
   faint: string;
   /** Text drawn on top of a strong accent. */
   inverse: string;
+  /** Caret / terminal cursor: an interaction color, never the annotation red. */
+  cursor: string;
 }
 
 export interface SyntaxTokens {

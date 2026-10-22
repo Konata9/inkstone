@@ -7,7 +7,7 @@
  * are deliberately darkened here: on paper, "bright" must mean readable.
  */
 
-import { named } from './data.ts';
+import { named, soften } from './data.ts';
 import type { Flavor } from './types.ts';
 
 export const xuanzhi: Flavor = {
@@ -46,20 +46,23 @@ export const xuanzhi: Flavor = {
   },
 
   text: {
-    // 松烟墨.
-    primary: '#2a2723',
+    // 松烟墨, held at ~11.5:1 instead of packed to the maximum.
+    primary: '#35322d',
     secondary: '#5b564c',
     muted: '#746b5e',
     faint: '#8f8577',
     inverse: '#f7f4ed',
+    // 玉鈫蓝 — the cool interaction colour, not the annotation red.
+    cursor: named('玉鈫蓝'),
   },
 
   syntax: {
     // 垩灰, cooled and darkened one step so comments read as pencil notes
     // and stay clear of 苍黄 (decorators) on paper.
     comment: '#65706f',
-    keyword: named('鹤顶红'),
-    storage: named('鹤顶红'),
+    // 鹤顶红 kept, chroma compressed: still the seal red, no longer a siren.
+    keyword: soften('鹤顶红', 0.165),
+    storage: soften('鹤顶红', 0.165),
     function: named('飞燕草蓝'),
     method: named('品蓝'),
     string: named('荷叶绿'),
@@ -67,34 +70,34 @@ export const xuanzhi: Flavor = {
     boolean: named('蟹蝥红'),
     type: named('桔梗紫'),
     constant: named('蟹蝥红'),
-    variable: '#2a2723', // 松烟墨
+    variable: '#35322d', // 松烟墨, softened
     parameter: named('桔梗紫'),
     property: '#4b463d',
     operator: '#6b6459',
-    punctuation: '#857c6d',
+    punctuation: '#7b7365',
     decorator: named('苍黄'),
-    tag: named('玫瑰紫'),
+    tag: soften('玫瑰紫', 0.165),
     attribute: named('苍黄'),
     regexp: named('玉鈫蓝'),
     escape: named('玉鈫蓝'),
-    invalid: named('尖晶玉红'),
+    invalid: soften('尖晶玉红', 0.18),
     deprecated: '#8f8577',
   },
 
   status: {
-    error: named('尖晶玉红'),
+    error: soften('尖晶玉红', 0.18),
     warning: named('蟹蝥红'),
     info: named('飞燕草蓝'),
     success: named('荷叶绿'),
     modified: named('苍黄'),
     added: named('荷叶绿'),
-    deleted: named('尖晶玉红'),
+    deleted: soften('尖晶玉红', 0.165),
     renamed: named('飞燕草蓝'),
   },
 
   ansi: [
     '#5b564c', // black
-    named('鹤顶红'), // red
+    soften('鹤顶红', 0.18), // red
     named('荷叶绿'), // green
     named('苍黄'), // yellow
     named('飞燕草蓝'), // blue
@@ -102,7 +105,7 @@ export const xuanzhi: Flavor = {
     named('玉鈫蓝'), // cyan
     '#8b8172', // white
     '#a1988a', // bright black
-    named('尖晶玉红'), // bright red
+    soften('尖晶玉红', 0.18), // bright red
     named('薄荷绿'), // bright green
     named('山鸡黄'), // bright yellow (darkened: paper needs dark "brights")
     named('品蓝'), // bright blue

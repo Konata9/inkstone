@@ -23,7 +23,7 @@ export function buildGhosttyTheme(flavor: Flavor): string {
     '',
     `background = ${f.surface.base}`,
     `foreground = ${f.text.primary}`,
-    `cursor-color = ${f.syntax.keyword}`,
+    `cursor-color = ${f.text.cursor}`,
     `cursor-text = ${f.surface.base}`,
     `selection-background = ${f.surface.selection}`,
     `selection-foreground = ${f.text.primary}`,

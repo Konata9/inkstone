@@ -14,23 +14,25 @@ A traditional Chinese color theme for editors and terminals, built from the 526-
 
 | 变体 | 气质 | 画布 | 关键字 | 字符串 | 类型 |
 | --- | --- | --- | --- | --- | --- |
-| **玄墨 Xuanmo**（暗） | 松烟墨底，朱砂批注 | `#14131a` | 海棠红 `#f03752` | 铜绿 `#2bae85` | 姜黄 `#e2c027` |
-| **玄墨 Dimmed**（暗） | 淡墨灰底，低饱和矿物色 | `#1b1a20` | 山黎豆红 `#c27c88` | 松霜绿 `#83a78d` | 土黄 `#d6a01d` |
-| **宣纸 Xuanzhi**（暖亮） | 生宣暖白，赭石花青 | `#f7f4ed` | 鹤顶红 `#d42517` | 荷叶绿 `#1a6840` | 桔梗紫 `#813c85` |
-| **宣纸 Dimmed**（暖亮） | 陈纸暖灰，褪色颜料 | `#e9e2d4` | 石板灰 `#624941` | 绿灰 `#314a43` | 紫灰 `#5d3f51` |
+| **玄墨 Xuanmo**（暗） | 松烟墨底，朱砂批注 | `#14131a` | 海棠红 · 降彩 `#da5761` | 铜绿 `#2bae85` | 土黄 `#d6a01d` |
+| **玄墨 Dimmed**（暗） | 深墨夜色，矿物色低一度 | `#19181e` | 山黎豆红 `#c27c88` | 梧枝绿 `#69a794` | 土黄 `#d6a01d` |
+| **宣纸 Xuanzhi**（暖亮） | 生宣暖白，赭石花青 | `#f7f4ed` | 鹤顶红 · 降彩 `#c34435` | 荷叶绿 `#1a6840` | 桔梗紫 `#813c85` |
+| **宣纸 Dimmed**（暖亮） | 陈纸暖灰，深墨旧色 | `#e9e2d4` | 烟红 `#894e54` | 荷叶绿 `#1a6840` | 野菊紫 `#525288` |
 
 ### 海与瓷
 
 | 变体 | 气质 | 画布 | 关键字 | 字符串 | 类型 |
 | --- | --- | --- | --- | --- | --- |
-| **沧海 Canghai**（暗） | 深海暮色，青绿矿物 | `#0d1822` | 银朱 `#f43e06` | 竹绿 `#1ba784` | 淡牵牛紫 `#d1c2d3` |
-| **青瓷 Qingci**（亮） | 月白釉底，青灰题字 | `#e8f0ec` | 尖晶玉红 `#cc163a` | 荷叶绿 `#1a6840` | 桔梗紫 `#813c85` |
+| **沧海 Canghai**（暗） | 深海暮色，青绿矿物 | `#0d1822` | 银朱 · 降彩 `#dc5e41` | 竹绿 `#1ba784` | 萝兰紫 `#c08eaf` |
+| **青瓷 Qingci**（亮） | 月白釉底，青灰题字 | `#e8f0ec` | 尖晶玉红 · 降彩 `#bc3a46` | 荷叶绿 `#1a6840` | 桔梗紫 `#813c85` |
 
 - 墨纸组关键字用**朱批红**，呼应古籍朱笔批注；海瓷组把银朱 / 尖晶玉红当作釉面上的印章。
 - 海瓷组取青绿山水的矿物色：霁青、海青、竹绿、石绿，配少量暖色反光。
-- Dimmed 只用于墨纸组：降低饱和度、柔化画布，**不放宽可读性**，正文仍 ≥ 7:1，语法色与注释 ≥ 4.5:1。
-- 强调色尽量保留传统色原值；中性表面与个别弱化前景做了明度延展，全部标注在 [色板文档](docs/palette.md)。
-- 480 项 WCAG 对比度检查，六个变体执行同一套阈值。
+- 朱砂系保留传统色相与明度，只把彩度压到屏幕友好的范围，标注为「降彩」；错误态保留更高一档彩度。
+- Dimmed 只用于墨纸组：**降环境光，不降墨色**。画布更沉、墨色仍 ≥ 10.5:1，强调色保留可辨识的色相（C ≥ 0.045），避免褪成灰雾。
+- 光标改用各变体的冷色交互色（羽扇豆蓝 / 涧石蓝 / 玉鈫蓝），不再复用关键字红。
+- 强调色尽量保留传统色原值；中性表面、弱化前景与降彩颜料均在 [色板文档](docs/palette.md) 中标注。
+- 846 项检查：对比度上下限 + OKLCH 彩度带，六个变体执行同一套阈值。
 
 ## 安装
 
@@ -204,16 +206,18 @@ pnpm typecheck
 pnpm preview      # 构建并在浏览器打开预览页
 ```
 
-生成器保证各端一致：改一处色板，VS Code、Ghostty、Kaku、OpenCode 同时更新。构建会拒绝低于对比度阈值的配色。
+生成器保证各端一致：改一处色板，VS Code、Ghostty、Kaku、OpenCode 同时更新。构建会拒绝落在对比度区间或彩度预算之外的配色。
 
 发布流程（tag → GitHub Release）见 [docs/releasing.md](docs/releasing.md)。VS Code Marketplace 的上架文案与发布物见 [docs/marketplace.md](docs/marketplace.md)。
 
 ### 设计约束
 
-1. **三组光线**：墨纸组以墨与纸为底，Dimmed 抬到淡墨灰 / 压成陈纸色；海瓷组以深海与青瓷釉为底。
-2. **传统色可追溯**：`nameOf()` 能把每个色值反查回传统色名，`docs/palette.md` 自动列出。
-3. **同一骨架**：六个变体的色相顺序一致（朱 → 蓝 → 绿 → 橙 → 紫 → 青 → 绛），切换只换光线与饱和度。
-4. **不做花活**：无渐变、无斜体注释、无玻璃拟态；只做耐看的纸墨与海色。
+1. **三组光线**：墨纸组以墨与纸为底，Dimmed 把灯调暗而不是蒙灰；海瓷组以深海与青瓷釉为底。
+2. **对比度是区间**：正文 10.5–12.5:1、语法色 4.5–9:1；过低伤可读性，过高伤耐受度。
+3. **彩度有预算**：朱砂系 C ≤ 0.175，其余强调色 C ≤ 0.175，光标 C ≤ 0.105；超出时保留色相与明度、只压彩度。
+4. **传统色可追溯**：`nameOf()` 反查原值，降彩颜料通过 `soften()` 记录来源，`docs/palette.md` 自动列出。
+5. **同一骨架**：六个变体的色相顺序一致（朱 → 蓝 → 绿 → 橙 → 紫 → 青 → 绛），切换只换光线与饱和度。
+6. **不做花活**：无渐变、无斜体注释、无玻璃拟态；只做耐看的纸墨与海色。
 
 ## 许可与致谢
 
@@ -229,12 +233,12 @@ pnpm preview      # 构建并在浏览器打开预览页
 **Inkstone (墨观)** is a traditional Chinese color theme for VS Code-likes and terminals. It takes its accents from the 526-color `zhongguose` palette: cinnabar for keywords, verdigris for strings, turmeric for types, and layered ink neutrals.
 
 - **Xuanmo (玄墨)** — dark, pine-soot ink and cinnabar annotations.
-- **Xuanmo Dimmed** — dark, pale ink grey and low-saturation pigments; the same contrast floors.
+- **Xuanmo Dimmed** — dark, lower ambient light with pigments that keep their hue; ink still clears 10.5:1.
 - **Xuanzhi (宣纸)** — warm light, raw xuan paper and mineral pigments.
-- **Xuanzhi Dimmed** — warm light, aged paper and faded pigments; the same contrast floors.
+- **Xuanzhi Dimmed** — warm light, aged paper and deeper ink; faded pigments, not grey ones.
 - **Canghai (沧海)** — deep-sea twilight, blue-green minerals and a cinnabar seal.
 - **Qingci (青瓷)** — cool light, moon-white celadon glaze and grey ink.
 
 Install the VSIX from `dist/`, or install the Ghostty / Kaku / OpenCode themes with the scripts above. The same Lua scheme also works in WezTerm.
 
-Built with a generator: one semantic palette produces the VS Code themes, the Ghostty themes and the terminal ANSI schemes, and the build fails if any token drops below its contrast floor.
+Built with a generator: one semantic palette produces the VS Code themes, the Ghostty themes and the terminal ANSI schemes, and the build fails if any token leaves its contrast band or OKLCH chroma budget.

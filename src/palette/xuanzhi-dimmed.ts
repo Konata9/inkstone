@@ -1,9 +1,10 @@
 /**
  * 宣纸 Dimmed — the muted warm-light flavor.
  *
- * Raw xuan paper aged into a tea-stained off-white, with pigments that have
- * faded one step. The canvas is darker than 宣纸 and the accents are quieter,
- * but the palette still clears the same WCAG floors as the standard flavors.
+ * Raw xuan paper aged into a tea-stained off-white, with ink that is deeper
+ * rather than greyer. Pigments keep their hue identity instead of fading toward
+ * neutral, so the page reads as old paper under warm light, not a sheet of frosted glass.
+ * Body text clears 10.5:1; the audited comfort ceilings apply unchanged.
  */
 
 import { named } from './data.ts';
@@ -18,8 +19,8 @@ export const xuanzhiDimmed: Flavor = {
     dimmed: true,
     family: 'ink',
     description: {
-      zh: '陈纸暖灰，旧色未褪；比生宣低一档亮度。',
-      en: 'Aged xuan paper and faded mineral pigments, one stop softer than raw paper.',
+      zh: '陈纸暖灰，墨色更深；比生宣低一档亮度。',
+      en: 'Aged xuan paper and deeper ink, one stop softer than raw paper.',
     },
   },
 
@@ -46,32 +47,35 @@ export const xuanzhiDimmed: Flavor = {
   },
 
   text: {
-    // 松烟墨, softened for long sessions on darker paper.
-    primary: '#3a352e',
-    secondary: '#5f594f',
-    muted: '#686154',
-    faint: '#867e70',
+    // 松烟墨, deepened: aged paper gets darker ink, not a grey wash.
+    primary: '#2f2b25',
+    secondary: '#4f4a40',
+    muted: '#665f53',
+    faint: '#847c6e',
     inverse: '#f3eee3',
+    cursor: named('玉鈫蓝'),
   },
 
   syntax: {
     // 鼠背灰 — the dimmest note that still clears 4.5:1 on aged paper.
     comment: named('鼠背灰'),
-    keyword: named('石板灰'),
-    storage: named('石板灰'),
-    function: named('鲸鱼灰'),
-    method: named('战舰灰'),
-    string: named('绿灰'),
+    // Faded pigments, not grey pigments: every hue keeps enough chroma to
+    // stay recognisable through the dimmed light.
+    keyword: named('烟红'),
+    storage: named('烟红'),
+    function: named('鷃蓝'),
+    method: named('海涛蓝'),
+    string: named('荷叶绿'),
     number: named('驼色'),
     boolean: named('驼色'),
-    type: named('紫灰'),
+    type: named('野菊紫'),
     constant: named('潭水绿'),
-    variable: '#3a352e', // 松烟墨, softened
+    variable: '#2f2b25', // 松烟墨, deepened
     parameter: named('紫灰'),
     property: '#4f4a41',
     operator: '#6b6458',
-    punctuation: '#7d7567',
-    decorator: named('龙睛鱼紫'),
+    punctuation: '#736c5f',
+    decorator: named('芓紫'),
     tag: named('芓紫'),
     attribute: named('潭水绿'),
     regexp: named('苍蓝'),
@@ -82,27 +86,27 @@ export const xuanzhiDimmed: Flavor = {
 
   status: {
     error: named('殷红'),
-    warning: named('蟹蝥红'),
-    info: named('鲸鱼灰'),
-    success: named('绿灰'),
+    warning: named('淡豆沙'),
+    info: named('鷃蓝'),
+    success: named('荷叶绿'),
     modified: named('驼色'),
-    added: named('绿灰'),
+    added: named('荷叶绿'),
     deleted: named('殷红'),
-    renamed: named('鲸鱼灰'),
+    renamed: named('鷃蓝'),
   },
 
   ansi: [
     '#5f594f', // black
-    named('玫瑰灰'), // red
-    named('绿灰'), // green
+    named('烟红'), // red
+    named('荷叶绿'), // green
     named('驼色'), // yellow
-    named('鲸鱼灰'), // blue
-    named('紫灰'), // magenta
-    named('战舰灰'), // cyan
+    named('鷃蓝'), // blue
+    named('芓紫'), // magenta
+    named('苍蓝'), // cyan
     '#8f8778', // white
     '#a59c8d', // bright black
     named('殷红'), // bright red
-    named('荷叶绿'), // bright green
+    named('薄荷绿'), // bright green
     '#b5851f', // bright yellow (darkened: paper needs dark "brights")
     named('玉鈫蓝'), // bright blue
     named('芓紫'), // bright magenta

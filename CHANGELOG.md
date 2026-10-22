@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **Palette comfort pass**: the audit now checks contrast bands and OKLCH chroma budgets, not just minimum ratios. Body text moves from 13.5–14.3:1 to ≈11.5:1, and syntax colors above 9:1 are brought back into range.
+- **Cinnabar, softened**: the red family keeps its traditional hue and lightness but drops to C≈0.165 (errors 0.18), so 海棠红 / 银朱 / 鹤顶红 / 尖晶玉红 read as pigment instead of neon. `soften()` records the source color for the docs.
+- **Cursor decoupled from keywords**: a new `text.cursor` token uses each flavor's cool interaction color (羽扇豆蓝 / 涧石蓝 / 玉鈫蓝) instead of the annotation red.
+- **Dimmed, reframed**: the dark canvas deepens instead of lifting into grey, the light canvas keeps its ink dark, and pigments retain ~75% chroma. Dimmed body text now clears 10.5:1 and punctuation is readable.
 - New **OpenCode** target: all six flavors are generated as OpenCode V2 themes (`base` + mode hue scales) and installed with `pnpm install:opencode`.
 - The OpenCode build maps the same semantic palette to text, surfaces, syntax, diff, Markdown, feedback fills and nine-step hue scales; `accent` is cinnabar and `interactive` is 晴山蓝.
 - Post-build checks now verify OpenCode JSON, token references and text/fill contrast, alongside the VS Code, Ghostty and Kaku checks.

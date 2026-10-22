@@ -7,7 +7,7 @@
  * restrained than a neon night theme.
  */
 
-import { named } from './data.ts';
+import { named, soften } from './data.ts';
 import type { Flavor } from './types.ts';
 
 export const canghai: Flavor = {
@@ -32,7 +32,7 @@ export const canghai: Flavor = {
     sunken: '#0a131b',
     input: '#152430',
     // 海青 thinned into the night water.
-    selection: '#23404f',
+    selection: '#1d3644',
     selectionInactive: '#1a2c38',
     hover: '#172733',
     active: '#20323f',
@@ -46,54 +46,58 @@ export const canghai: Flavor = {
   },
 
   text: {
-    // 月白 cooled toward the sea.
-    primary: '#d7e3ec',
-    secondary: '#a5b8c7',
-    muted: '#7d93a5',
+    // 月白 cooled toward the sea, kept inside the same comfort band as 玄墨.
+    primary: '#c8d4dd',
+    secondary: '#9aadbb',
+    muted: '#788d9f',
     faint: '#5e7385',
     inverse: '#0d1822',
+    // 涧石蓝 — a quiet cyan-blue caret, the cool counterpart of the seal.
+    cursor: named('涧石蓝'),
   },
 
   syntax: {
     // 晚波蓝 — the quiet note of the tide.
     comment: named('晚波蓝'),
-    keyword: named('银朱'),
-    storage: named('银朱'),
+    // 银朱 at pigment strength is a printer's ink; compress it to screen
+    // strength so the cinnabar seal still reads as cinnabar.
+    keyword: soften('银朱', 0.165),
+    storage: soften('银朱', 0.165),
     function: named('霁青'),
     method: named('海青'),
     string: named('竹绿'),
-    number: named('姜黄'),
-    boolean: named('姜黄'),
-    type: named('淡牵牛紫'),
+    number: named('土黄'),
+    boolean: named('土黄'),
+    type: named('萝兰紫'),
     constant: named('土黄'),
-    variable: '#d7e3ec', // 月白, cooled
-    parameter: named('凤信紫'),
-    property: '#b9c8d4',
-    operator: '#9db0c0',
+    variable: '#c8d4dd', // 月白, cooled
+    parameter: named('萝兰紫'),
+    property: '#b3c2ce',
+    operator: '#8fa3b4',
     punctuation: '#7f95a6',
     decorator: named('萝兰紫'),
-    tag: named('山茶红'),
-    attribute: named('姜黄'),
+    tag: soften('山茶红', 0.165),
+    attribute: named('土黄'),
     regexp: named('石绿'),
     escape: named('石绿'),
-    invalid: named('银朱'),
+    invalid: soften('银朱', 0.18),
     deprecated: '#6f8494',
   },
 
   status: {
-    error: named('银朱'),
+    error: soften('银朱', 0.18),
     warning: named('土黄'),
     info: named('霁青'),
     success: named('竹绿'),
-    modified: named('姜黄'),
+    modified: named('土黄'),
     added: named('竹绿'),
-    deleted: named('银朱'),
+    deleted: soften('银朱', 0.165),
     renamed: named('霁青'),
   },
 
   ansi: [
     '#1b2b36', // black
-    named('银朱'), // red
+    soften('银朱', 0.18), // red
     named('竹绿'), // green
     named('姜黄'), // yellow
     named('海青'), // blue
@@ -101,7 +105,7 @@ export const canghai: Flavor = {
     named('石绿'), // cyan
     '#c7d6df', // white
     '#5e7385', // bright black
-    named('山茶红'), // bright red
+    soften('山茶红', 0.18), // bright red
     named('蛙绿'), // bright green
     named('秋葵黄'), // bright yellow
     named('霁青'), // bright blue

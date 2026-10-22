@@ -87,7 +87,7 @@ function workbench(flavor: Flavor): Record<string, string> {
     'editor.foreground': t.primary,
     'editorLineNumber.foreground': t.faint,
     'editorLineNumber.activeForeground': t.secondary,
-    'editorCursor.foreground': y.keyword,
+    'editorCursor.foreground': t.cursor,
     'editorCursor.background': s.base,
     'editor.selectionBackground': s.selection,
     'editor.inactiveSelectionBackground': s.selectionInactive,
@@ -317,7 +317,7 @@ function workbench(flavor: Flavor): Record<string, string> {
     // ----------------------------------------------------------- terminal
     'terminal.background': s.base,
     'terminal.foreground': t.primary,
-    'terminalCursor.foreground': y.keyword,
+    'terminalCursor.foreground': t.cursor,
     'terminalCursor.background': s.base,
     'terminal.selectionBackground': s.selection,
     'terminal.inactiveSelectionBackground': s.selectionInactive,
