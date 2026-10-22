@@ -24,6 +24,14 @@ jobs:
       - name: Build themes (audits contrast)
         run: pnpm build
 
+      - name: Check generated files are committed
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git status --short
+            echo "::error::Generated files are stale; run 'pnpm build' and commit the result."
+            exit 1
+          fi
+
       - run: pnpm typecheck
 
       - name: Package VSIX

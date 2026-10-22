@@ -33,7 +33,6 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { flavors } from '../src/palette/index.ts';
 import {
@@ -43,8 +42,16 @@ import {
   themeDisplayName,
   vscodeFileName,
 } from '../src/targets/naming.ts';
-import { readJson, vsixFileName } from './packaging.ts';
+import { argValue } from './args.ts';
+import { extractReleaseNotes, hasUnreleasedEntries } from './changelog.ts';
+import { vsixFileName } from './packaging.ts';
 import type { PackageJson } from './packaging.ts';
+import {
+  assertTagMatchesVersion,
+  readRootPkg,
+  readVscodePkg,
+  root,
+} from './versioning.ts';
 
 interface ThemeManifest {
   id: string;
@@ -58,18 +65,6 @@ interface ThemeManifest {
     opencode: string;
     vscode: string;
   };
-}
-
-function argValue(flag: string): string | undefined {
-  const index = process.argv.indexOf(flag);
-  if (index === -1) return undefined;
-
-  const value = process.argv[index + 1];
-  if (!value || value.startsWith('--')) {
-    throw new Error(`${flag} requires a value`);
-  }
-
-  return value;
 }
 
 function fail(message: string): never {
@@ -99,25 +94,21 @@ function zipCommand(): void {
   }
 }
 
-const root = fileURLToPath(new URL('..', import.meta.url));
 const releaseDir = join(root, 'dist', 'release');
 const stagingDir = join(root, 'dist', '.release-staging');
 const notesPath = join(root, 'dist', 'release-notes.md');
 
-const rootPkg = readJson<PackageJson>(join(root, 'package.json'));
-const vscodePkg = readJson<PackageJson>(join(root, 'packages', 'vscode', 'package.json'));
+const rootPkg = readRootPkg();
+const vscodePkg = readVscodePkg();
 const version = String(rootPkg.version);
-const tag = argValue('--tag');
+const tag = argValue('--tag', fail);
 
-if (rootPkg.version !== vscodePkg.version) {
-  fail(
-    `version mismatch: root package.json is ${rootPkg.version}, ` +
-      `packages/vscode/package.json is ${vscodePkg.version}`,
-  );
-}
-
-if (tag && tag !== `v${version}`) {
-  fail(`tag ${tag} does not match package version v${version}`);
+if (tag) {
+  try {
+    assertTagMatchesVersion(tag, version);
+  } catch (error) {
+    fail((error as Error).message);
+  }
 }
 
 zipCommand();
@@ -139,7 +130,7 @@ const ghosttyArchive = `inkstone-ghostty-${version}.zip`;
 const kakuArchive = `inkstone-kaku-${version}.zip`;
 const opencodeArchive = `inkstone-opencode-${version}.zip`;
 const bundleArchive = `inkstone-${version}.zip`;
-const vsixName = vsixFileName(vscodePkg);
+const vsixName = vsixFileName({ ...vscodePkg, version });
 const vsixPath = join(root, 'dist', vsixName);
 
 assertFile(vsixPath);
@@ -305,22 +296,8 @@ execFileSync(
 
 rmSync(stagingDir, { recursive: true, force: true });
 
-function extractReleaseNotes(): string | undefined {
-  const changelog = readFileSync(join(root, 'CHANGELOG.md'), 'utf8');
-  const lines = changelog.split('\n');
-  const escaped = version.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const heading = new RegExp(`^##\\s+v?${escaped}(?:\\s|$)`);
-  const start = lines.findIndex((line) => heading.test(line));
-  if (start === -1) return undefined;
-
-  let end = lines.findIndex((line, index) => index > start && /^##\s+/.test(line));
-  if (end === -1) end = lines.length;
-
-  const body = lines.slice(start + 1, end).join('\n').trim();
-  return body.length > 0 ? `${body}\n` : undefined;
-}
-
-const notes = extractReleaseNotes();
+const changelog = readFileSync(join(root, 'CHANGELOG.md'), 'utf8');
+const notes = extractReleaseNotes(changelog, version);
 if (notes) {
   writeFileSync(notesPath, notes, 'utf8');
   console.log(`  ✓ dist/release-notes.md (from CHANGELOG.md ${version})`);
@@ -328,18 +305,7 @@ if (notes) {
   console.warn(`  ! CHANGELOG.md has no "## ${version}" section; the workflow will use generated notes`);
 }
 
-function unreleasedHasEntries(): boolean {
-  const lines = readFileSync(join(root, 'CHANGELOG.md'), 'utf8').split('\n');
-  const start = lines.findIndex((line) => /^##\s+Unreleased\s*$/.test(line));
-  if (start === -1) return false;
-
-  let end = lines.findIndex((line, index) => index > start && /^##\s+/.test(line));
-  if (end === -1) end = lines.length;
-
-  return lines.slice(start + 1, end).some((line) => line.trim().length > 0);
-}
-
-if (notes && unreleasedHasEntries()) {
+if (notes && hasUnreleasedEntries(changelog)) {
   console.warn(
     '  ! CHANGELOG.md still has an "## Unreleased" section; ' +
       `those entries are not in the ${version} release notes. ` +

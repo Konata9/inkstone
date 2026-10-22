@@ -28,6 +28,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Verify release tag
+        run: pnpm release:check --tag "$GITHUB_REF_NAME"
+
       - name: Build themes (audits contrast)
         run: pnpm build
 

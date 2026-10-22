@@ -4,7 +4,9 @@
  *   pnpm build
  *
  * Outputs:
+ *   packages/vscode/package.json   (version synced from the root package.json)
  *   packages/vscode/themes/*.json
+ *   packages/vscode/CHANGELOG.md   (copy of the root CHANGELOG.md)
  *   dist/ghostty/Inkstone *
  *   dist/kaku/*.lua
  *   dist/opencode/*.json
@@ -12,7 +14,7 @@
  *   docs/palette.md
  */
 
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -33,8 +35,27 @@ if (!checks.ok) {
   process.exit(1);
 }
 
+/** Keep the extension manifest on the root version; the file stays committed. */
+function syncVscodeVersion(): string {
+  const rootPkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as {
+    version: string;
+  };
+  const manifest = JSON.parse(
+    readFileSync(join(root, 'packages', 'vscode', 'package.json'), 'utf8'),
+  ) as Record<string, unknown>;
+  return `${JSON.stringify({ ...manifest, version: rootPkg.version }, null, 2)}\n`;
+}
+
 const files = [
+  {
+    path: 'packages/vscode/package.json',
+    content: syncVscodeVersion(),
+  },
   ...generateVscode(),
+  {
+    path: 'packages/vscode/CHANGELOG.md',
+    content: readFileSync(join(root, 'CHANGELOG.md'), 'utf8'),
+  },
   ...generateGhostty(),
   ...generateKaku(),
   ...generateOpencode(),
