@@ -9,6 +9,14 @@
   "engines": {
     "node": ">=20"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Konata9/inkstone"
+  },
+  "homepage": "https://github.com/Konata9/inkstone#readme",
+  "bugs": {
+    "url": "https://github.com/Konata9/inkstone/issues"
+  },
   "scripts": {
     "build": "tsx src/build.ts",
     "validate": "tsx src/validate.ts",
@@ -16,6 +24,7 @@
     "typecheck": "tsc --noEmit",
     "preview": "pnpm build && open preview/index.html",
     "package:vscode": "pnpm build && node scripts/package-vscode.mjs",
+    "package:release": "tsx scripts/package-release.ts",
     "install:ghostty": "pnpm build && bash scripts/install-ghostty.sh",
     "install:kaku": "pnpm build && bash scripts/install-kaku.sh",
     "install:opencode": "pnpm build && bash scripts/install-opencode.sh"

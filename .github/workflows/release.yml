@@ -1,0 +1,64 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # pnpm version comes from package.json "packageManager"; do not set `version` here.
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build themes (audits contrast)
+        run: pnpm build
+
+      - run: pnpm typecheck
+
+      - name: Package VSIX
+        run: pnpm package:vscode
+
+      - name: Assemble release assets
+        run: pnpm exec tsx scripts/package-release.ts --tag "$GITHUB_REF_NAME"
+
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          tag="$GITHUB_REF_NAME"
+          notes="dist/release-notes.md"
+          args=(--title "墨观 Inkstone $tag" --verify-tag)
+          if [[ "$tag" == *-* ]]; then
+            args+=(--prerelease)
+          fi
+
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" dist/release/* --clobber
+            if [ -f "$notes" ]; then
+              gh release edit "$tag" --notes-file "$notes"
+            fi
+          elif [ -f "$notes" ]; then
+            gh release create "$tag" dist/release/* "${args[@]}" --notes-file "$notes"
+          else
+            gh release create "$tag" dist/release/* "${args[@]}" --generate-notes
+          fi

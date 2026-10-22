@@ -5,6 +5,7 @@
 - New **OpenCode** target: all six flavors are generated as OpenCode V2 themes (`base` + mode hue scales) and installed with `pnpm install:opencode`.
 - The OpenCode build maps the same semantic palette to text, surfaces, syntax, diff, Markdown, feedback fills and nine-step hue scales; `accent` is cinnabar and `interactive` is 晴山蓝.
 - Post-build checks now verify OpenCode JSON, token references and text/fill contrast, alongside the VS Code, Ghostty and Kaku checks.
+- GitHub Releases now ship per-target archives, a machine-readable `manifest.json` and `SHA256SUMS`; pushing a `v*` tag builds and publishes them automatically.
 
 ## 0.3.0
 

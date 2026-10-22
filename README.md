@@ -34,9 +34,24 @@ A traditional Chinese color theme for editors and terminals, built from the 526-
 
 ## 安装
 
+### GitHub Releases
+
+每个版本都会在 [Releases](https://github.com/Konata9/inkstone/releases) 附带：
+
+| 产物 | 用途 |
+| --- | --- |
+| `moguan.inkstone-<version>.vsix` | VS Code / Cursor / Windsurf / VSCodium |
+| `inkstone-ghostty-<version>.zip` | Ghostty 主题文件 |
+| `inkstone-kaku-<version>.zip` | Kaku / WezTerm Lua 色表 |
+| `inkstone-opencode-<version>.zip` | OpenCode V2 主题 |
+| `inkstone-<version>.zip` | 全部产物 + `manifest.json` + 安装说明 |
+| `manifest.json` / `SHA256SUMS` | 机器可读索引与校验和 |
+
+下面的本地安装方式仍然适用于从源码构建。
+
 ### VS Code / Cursor / Windsurf / VSCodium
 
-本仓库以本地 VSIX 分发（暂未上架 Marketplace）。
+从 [Releases](https://github.com/Konata9/inkstone/releases) 下载最新 VSIX，或本地构建（暂未上架 Marketplace）。
 
 ```bash
 pnpm install
@@ -190,6 +205,8 @@ pnpm preview      # 构建并在浏览器打开预览页
 ```
 
 生成器保证各端一致：改一处色板，VS Code、Ghostty、Kaku、OpenCode 同时更新。构建会拒绝低于对比度阈值的配色。
+
+发布流程（tag → GitHub Release）见 [docs/releasing.md](docs/releasing.md)。VS Code Marketplace 的上架文案与发布物见 [docs/marketplace.md](docs/marketplace.md)。
 
 ### 设计约束
 

@@ -1,10 +1,11 @@
 {
   "name": "inkstone",
   "displayName": "墨观 Inkstone · 中国传统色彩",
-  "description": "A traditional Chinese color theme for VS Code, Cursor and friends. Ink-and-paper 玄墨 / 宣纸, their Dimmed variants, and the blue-green 沧海 / 青瓷, built from the 526-color zhongguose palette.",
+  "description": "A traditional Chinese color theme built from the 526-color zhongguose palette. Six variants: 玄墨 Xuanmo, 玄墨 Dimmed, 宣纸 Xuanzhi, 宣纸 Dimmed, 沧海 Canghai, 青瓷 Qingci.",
   "version": "0.3.0",
   "publisher": "moguan",
   "license": "MIT",
+  "homepage": "https://github.com/Konata9/inkstone#readme",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -42,7 +43,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Konata9/inkstone"
+    "url": "https://github.com/Konata9/inkstone",
+    "directory": "packages/vscode"
   },
   "bugs": {
     "url": "https://github.com/Konata9/inkstone/issues"
@@ -85,6 +87,6 @@
     }
   },
   "scripts": {
-    "package": "vsce package --no-dependencies"
+    "package": "npx @vscode/vsce package --no-dependencies"
   }
 }
