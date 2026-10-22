@@ -16,8 +16,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { audit } from './audit.ts';
-import { checkThemes } from './check.ts';
+import { reportFailures, runChecks } from './checks.ts';
 import { flavors } from './palette/index.ts';
 import { renderPaletteDoc } from './targets/docs.ts';
 import { generateGhostty } from './targets/ghostty.ts';
@@ -28,16 +27,9 @@ import { generateVscode } from './targets/vscode.ts';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 
-const report = audit();
-if (!report.ok) {
-  console.error('Build stopped: fix the palette audit first.');
-  process.exit(1);
-}
-
-const issues = checkThemes();
-if (issues.length > 0) {
-  console.error('\nTheme checks failed:');
-  for (const issue of issues) console.error(`  ✗ ${issue}`);
+const checks = runChecks();
+if (!checks.ok) {
+  reportFailures(checks, 'Build stopped');
   process.exit(1);
 }
 
@@ -59,7 +51,7 @@ for (const file of files) {
 
 console.log(
   `\nBuilt ${files.length} files for ${flavors.length} flavors ` +
-    `(${report.checks} palette checks, ${flavors.length} VS Code themes, ` +
+    `(${checks.audit.checks} palette checks, ${flavors.length} VS Code themes, ` +
     `${flavors.length} Ghostty themes, ${flavors.length} Kaku schemes, ` +
     `${flavors.length} OpenCode themes).\n`,
 );

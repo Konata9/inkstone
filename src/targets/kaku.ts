@@ -8,6 +8,7 @@
 import { parseHex } from '../color.ts';
 import { flavors, flavorName } from '../palette/index.ts';
 import type { Flavor } from '../palette/types.ts';
+import { kakuFileName } from './naming.ts';
 import type { GeneratedFile } from './vscode.ts';
 
 function quote(value: string): string {
@@ -114,17 +115,7 @@ ${hexList(f.ansi.slice(8, 16))}
 
 export function generateKaku(): GeneratedFile[] {
   return flavors.map((flavor) => ({
-    path: `dist/kaku/inkstone-${flavor.meta.id}.lua`,
+    path: `dist/kaku/${kakuFileName(flavor)}`,
     content: buildKakuScheme(flavor),
   }));
-}
-
-/** Small helper used by the install docs: the exact snippet Kaku users paste. */
-export function kakuSnippet(flavor: Flavor): string {
-  const en = flavorName(flavor, 'en');
-  return [
-    `config.color_schemes = config.color_schemes or {}`,
-    `config.color_schemes['Inkstone ${en}'] = dofile(wezterm.config_dir .. '/inkstone-${flavor.meta.id}.lua')`,
-    `config.color_scheme = 'Inkstone ${en}'`,
-  ].join('\n');
 }

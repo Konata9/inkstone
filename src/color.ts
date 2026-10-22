@@ -74,20 +74,6 @@ export function contrast(a: string, b: string): number {
   return (hi + 0.05) / (lo + 0.05);
 }
 
-/** Composite a possibly translucent color over an opaque backdrop. */
-export function flatten(foreground: string, background: string): string {
-  const fg = parseHex(foreground);
-  const bg = parseHex(background);
-  if (fg.a >= 1) return normalizeHex(foreground);
-  const mixChannel = (f: number, b: number) => f * fg.a + b * (1 - fg.a);
-  return toHex({
-    r: mixChannel(fg.r, bg.r),
-    g: mixChannel(fg.g, bg.g),
-    b: mixChannel(fg.b, bg.b),
-    a: 1,
-  });
-}
-
 /** Mix two colors in sRGB space. `ratio` is the weight of `a` (0–1). */
 export function mix(a: string, b: string, ratio: number): string {
   const x = parseHex(a);
@@ -191,13 +177,6 @@ export function softenToChroma(value: string, limit: number): string {
   const color = toOklch(value);
   if (color.c <= limit) return normalizeHex(value);
   return fromOklch({ ...color, c: limit });
-}
-
-export function wcagLevel(ratio: number, large = false): 'AAA' | 'AA' | 'AA Large' | 'fail' {
-  if (ratio >= 7) return 'AAA';
-  if (ratio >= 4.5) return 'AA';
-  if (large && ratio >= 3) return 'AA Large';
-  return 'fail';
 }
 
 export function formatRatio(ratio: number): string {

@@ -8,9 +8,7 @@ root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 target="$HOME/.config/kaku"
 
 mkdir -p "$target"
-for name in xuanmo xuanmo-dimmed xuanzhi xuanzhi-dimmed canghai qingci; do
-  cp "$root/dist/kaku/inkstone-$name.lua" "$target/"
-done
+cp "$root"/dist/kaku/inkstone-*.lua "$target/"
 
 echo "Installed to $target"
 echo

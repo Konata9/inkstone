@@ -46,10 +46,6 @@ export function findByName(name: string): TraditionalColor | undefined {
   return byName.get(name);
 }
 
-export function findByHex(hex: string): TraditionalColor[] {
-  return byHex.get(normalizeHex(hex)) ?? [];
-}
-
 /** Returns the first traditional name for a hex, if it is an exact palette value. */
 export function nameOf(hex: string): string | undefined {
   return byHex.get(normalizeHex(hex))?.[0]?.name;

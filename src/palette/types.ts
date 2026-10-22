@@ -112,21 +112,6 @@ export interface Flavor {
   ];
 }
 
-export interface FlavorSet {
-  /** Dark flavor. */
-  xuanmo: Flavor;
-  /** Muted dark flavor. */
-  xuanmoDimmed: Flavor;
-  /** Warm light flavor. */
-  xuanzhi: Flavor;
-  /** Muted warm-light flavor. */
-  xuanzhiDimmed: Flavor;
-  /** Deep-sea dark flavor. */
-  canghai: Flavor;
-  /** Celadon light flavor. */
-  qingci: Flavor;
-}
-
 export const ANSI_NAMES = [
   'black',
   'red',

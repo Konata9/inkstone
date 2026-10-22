@@ -8,15 +8,6 @@ import { xuanzhiDimmed } from './xuanzhi-dimmed.ts';
 
 export const flavors: Flavor[] = [xuanmo, xuanmoDimmed, xuanzhi, xuanzhiDimmed, canghai, qingci];
 
-export const flavorById = {
-  xuanmo,
-  xuanmoDimmed,
-  xuanzhi,
-  xuanzhiDimmed,
-  canghai,
-  qingci,
-} as const;
-
 /** Flavors grouped by family, in display order. */
 export const flavorFamilies: Array<{ id: FlavorFamily; zh: string; en: string; flavors: Flavor[] }> = [
   { id: 'ink', zh: '墨与纸', en: 'Ink & Paper', flavors: [xuanmo, xuanmoDimmed, xuanzhi, xuanzhiDimmed] },
@@ -28,6 +19,3 @@ export function flavorName(flavor: Flavor, lang: 'zh' | 'en' = 'zh'): string {
   const base = lang === 'zh' ? flavor.meta.zh : flavor.meta.en;
   return flavor.meta.dimmed ? `${base} Dimmed` : base;
 }
-
-export { canghai, qingci, xuanmo, xuanmoDimmed, xuanzhi, xuanzhiDimmed };
-export type { Flavor } from './types.ts';

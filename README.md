@@ -170,9 +170,11 @@ src/
   color.ts                色彩工具：对比度、混色、alpha
   audit.ts                色板审计（构建时强制）
   check.ts                产物检查（主题 key、Ghostty、Lua 语法）
+  checks.ts               build 与 validate 共用的检查入口
   palette/
     data/zhongguose.json  526 个中国传统颜色（唯一色值来源）
     data/SOURCE.md        数据来源与署名
+    labels.ts             语义角色的中文标签（docs 与 preview 共用）
     xuanmo.ts             玄墨语义色板
     xuanmo-dimmed.ts      玄墨 Dimmed 语义色板
     xuanzhi.ts            宣纸语义色板
@@ -180,12 +182,14 @@ src/
     canghai.ts            沧海语义色板
     qingci.ts             青瓷语义色板
   targets/
+    naming.ts             各端文件名与主题显示名（唯一来源）
     vscode.ts             workbench + TextMate + 语义 token
     ghostty.ts            Ghostty 主题
     kaku.ts               Kaku / WezTerm Lua 色表
     opencode.ts           OpenCode V2 主题（base + hue scale）
     preview.ts            预览页
     docs.ts               色板文档
+scripts/                  安装脚本、VSIX 与 Release 打包
 packages/vscode/          VS Code 扩展（VSIX）
 dist/                     生成物：Ghostty 主题、Kaku 色表、OpenCode 主题、VSIX
 preview/index.html        本地预览页（生成物）
@@ -201,7 +205,7 @@ docs/preview.png          预览页截图（生成物）
 ```bash
 pnpm install
 pnpm build        # 审计色板 → 生成全部产物
-pnpm test         # 只跑色板审计
+pnpm test         # 色板审计 + 产物检查（与 build 的检查一致）
 pnpm typecheck
 pnpm preview      # 构建并在浏览器打开预览页
 ```

@@ -5,9 +5,10 @@
  * TextMate scopes and semantic tokens all read from the same flavor object.
  */
 
-import { alpha, mix } from '../color.ts';
-import { flavors, flavorName } from '../palette/index.ts';
+import { alpha, darken, lighten } from '../color.ts';
+import { flavors } from '../palette/index.ts';
 import type { Flavor } from '../palette/types.ts';
+import { themeDisplayName, vscodeFileName } from './naming.ts';
 
 interface TokenSpec {
   name: string;
@@ -39,9 +40,7 @@ const transparent = '#00000000';
 
 /** Shift a color toward the ambient light of the flavor. */
 function lift(flavor: Flavor, color: string, amount = 0.14): string {
-  return flavor.meta.appearance === 'dark'
-    ? mix('#ffffff', color, amount)
-    : mix('#000000', color, amount);
+  return flavor.meta.appearance === 'dark' ? lighten(color, amount) : darken(color, amount);
 }
 
 function shadow(flavor: Flavor, opacity: number): string {
@@ -824,11 +823,9 @@ function semanticColors(f: Flavor): ThemeFile['semanticTokenColors'] {
 }
 
 export function buildTheme(flavor: Flavor): ThemeFile {
-  const zh = flavorName(flavor, 'zh');
-  const en = flavorName(flavor, 'en');
   return {
     $schema: 'vscode://schemas/color-theme',
-    name: flavor.meta.dimmed ? `墨观 · ${zh} (Inkstone ${en})` : `墨观 · ${zh} Inkstone ${en}`,
+    name: themeDisplayName(flavor),
     type: flavor.meta.appearance,
     semanticHighlighting: true,
     colors: workbench(flavor),
@@ -848,7 +845,7 @@ export interface GeneratedFile {
 
 export function generateVscode(): GeneratedFile[] {
   return flavors.map((flavor) => ({
-    path: `packages/vscode/themes/${flavor.meta.id}-color-theme.json`,
+    path: `packages/vscode/themes/${vscodeFileName(flavor)}`,
     content: `${JSON.stringify(buildTheme(flavor), null, 2)}\n`,
   }));
 }

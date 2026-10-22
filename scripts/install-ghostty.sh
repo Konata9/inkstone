@@ -8,12 +8,7 @@ root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 target="${XDG_CONFIG_HOME:-$HOME/.config}/ghostty/themes"
 
 mkdir -p "$target"
-for name in \
-  "Inkstone Xuanmo" "Inkstone Xuanmo Dimmed" \
-  "Inkstone Xuanzhi" "Inkstone Xuanzhi Dimmed" \
-  "Inkstone Canghai" "Inkstone Qingci"; do
-  cp "$root/dist/ghostty/$name" "$target/"
-done
+cp "$root"/dist/ghostty/* "$target/"
 
 echo "Installed to $target"
 echo

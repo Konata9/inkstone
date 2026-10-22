@@ -12,12 +12,52 @@
 import { contrast, darken, lighten, luminance, mix } from '../color.ts';
 import { flavors } from '../palette/index.ts';
 import type { Flavor } from '../palette/types.ts';
+import { opencodeFileName } from './naming.ts';
 import type { GeneratedFile } from './vscode.ts';
 
 type Mode = 'dark' | 'light';
 
 /** A hex color, `transparent`, or a `$token` / `$hue.name.step` reference. */
 type ColorValue = string;
+
+/** Hue scales every OpenCode theme must provide. */
+export const OPENCODE_HUES = ['gray', 'red', 'orange', 'yellow', 'green', 'cyan', 'blue', 'purple'] as const;
+
+/** Steps in a hue scale, light (100) to dark (900). */
+export const OPENCODE_STEPS = ['100', '200', '300', '400', '500', '600', '700', '800', '900'] as const;
+
+/** Syntax roles OpenCode renders. */
+export const OPENCODE_SYNTAX_KEYS = [
+  'comment',
+  'keyword',
+  'function',
+  'variable',
+  'string',
+  'number',
+  'type',
+  'operator',
+  'punctuation',
+] as const;
+
+/** Markdown roles OpenCode renders. */
+export const OPENCODE_MARKDOWN_KEYS = [
+  'text',
+  'heading',
+  'link',
+  'linkText',
+  'code',
+  'blockQuote',
+  'emphasis',
+  'strong',
+  'horizontalRule',
+  'listItem',
+  'listEnumeration',
+  'image',
+  'imageText',
+  'codeBlock',
+] as const;
+
+type HueStep = (typeof OPENCODE_STEPS)[number];
 
 interface StatefulColor {
   base: ColorValue;
@@ -28,17 +68,7 @@ interface StatefulColor {
   $disabled?: ColorValue;
 }
 
-interface HueScale {
-  100: string;
-  200: string;
-  300: string;
-  400: string;
-  500: string;
-  600: string;
-  700: string;
-  800: string;
-  900: string;
-}
+type HueScale = Record<HueStep, string>;
 
 interface OpencodeTheme {
   $schema: string;
@@ -67,24 +97,8 @@ interface OpencodeTheme {
       highlight: { added: ColorValue; removed: ColorValue };
       lineNumber: { text: ColorValue; background: { added: ColorValue; removed: ColorValue } };
     };
-    syntax: Record<'comment' | 'keyword' | 'function' | 'variable' | 'string' | 'number' | 'type' | 'operator' | 'punctuation', ColorValue>;
-    markdown: Record<
-      | 'text'
-      | 'heading'
-      | 'link'
-      | 'linkText'
-      | 'code'
-      | 'blockQuote'
-      | 'emphasis'
-      | 'strong'
-      | 'horizontalRule'
-      | 'listItem'
-      | 'listEnumeration'
-      | 'image'
-      | 'imageText'
-      | 'codeBlock',
-      ColorValue
-    >;
+    syntax: Record<(typeof OPENCODE_SYNTAX_KEYS)[number], ColorValue>;
+    markdown: Record<(typeof OPENCODE_MARKDOWN_KEYS)[number], ColorValue>;
     '@dialog': {
       background: {
         base: ColorValue;
@@ -136,11 +150,6 @@ function hueScale(flavor: Flavor, anchor: string): HueScale {
   };
 }
 
-/** A low-opacity equivalent built by mixing, so no alpha compositing is assumed. */
-function tint(color: string, backdrop: string, amount: number): string {
-  return mix(color, backdrop, amount);
-}
-
 /**
  * Nudge an accent until it clears a contrast floor on a tinted surface.
  *
@@ -169,14 +178,14 @@ function buildTheme(flavor: Flavor): OpencodeTheme {
   const mode: Mode = dark ? 'dark' : 'light';
   const highlight = (color: string) => (dark ? lighten(color, 0.18) : darken(color, 0.14));
   const feedbackFill = {
-    error: tint(st.error, s.base, 0.1),
-    warning: tint(st.warning, s.base, 0.1),
-    success: tint(st.success, s.base, 0.1),
-    info: tint(st.info, s.base, 0.1),
+    error: mix(st.error, s.base, 0.1),
+    warning: mix(st.warning, s.base, 0.1),
+    success: mix(st.success, s.base, 0.1),
+    info: mix(st.info, s.base, 0.1),
   };
   const diffFill = {
-    added: tint(st.added, s.base, 0.1),
-    removed: tint(st.deleted, s.base, 0.1),
+    added: mix(st.added, s.base, 0.1),
+    removed: mix(st.deleted, s.base, 0.1),
   };
 
   const hue = {
@@ -304,8 +313,8 @@ function buildTheme(flavor: Flavor): OpencodeTheme {
         lineNumber: {
           text: t.secondary,
           background: {
-            added: tint(st.added, s.base, 0.1),
-            removed: tint(st.deleted, s.base, 0.1),
+            added: diffFill.added,
+            removed: diffFill.removed,
           },
         },
       },
@@ -350,17 +359,9 @@ function buildTheme(flavor: Flavor): OpencodeTheme {
   return theme;
 }
 
-export function buildOpencodeTheme(flavor: Flavor): OpencodeTheme {
-  return buildTheme(flavor);
-}
-
-export function opencodeThemeName(flavor: Flavor): string {
-  return `inkstone-${flavor.meta.id}`;
-}
-
 export function generateOpencode(): GeneratedFile[] {
   return flavors.map((flavor) => ({
-    path: `dist/opencode/${opencodeThemeName(flavor)}.json`,
+    path: `dist/opencode/${opencodeFileName(flavor)}`,
     content: `${JSON.stringify(buildTheme(flavor), null, 2)}\n`,
   }));
 }

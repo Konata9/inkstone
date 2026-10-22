@@ -7,7 +7,7 @@
  */
 
 import { chromaOf, contrast, formatRatio, isValidHex, luminance, normalizeHex } from './color.ts';
-import { findByName, findByHex, softenedSource, traditionalColors } from './palette/data.ts';
+import { findByName, nameOf, softenedSource, traditionalColors } from './palette/data.ts';
 import { flavors, flavorName } from './palette/index.ts';
 import type { Flavor } from './palette/types.ts';
 
@@ -95,7 +95,7 @@ export interface AuditReport {
   datasetIssues: string[];
 }
 
-export function audit(options: { silent?: boolean } = {}): AuditReport {
+export function audit(): AuditReport {
   const results: Result[] = [];
   const warnings: string[] = [];
 
@@ -295,7 +295,7 @@ export function audit(options: { silent?: boolean } = {}): AuditReport {
     // --- Provenance ------------------------------------------------------
     const derived: string[] = [];
     for (const [role, hex] of Object.entries({ ...syntax, ...status })) {
-      if (findByHex(hex).length === 0) derived.push(`${role}=${hex}`);
+      if (!nameOf(hex)) derived.push(`${role}=${hex}`);
     }
     const allowedDerived = new Set([
       'variable',
@@ -359,60 +359,58 @@ export function audit(options: { silent?: boolean } = {}): AuditReport {
   }
   const ok = failures.length === 0 && datasetIssues.length === 0;
 
-  if (!options.silent) {
-    const useColor = process.stdout.isTTY;
-    const paint = (code: string, text: string) => (useColor ? `\u001B[${code}m${text}\u001B[0m` : text);
-    const green = (text: string) => paint('32', text);
-    const red = (text: string) => paint('31', text);
-    const yellow = (text: string) => paint('33', text);
-    const gray = (text: string) => paint('90', text);
-    const bold = (text: string) => paint('1', text);
+  const useColor = process.stdout.isTTY;
+  const paint = (code: string, text: string) => (useColor ? `\u001B[${code}m${text}\u001B[0m` : text);
+  const green = (text: string) => paint('32', text);
+  const red = (text: string) => paint('31', text);
+  const yellow = (text: string) => paint('33', text);
+  const gray = (text: string) => paint('90', text);
+  const bold = (text: string) => paint('1', text);
 
-    console.log(bold('\n墨观 Inkstone · palette audit\n'));
+  console.log(bold('\n墨观 Inkstone · palette audit\n'));
 
-    for (const flavor of flavors) {
-      const rows = results.filter((result) => result.flavor === flavor.meta.id);
-      const textRows = rows.filter(
-        (row) =>
-          row.kind === 'contrast' &&
-          !row.label.startsWith('ansi') &&
-          !row.label.startsWith('border') &&
-          !row.label.startsWith('selection') &&
-          !row.label.endsWith('(dimmed floor)'),
-      );
-      const worst = [...textRows].sort((a, b) => a.ratio - b.ratio)[0];
-      console.log(
-        `${bold(flavorName(flavor, 'zh'))} ${gray(flavorName(flavor, 'en'))}  ${gray(`${rows.length} checks`)}  ` +
-          (failures.some((failure) => failure.flavor === flavor.meta.id) ? red('FAIL') : green('PASS')) +
-          (worst ? gray(`  lowest text ${formatRatio(worst.ratio)} (${worst.label})`) : ''),
-      );
-    }
-
-    if (failures.length > 0) {
-      console.log(`\n${red('Comfort failures')}`);
-      for (const failure of failures) {
-        console.log(
-          `  ${red('✗')} ${failure.flavor} ${failure.label}: ${showValue(failure)} ` +
-            gray(`(band ${showRule(failure)}, ${failure.fg}${failure.kind === 'chroma' ? '' : ` on ${failure.bg}`})`),
-        );
-      }
-    }
-
-    if (warnings.length > 0) {
-      console.log(`\n${yellow('Warnings')}`);
-      for (const warning of warnings) console.log(`  ${yellow('!')} ${warning}`);
-    }
-
-    if (datasetIssues.length > 0) {
-      console.log(`\n${red('Dataset')}`);
-      for (const issue of datasetIssues) console.log(`  ${red('✗')} ${issue}`);
-    }
-
-    console.log(
-      `${gray(`\ndataset: ${traditionalColors.length} colors, ${names.size} names, ${hexes.size} unique hex values`)}`,
+  for (const flavor of flavors) {
+    const rows = results.filter((result) => result.flavor === flavor.meta.id);
+    const textRows = rows.filter(
+      (row) =>
+        row.kind === 'contrast' &&
+        !row.label.startsWith('ansi') &&
+        !row.label.startsWith('border') &&
+        !row.label.startsWith('selection') &&
+        !row.label.endsWith('(dimmed floor)'),
     );
-    console.log(ok ? green('\nAudit passed.\n') : red('\nAudit failed.\n'));
+    const worst = [...textRows].sort((a, b) => a.ratio - b.ratio)[0];
+    console.log(
+      `${bold(flavorName(flavor, 'zh'))} ${gray(flavorName(flavor, 'en'))}  ${gray(`${rows.length} checks`)}  ` +
+        (failures.some((failure) => failure.flavor === flavor.meta.id) ? red('FAIL') : green('PASS')) +
+        (worst ? gray(`  lowest text ${formatRatio(worst.ratio)} (${worst.label})`) : ''),
+    );
   }
+
+  if (failures.length > 0) {
+    console.log(`\n${red('Comfort failures')}`);
+    for (const failure of failures) {
+      console.log(
+        `  ${red('✗')} ${failure.flavor} ${failure.label}: ${showValue(failure)} ` +
+          gray(`(band ${showRule(failure)}, ${failure.fg}${failure.kind === 'chroma' ? '' : ` on ${failure.bg}`})`),
+      );
+    }
+  }
+
+  if (warnings.length > 0) {
+    console.log(`\n${yellow('Warnings')}`);
+    for (const warning of warnings) console.log(`  ${yellow('!')} ${warning}`);
+  }
+
+  if (datasetIssues.length > 0) {
+    console.log(`\n${red('Dataset')}`);
+    for (const issue of datasetIssues) console.log(`  ${red('✗')} ${issue}`);
+  }
+
+  console.log(
+    `${gray(`\ndataset: ${traditionalColors.length} colors, ${names.size} names, ${hexes.size} unique hex values`)}`,
+  );
+  console.log(ok ? green('\nAudit passed.\n') : red('\nAudit failed.\n'));
 
   return { ok, checks: results.length, failures, warnings, datasetIssues };
 }

@@ -10,10 +10,24 @@ import { parse as parseLua } from 'luaparse';
 
 import { contrast, isValidHex } from './color.ts';
 import { flavors } from './palette/index.ts';
+import { ANSI_NAMES } from './palette/types.ts';
 import { generateGhostty } from './targets/ghostty.ts';
 import { generateKaku } from './targets/kaku.ts';
-import { generateOpencode } from './targets/opencode.ts';
+import {
+  generateOpencode,
+  OPENCODE_HUES,
+  OPENCODE_MARKDOWN_KEYS,
+  OPENCODE_STEPS,
+  OPENCODE_SYNTAX_KEYS,
+} from './targets/opencode.ts';
 import { buildTheme } from './targets/vscode.ts';
+
+/** Workbench key for an ANSI slot, e.g. `terminal.ansiBrightBlack`. */
+function terminalAnsiKey(slot: number): string {
+  const name = ANSI_NAMES[slot];
+  if (!name) throw new Error(`ANSI slot ${slot} is out of range`);
+  return `terminal.ansi${name.charAt(0).toUpperCase()}${name.slice(1)}`;
+}
 
 const requiredColors = [
   'editor.background',
@@ -104,24 +118,7 @@ export function checkThemes(): string[] {
     if (semantic.length < 20) issues.push(`${label}: semanticTokenColors looks too small (${semantic.length})`);
 
     for (const [slot, hex] of flavor.ansi.entries()) {
-      const key = `terminal.${[
-        'ansiBlack',
-        'ansiRed',
-        'ansiGreen',
-        'ansiYellow',
-        'ansiBlue',
-        'ansiMagenta',
-        'ansiCyan',
-        'ansiWhite',
-        'ansiBrightBlack',
-        'ansiBrightRed',
-        'ansiBrightGreen',
-        'ansiBrightYellow',
-        'ansiBrightBlue',
-        'ansiBrightMagenta',
-        'ansiBrightCyan',
-        'ansiBrightWhite',
-      ][slot]}`;
+      const key = terminalAnsiKey(slot);
       if (theme.colors[key] !== hex) issues.push(`${label}: ${key} drifted from the ANSI palette`);
     }
   }
@@ -172,36 +169,7 @@ export function checkThemes(): string[] {
   }
 
   // --- OpenCode --------------------------------------------------------
-  const opencodeHues = ['gray', 'red', 'orange', 'yellow', 'green', 'cyan', 'blue', 'purple'];
   const opencodeAliases = ['accent', 'interactive', 'neutral'];
-  const opencodeSteps = ['100', '200', '300', '400', '500', '600', '700', '800', '900'];
-  const opencodeSyntax = [
-    'comment',
-    'keyword',
-    'function',
-    'variable',
-    'string',
-    'number',
-    'type',
-    'operator',
-    'punctuation',
-  ];
-  const opencodeMarkdown = [
-    'text',
-    'heading',
-    'link',
-    'linkText',
-    'code',
-    'blockQuote',
-    'emphasis',
-    'strong',
-    'horizontalRule',
-    'listItem',
-    'listEnumeration',
-    'image',
-    'imageText',
-    'codeBlock',
-  ];
 
   function readReference(root: Record<string, unknown>, reference: string): unknown {
     return reference
@@ -212,12 +180,7 @@ export function checkThemes(): string[] {
         : undefined), root);
   }
 
-  function isColorValue(root: Record<string, unknown>, value: unknown, depth = 0): boolean {
-    if (value === 'transparent' || (typeof value === 'string' && isValidHex(value))) return true;
-    if (depth > 20 || typeof value !== 'string' || !value.startsWith('$')) return false;
-    return isColorValue(root, readReference(root, value), depth + 1);
-  }
-
+  /** Resolve a `$token` / `$hue.name.step` chain to a concrete value, if it is valid. */
   function resolvedColor(root: Record<string, unknown>, value: unknown, depth = 0): string | undefined {
     if (typeof value !== 'string') return undefined;
     if (value === 'transparent' || isValidHex(value)) return value;
@@ -259,13 +222,13 @@ export function checkThemes(): string[] {
     if (!hue) {
       issues.push(`opencode ${file.path}: missing hue scales`);
     } else {
-      for (const name of opencodeHues) {
+      for (const name of OPENCODE_HUES) {
         const scale = hue[name] as Record<string, unknown> | undefined;
         if (!scale || typeof scale !== 'object') {
           issues.push(`opencode ${file.path}: missing hue ${name}`);
           continue;
         }
-        for (const step of opencodeSteps) {
+        for (const step of OPENCODE_STEPS) {
           if (!isValidHex(String(scale[step]))) {
             issues.push(`opencode ${file.path}: hue.${name}.${step} is not a hex color`);
           }
@@ -303,7 +266,7 @@ export function checkThemes(): string[] {
     let checkedColors = 0;
     const walk = (value: unknown, path: string) => {
       if (typeof value === 'string') {
-        if (!isColorValue(merged, value)) {
+        if (resolvedColor(merged, value) === undefined) {
           issues.push(`opencode ${file.path}: ${path} is not a valid color (${value})`);
         }
         checkedColors += 1;
@@ -318,11 +281,11 @@ export function checkThemes(): string[] {
     }
 
     const syntax = base.syntax as Record<string, unknown> | undefined;
-    for (const token of opencodeSyntax) {
+    for (const token of OPENCODE_SYNTAX_KEYS) {
       if (!syntax || !(token in syntax)) issues.push(`opencode ${file.path}: missing syntax.${token}`);
     }
     const markdown = base.markdown as Record<string, unknown> | undefined;
-    for (const token of opencodeMarkdown) {
+    for (const token of OPENCODE_MARKDOWN_KEYS) {
       if (!markdown || !(token in markdown)) issues.push(`opencode ${file.path}: missing markdown.${token}`);
     }
 

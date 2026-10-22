@@ -6,4 +6,4 @@
 - **传统色名**：属于公共文化资产；色值整理与网站数据版权归原作者所有，本仓库仅作主题创作的取色参考，并在 README、`docs/palette.md` 中署名。
 - **抓取时间**：2026-10-21。
 
-如果后续 Figma 文件导出了变量表，可以用 `src/palette/data.ts` 的 `findByName` / `findByHex` 做一次 diff。
+如果后续 Figma 文件导出了变量表，可以用 `src/palette/data.ts` 的 `findByName` / `nameOf` 做一次 diff。

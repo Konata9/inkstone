@@ -9,6 +9,7 @@
 import { alpha, contrast, formatRatio, luminance } from '../color.ts';
 import { colorLabel, nameOf } from '../palette/data.ts';
 import { flavorFamilies, flavors, flavorName } from '../palette/index.ts';
+import { syntaxLabels } from '../palette/labels.ts';
 import type { Flavor } from '../palette/types.ts';
 import { ANSI_NAMES } from '../palette/types.ts';
 
@@ -24,42 +25,29 @@ function cssVars(f: Flavor): string {
     `--bg:${s.base}`,
     `--bg-alt:${s.alt}`,
     `--activity:${dark ? s.sunken : s.raised}`,
-    `--bg-raised:${s.raised}`,
-    `--bg-overlay:${s.overlay}`,
     `--bg-sunken:${s.sunken}`,
-    `--bg-input:${s.input}`,
     `--sel:${s.selection}`,
-    `--sel-idle:${s.selectionInactive}`,
-    `--hover:${s.hover}`,
     `--active:${s.active}`,
     `--border:${b.normal}`,
     `--border-subtle:${b.subtle}`,
     `--border-strong:${b.strong}`,
-    `--focus:${b.focus}`,
     `--fg:${t.primary}`,
     `--fg-2:${t.secondary}`,
     `--fg-3:${t.muted}`,
     `--fg-4:${t.faint}`,
-    `--inverse:${t.inverse}`,
     `--cursor:${t.cursor}`,
     `--kw:${y.keyword}`,
-    `--st:${y.storage}`,
     `--fn:${y.function}`,
     `--str:${y.string}`,
     `--num:${y.number}`,
     `--type:${y.type}`,
-    `--const:${y.constant}`,
     `--cm:${y.comment}`,
-    `--op:${y.operator}`,
-    `--punc:${y.punctuation}`,
     `--dec:${y.decorator}`,
-    `--tag:${y.tag}`,
-    `--attr:${y.attribute}`,
-    `--err:${y.invalid}`,
     `--var:${y.variable}`,
     `--param:${y.parameter}`,
     `--prop:${y.property}`,
-    ...f.ansi.map((color, index) => `--ansi-${index}:${color}`),
+    // Only the ANSI slots the terminal mock styles reference.
+    ...[1, 2, 3, 4, 5, 6].map((index) => `--ansi-${index}:${f.ansi[index]}`),
     `--diff-add:${alpha(y.string, dark ? 0.15 : 0.13)}`,
     `--diff-del:${alpha(y.invalid, dark ? 0.15 : 0.12)}`,
     `--lens:${dark ? 'rgba(255,255,255,0.06)' : 'rgba(43,39,35,0.05)'}`,
@@ -147,17 +135,17 @@ function codeBlock(lines: string[], options: { active?: number; selected?: numbe
 /* Pieces                                                              */
 /* ------------------------------------------------------------------ */
 
-const accentRoles: Array<[keyof Flavor['syntax'], string, string]> = [
-  ['keyword', '关键字', 'keyword'],
-  ['function', '函数', 'function'],
-  ['string', '字符串', 'string'],
-  ['number', '数字', 'number'],
-  ['type', '类型', 'type'],
-  ['constant', '常量', 'constant'],
-  ['comment', '注释', 'comment'],
-  ['decorator', '装饰器', 'decorator'],
-  ['tag', '标签', 'tag'],
-  ['invalid', '错误', 'invalid'],
+const accentRoles: Array<keyof Flavor['syntax']> = [
+  'keyword',
+  'function',
+  'string',
+  'number',
+  'type',
+  'constant',
+  'comment',
+  'decorator',
+  'tag',
+  'invalid',
 ];
 
 function swatch(hex: string, label: string, sub: string) {
@@ -197,9 +185,9 @@ function accents(f: Flavor) {
   return `
     <div class="swatches">
       ${accentRoles
-        .map(([role, zh]) => {
+        .map((role) => {
           const hex = f.syntax[role];
-          return swatch(hex, zh, formatRatio(contrast(hex, f.surface.base)));
+          return swatch(hex, syntaxLabels[role], formatRatio(contrast(hex, f.surface.base)));
         })
         .join('')}
     </div>`;
@@ -315,12 +303,16 @@ function markdownMock(f: Flavor) {
   </div>`;
 }
 
+/** Distinct traditional colors referenced by one flavor or a group of them. */
+function namedColorCount(list: Flavor[]): number {
+  const names = list.flatMap((f) =>
+    [...Object.values(f.syntax), ...Object.values(f.status), ...f.ansi].map((hex) => nameOf(hex)),
+  );
+  return new Set(names.filter((name): name is string => Boolean(name))).size;
+}
+
 function flavorSection(f: Flavor) {
-  const namedCount = new Set(
-    [...Object.values(f.syntax), ...Object.values(f.status), ...f.ansi]
-      .map((hex) => nameOf(hex))
-      .filter((name): name is string => Boolean(name)),
-  ).size;
+  const namedCount = namedColorCount([f]);
   const tone = f.meta.appearance === 'dark' ? 'DARK' : f.meta.family === 'sea' ? 'COOL LIGHT' : 'WARM LIGHT';
   return `
   <section class="flavor f-${f.meta.id}" style="${cssVars(f)}">
@@ -367,13 +359,7 @@ function flavorSection(f: Flavor) {
 /* ------------------------------------------------------------------ */
 
 export function renderPreview(): string {
-  const totalNamed = new Set(
-    flavors.flatMap((f) =>
-      [...Object.values(f.syntax), ...Object.values(f.status), ...f.ansi]
-        .map((hex) => nameOf(hex))
-        .filter((name): name is string => Boolean(name)),
-    ),
-  ).size;
+  const totalNamed = namedColorCount(flavors);
 
   return `<!doctype html>
 <html lang="zh-CN">
@@ -512,18 +498,13 @@ export function renderPreview(): string {
   .line-selected { background: var(--sel); }
   .line-selected .ln { color: var(--fg-2); }
 
-  .kw, .st { color: var(--kw); }
+  .kw { color: var(--kw); }
   .fn { color: var(--fn); }
   .str { color: var(--str); }
   .num { color: var(--num); }
   .type { color: var(--type); }
-  .const { color: var(--const); }
   .cm { color: var(--cm); font-style: italic; }
-  .op { color: var(--op); }
-  .punc { color: var(--punc); }
   .dec { color: var(--dec); }
-  .tag { color: var(--tag); }
-  .attr { color: var(--attr); }
   .var { color: var(--var); }
   .param { color: var(--param); font-style: italic; }
   .prop { color: var(--prop); }

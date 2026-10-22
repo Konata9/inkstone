@@ -35,19 +35,16 @@ import {
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { flavors, flavorName } from '../src/palette/index.ts';
-import { opencodeThemeName } from '../src/targets/opencode.ts';
-
-interface PackageJson {
-  name: string;
-  version: string;
-  publisher?: string;
-  license?: string;
-  repository?: {
-    type?: string;
-    url?: string;
-  };
-}
+import { flavors } from '../src/palette/index.ts';
+import {
+  ghosttyThemeName,
+  kakuFileName,
+  opencodeFileName,
+  themeDisplayName,
+  vscodeFileName,
+} from '../src/targets/naming.ts';
+import { readJson, vsixFileName } from './packaging.ts';
+import type { PackageJson } from './packaging.ts';
 
 interface ThemeManifest {
   id: string;
@@ -73,10 +70,6 @@ function argValue(flag: string): string | undefined {
   }
 
   return value;
-}
-
-function readJson<T>(path: string): T {
-  return JSON.parse(readFileSync(path, 'utf8')) as T;
 }
 
 function fail(message: string): never {
@@ -134,9 +127,9 @@ rmSync(stagingDir, { recursive: true, force: true });
 rmSync(notesPath, { force: true });
 mkdirSync(releaseDir, { recursive: true });
 
-const ghosttyFiles = flavors.map((flavor) => `Inkstone ${flavorName(flavor, 'en')}`);
-const kakuFiles = flavors.map((flavor) => `inkstone-${flavor.meta.id}.lua`);
-const opencodeFiles = flavors.map((flavor) => `${opencodeThemeName(flavor)}.json`);
+const ghosttyFiles = flavors.map(ghosttyThemeName);
+const kakuFiles = flavors.map(kakuFileName);
+const opencodeFiles = flavors.map(opencodeFileName);
 
 for (const file of ghosttyFiles) assertFile(join(root, 'dist', 'ghostty', file));
 for (const file of kakuFiles) assertFile(join(root, 'dist', 'kaku', file));
@@ -146,7 +139,7 @@ const ghosttyArchive = `inkstone-ghostty-${version}.zip`;
 const kakuArchive = `inkstone-kaku-${version}.zip`;
 const opencodeArchive = `inkstone-opencode-${version}.zip`;
 const bundleArchive = `inkstone-${version}.zip`;
-const vsixName = `${vscodePkg.publisher}.${vscodePkg.name}-${version}.vsix`;
+const vsixName = vsixFileName(vscodePkg);
 const vsixPath = join(root, 'dist', vsixName);
 
 assertFile(vsixPath);
@@ -165,15 +158,15 @@ copyFileSync(vsixPath, join(releaseDir, vsixName));
 
 const themes: ThemeManifest[] = flavors.map((flavor) => ({
   id: flavor.meta.id,
-  name: `Inkstone ${flavorName(flavor, 'en')}`,
-  displayName: `墨观 · ${flavorName(flavor, 'zh')} (Inkstone ${flavorName(flavor, 'en')})`,
+  name: ghosttyThemeName(flavor),
+  displayName: themeDisplayName(flavor),
   mode: flavor.meta.appearance,
   family: flavor.meta.family,
   files: {
-    ghostty: `Inkstone ${flavorName(flavor, 'en')}`,
-    kaku: `inkstone-${flavor.meta.id}.lua`,
-    opencode: `${opencodeThemeName(flavor)}.json`,
-    vscode: `${flavor.meta.id}-color-theme.json`,
+    ghostty: ghosttyThemeName(flavor),
+    kaku: kakuFileName(flavor),
+    opencode: opencodeFileName(flavor),
+    vscode: vscodeFileName(flavor),
   },
 }));
 

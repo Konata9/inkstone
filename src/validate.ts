@@ -1,5 +1,12 @@
 #!/usr/bin/env tsx
-import { audit } from './audit.ts';
+/**
+ * Validate the palettes and every generated target without writing files.
+ * `pnpm test` runs this, so it must cover exactly what the build gates on.
+ */
+import { reportFailures, runChecks } from './checks.ts';
 
-const report = audit();
-if (!report.ok) process.exitCode = 1;
+const checks = runChecks();
+if (!checks.ok) {
+  reportFailures(checks, 'Validation stopped');
+  process.exitCode = 1;
+}
