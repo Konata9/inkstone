@@ -1,0 +1,33 @@
+# Inkstone (墨观)
+
+> Traditional Chinese color themes for editors and terminals, built from the 526-color zhongguose palette.
+
+- Version: 0.3.3
+- Extension ID: Konata9.inkstone
+- License: MIT
+- Site: https://konata9.github.io/inkstone/
+- Chinese: https://konata9.github.io/inkstone/zh/
+- Source: https://github.com/Konata9/inkstone
+- Releases: https://github.com/Konata9/inkstone/releases
+- Full summary: https://konata9.github.io/inkstone/llms-full.txt
+
+## Variants
+
+| Id | Chinese | English | Appearance |
+| --- | --- | --- | --- |
+| xuanmo | 玄墨 | Xuanmo | dark |
+| xuanmo-dimmed | 玄墨 Dimmed | Xuanmo Dimmed | dark |
+| xuanzhi | 宣纸 | Xuanzhi | light |
+| xuanzhi-dimmed | 宣纸 Dimmed | Xuanzhi Dimmed | light |
+| canghai | 沧海 | Canghai | dark |
+| qingci | 青瓷 | Qingci | light |
+
+## Platforms
+
+- Editors: VS Code, Cursor, Windsurf, VSCodium
+- Terminals: Ghostty, Kaku / WezTerm
+- Also: OpenCode V2 themes
+
+## Install
+
+Download `Konata9.inkstone-<version>.vsix` (and terminal archives) from GitHub Releases.

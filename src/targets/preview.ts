@@ -19,7 +19,7 @@ import { ANSI_NAMES } from '../palette/types.ts';
 
 const esc = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
-function cssVars(f: Flavor): string {
+export function cssVars(f: Flavor): string {
   const s = f.surface;
   const b = f.border;
   const t = f.text;
@@ -167,7 +167,7 @@ function swatch(hex: string, label: string, sub: string) {
   );
 }
 
-function surfaces(f: Flavor) {
+export function surfaces(f: Flavor) {
   const s = f.surface;
   const b = f.border;
   const t = f.text;
@@ -185,7 +185,7 @@ function surfaces(f: Flavor) {
     </div>`;
 }
 
-function accents(f: Flavor) {
+export function accents(f: Flavor) {
   return `
     <div class="swatches">
       ${accentRoles
@@ -214,11 +214,11 @@ function ansiStrip(f: Flavor) {
 }
 
 /** Drop the trailing Palette class so the gallery editors stay short. */
-function galleryTsLines(f: Flavor): string[] {
+export function galleryTsLines(f: Flavor): string[] {
   return tsLines(f).slice(0, 22);
 }
 
-function editorMock(f: Flavor, options: { lines?: string[] } = {}) {
+export function editorMock(f: Flavor, options: { lines?: string[] } = {}) {
   const lines = options.lines ?? tsLines(f);
   const files = [
     ['theme.ts', true],
@@ -231,7 +231,7 @@ function editorMock(f: Flavor, options: { lines?: string[] } = {}) {
   <div class="editor">
     <div class="titlebar">
       <span class="dots"><i></i><i></i><i></i></span>
-      <span class="title">inkstone — theme.ts</span>
+      <span class="title">inkstone · theme.ts</span>
     </div>
     <div class="editor-body">
       <div class="activity">
@@ -239,10 +239,10 @@ function editorMock(f: Flavor, options: { lines?: string[] } = {}) {
         <span class="glyph">⌕</span>
         <span class="glyph">⑂</span>
         <span class="glyph">▷</span>
-        <span class="glyph">⚙</span>
+        <span class="glyph">◈</span>
       </div>
       <div class="sidebar">
-        <div class="side-title">INKSTONE</div>
+        <div class="side-title">Inkstone</div>
         <div class="side-row side-active"><span class="chev">▾</span> src</div>
         ${files
           .map(
@@ -271,8 +271,8 @@ function editorMock(f: Flavor, options: { lines?: string[] } = {}) {
   </div>`;
 }
 
-/** Shared editor chrome styles used by both the full preview and the gallery. */
-function editorStyles(): string {
+/** Shared editor chrome styles used by preview, gallery, and the product site. */
+export function editorStyles(): string {
   return `
   .editor { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--bg); }
   .titlebar { height: 32px; background: var(--bg-alt); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px; padding: 0 12px; }
@@ -283,7 +283,7 @@ function editorStyles(): string {
   .activity { background: var(--activity); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 12px 0; }
   .glyph { color: var(--fg-3); font-size: 14px; opacity: .8; }
   .sidebar { background: var(--bg-alt); border-right: 1px solid var(--border-subtle); padding: 10px 8px; font-size: 10.5px; color: var(--fg-2); }
-  .side-title { font-size: 9px; letter-spacing: .18em; color: var(--fg-3); padding: 2px 6px 8px; }
+  .side-title { font-size: 10px; letter-spacing: 0; color: var(--fg-3); padding: 4px 8px 8px; }
   .side-row { padding: 3px 6px; border-radius: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .side-row.file { padding-left: 20px; color: var(--fg-2); }
   .side-active { background: var(--active); color: var(--fg); }

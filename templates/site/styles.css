@@ -1,0 +1,372 @@
+/* Hallmark · v2.0.0 · custom · redesign: full · genre editorial
+   P4 H4 E4 S4 R4 V4 · brand: 墨观 Inkstone · Songti + flavor tokens
+   Waiver: paper/ink surfaces are product tokens (玄墨/宣纸), not AI cream+terracotta
+   Waiver 47a: editor mock is the product surface, not decorative fake chrome
+   Waiver 48: per-flavor hex blocks ARE the token system (injected before this sheet)
+   Signature: live editor mock as the hero stage */
+
+:root {
+  --serif: "Songti SC", "Noto Serif SC", "Source Han Serif SC", Georgia, serif;
+  --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", "SF Mono", "Cascadia Code", Menlo, monospace;
+  --measure: min(1640px, 100%);
+  --gutter: clamp(28px, 3vw, 64px);
+  --ease: cubic-bezier(.4, 0, .2, 1);
+  --wash: color-mix(in srgb, var(--kw) 7%, transparent);
+  --wash-2: color-mix(in srgb, var(--cursor) 6%, transparent);
+}
+
+* { box-sizing: border-box; }
+
+html, body { overflow-x: clip; }
+html { -webkit-font-smoothing: antialiased; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  line-height: 1.55;
+  transition: background-color .25s var(--ease), color .25s var(--ease);
+  position: relative;
+}
+
+/* Soft ink / paper atmosphere — tracks active flavor tokens */
+.atmosphere {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(120% 80% at 0% 100%, var(--wash), transparent 55%),
+    radial-gradient(90% 70% at 100% 0%, var(--wash-2), transparent 50%);
+  opacity: .9;
+  transition: opacity .4s var(--ease);
+}
+
+.wrap {
+  position: relative;
+  z-index: 1;
+  width: var(--measure);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* Flavor wipe: new theme reveals bottom-left → top-right. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) {
+  z-index: 2;
+  animation: flavor-wipe .85s var(--ease) both;
+}
+@keyframes flavor-wipe {
+  from { clip-path: polygon(0 100%, 0 100%, 0 100%); }
+  to { clip-path: polygon(0 100%, 220% 100%, 0 -120%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body { transition: none; }
+  .flavor-btn, .cta, .atmosphere { transition: none !important; }
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none !important; }
+}
+
+a { color: var(--kw); text-decoration: none; }
+a:hover { color: var(--cursor); }
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--cursor);
+  outline-offset: 2px;
+}
+
+.skip {
+  position: absolute; left: -999px; top: 0;
+  background: var(--bg-alt); color: var(--fg); padding: 8px 12px; z-index: 20;
+}
+.skip:focus { left: 12px; top: 12px; }
+
+.top {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 16px; padding: 22px 0 0; flex-wrap: wrap;
+}
+
+.brand-mark {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--serif); font-size: 18px; font-weight: 500; color: var(--fg);
+  letter-spacing: .02em;
+}
+.brand-logo {
+  width: 32px; height: 32px; border-radius: 7px; flex-shrink: 0;
+  display: block;
+}
+.brand-words span {
+  font-family: var(--sans); font-size: 12px; color: var(--fg-3);
+  margin-left: 10px; font-weight: 400;
+}
+.brand-mark:hover { color: var(--fg); }
+
+.lang { display: flex; gap: 2px; font-size: 13px; }
+.lang a {
+  color: var(--fg-3); padding: 6px 12px; border-radius: 6px; border: 1px solid transparent;
+}
+.lang a[aria-current="page"] {
+  color: var(--fg); border-color: var(--border); background: var(--bg-alt);
+}
+
+/* —— Hero: brand + CTA + flavor rail | product stage —— */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.55fr) minmax(0, 1.7fr);
+  gap: clamp(32px, 4vw, 64px);
+  align-items: start;
+  padding: clamp(32px, 5vh, 56px) 0 clamp(48px, 8vh, 88px);
+}
+
+.hero-copy { min-width: 0; }
+
+.hero h1 {
+  margin: 0 0 14px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 16px;
+  font-family: var(--serif);
+  font-style: normal;
+  font-weight: 500;
+  font-size: clamp(48px, 9vw, 84px);
+  letter-spacing: .02em;
+  line-height: 1.08;
+  color: var(--fg);
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+.hero-seal {
+  width: 64px; height: 64px; border-radius: 12px;
+  flex-shrink: 0;
+  display: block;
+  margin-top: 0.12em; /* optically align with the Songti first line */
+  box-shadow: 0 8px 24px -12px color-mix(in srgb, var(--fg) 28%, transparent);
+}
+.hero-title-text { min-width: 0; flex: 1 1 auto; }
+.hero h1 .brand-en {
+  display: block;
+  margin-top: 0.12em;
+  font-family: var(--sans);
+  font-size: 0.28em;
+  font-weight: 400;
+  color: var(--fg-3);
+  letter-spacing: .06em;
+}
+
+.tagline {
+  margin: 0 0 28px;
+  max-width: 28rem;
+  font-size: clamp(15px, 2vw, 17px);
+  color: var(--fg-2);
+  text-wrap: pretty;
+}
+.tagline::after {
+  content: "";
+  display: block;
+  width: 3rem;
+  height: 1px;
+  margin-top: 14px;
+  background: var(--border-strong);
+}
+html[lang="zh-CN"] .tagline {
+  white-space: nowrap;
+  max-width: none;
+}
+
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 20px; }
+.cta {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 12px 20px; border-radius: 8px; font-size: 14px;
+  border: 1px solid var(--border-strong);
+  transition: background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease), filter .15s var(--ease);
+}
+.cta-primary { background: var(--kw); color: var(--bg); border-color: var(--kw); }
+.cta-ghost { background: transparent; color: var(--fg); }
+@media (hover: hover) {
+  .cta-primary:hover { filter: brightness(1.08); color: var(--bg); }
+  .cta-ghost:hover { background: var(--bg-alt); color: var(--fg); }
+}
+
+/* Compatibility strip — may run wider than the copy column into the stage gap */
+.support-strip {
+  list-style: none;
+  margin: 0 0 28px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  align-items: center;
+  width: max(100%, min(42rem, 140%));
+  max-width: calc(100% + 8rem);
+}
+.support-strip li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--fg-2);
+  line-height: 1.2;
+}
+.support-strip .app-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--fg-3);
+}
+
+.flavor-rail {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+.flavor-btn {
+  appearance: none; cursor: pointer; font-family: var(--sans);
+  display: flex; align-items: center; gap: 10px;
+  width: 100%;
+  height: 56px;
+  box-sizing: border-box;
+  /* Each chip keeps its own palette (inline --chip-*), not the page chrome. */
+  background: var(--chip-bg);
+  color: var(--chip-fg);
+  border: 1px solid var(--chip-border);
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 12px; text-align: left;
+  transition: background .15s var(--ease), border-color .15s var(--ease), transform .1s var(--ease), box-shadow .15s var(--ease);
+}
+.flavor-icon {
+  width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0;
+  background:
+    linear-gradient(135deg, var(--chip-accent) 0 36%, transparent 36%),
+    var(--chip-bg);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--chip-fg) 16%, transparent);
+}
+.flavor-text {
+  display: block; min-width: 0; line-height: 1.25;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.flavor-btn .sub {
+  display: block; font-size: 10px; color: var(--chip-muted); margin-top: 2px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.flavor-btn[aria-pressed="true"] {
+  background: var(--chip-active);
+  color: var(--chip-fg);
+  border-color: var(--chip-border-strong);
+  box-shadow: inset 0 2px 0 var(--chip-accent);
+}
+.flavor-btn:active { transform: translateY(1px); }
+@media (hover: hover) {
+  .flavor-btn:hover {
+    background: var(--chip-alt);
+    color: var(--chip-fg);
+    border-color: var(--chip-border-strong);
+  }
+}
+.flavor-btn:focus-visible {
+  outline: 2px solid var(--chip-accent);
+  outline-offset: 2px;
+}
+
+.hero-stage {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-alt);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--fg) 4%, transparent),
+    0 24px 48px -28px color-mix(in srgb, var(--fg) 28%, transparent);
+}
+.hero-stage .editor { border: 0; border-radius: 0; }
+.hero-stage .editor-body { grid-template-columns: 40px 128px 1fr; min-height: 420px; }
+.hero-stage .code { font-size: 12px; line-height: 1.7; }
+.hero-stage .sidebar { font-size: 11.5px; }
+
+.flavor-panel { display: none; }
+.flavor-panel.is-active { display: block; }
+
+.section-title {
+  margin: 0 0 10px;
+  font-family: var(--serif);
+  font-style: normal;
+  font-weight: 500;
+  font-size: clamp(22px, 3vw, 28px);
+  color: var(--fg);
+  letter-spacing: .02em;
+}
+.app-icon {
+  width: 15px; height: 15px; flex-shrink: 0; color: var(--fg-3);
+}
+
+/* —— Specimen: shared source lede + active flavor idea + swatches —— */
+.specimen {
+  border-top: 1px solid var(--border-subtle);
+  padding: clamp(40px, 7vh, 64px) 0 clamp(56px, 9vh, 88px);
+}
+.specimen-head { margin: 0 0 28px; max-width: 40rem; }
+.specimen-head p {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 15px;
+  text-wrap: pretty;
+}
+.panel-label {
+  font-size: 13px;
+  color: var(--fg-3);
+  margin: 0 0 6px;
+}
+.panel-idea {
+  margin: 0 0 16px;
+  max-width: 36rem;
+  font-size: 15px;
+  color: var(--fg-2);
+  text-wrap: pretty;
+}
+.panel-body { min-width: 0; }
+.swatch-gap { height: 14px; }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 8px; }
+.chip { border: 1px solid var(--border-subtle); border-radius: 6px; overflow: hidden; background: var(--bg-alt); }
+.chip-color { height: 44px; display: flex; align-items: flex-end; justify-content: flex-end; padding: 4px 6px; }
+.chip-sample { font-family: var(--serif); font-size: 11px; opacity: .5; }
+.chip-body { padding: 7px 8px 8px; }
+.chip-name { font-size: 11px; color: var(--fg); display: flex; justify-content: space-between; gap: 4px; }
+.chip-cn { color: var(--fg-3); font-size: 10px; white-space: nowrap; }
+.chip-meta { display: flex; justify-content: space-between; gap: 4px; margin-top: 2px; font-size: 9.5px; color: var(--fg-3); }
+.chip-meta code { font-family: var(--mono); font-size: 9px; color: var(--fg-2); }
+
+.foot {
+  border-top: 1px solid var(--border-subtle);
+  padding: 28px 0 48px;
+  display: flex; flex-wrap: wrap; gap: 14px 28px;
+  justify-content: space-between; align-items: flex-start;
+  color: var(--fg-3); font-size: 13px;
+}
+.foot-meta { display: flex; flex-direction: column; gap: 4px; max-width: 36rem; }
+.foot-chips {
+  list-style: none; margin: 8px 0 0; padding: 0;
+  display: flex; flex-wrap: wrap; gap: 8px 16px;
+  font-size: 12px; color: var(--fg-4);
+}
+.foot nav { display: flex; flex-wrap: wrap; gap: 16px; }
+
+/* Site is PC-first (editor / terminal themes). Narrow viewports stack as a fallback. */
+@media (max-width: 1100px) {
+  .hero {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    align-items: start;
+  }
+  .hero-stage { order: -1; }
+}

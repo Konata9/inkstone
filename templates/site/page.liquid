@@ -1,0 +1,143 @@
+{% comment %}
+  Product landing page (Liquid).
+  Build injects locale copy, version, support lists, flavor tokens/panels, runtime config.
+{% endcomment %}
+<!doctype html>
+<html lang="{{ copy.htmlLang }}" data-flavor="xuanmo" data-appearance="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ copy.title }}</title>
+<meta name="description" content="{{ copy.description }}">
+<link rel="canonical" href="{{ canonical }}">
+<link rel="alternate" hreflang="en" href="{{ origin }}/">
+<link rel="alternate" hreflang="zh-CN" href="{{ origin }}/zh/">
+<link rel="alternate" hreflang="x-default" href="{{ origin }}/">
+<link rel="alternate" type="text/plain" href="{{ origin }}/llms.txt">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Inkstone">
+<meta property="og:title" content="{{ copy.title }}">
+<meta property="og:description" content="{{ copy.description }}">
+<meta property="og:url" content="{{ canonical }}">
+<meta property="og:image" content="{{ ogImage }}">
+<meta property="og:locale" content="{{ copy.ogLocale }}">
+<meta property="og:locale:alternate" content="{{ ogLocaleAlternate }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ copy.title }}">
+<meta name="twitter:description" content="{{ copy.description }}">
+<meta name="twitter:image" content="{{ ogImage }}">
+<link rel="icon" type="image/png" href="{{ home }}favicon.png">
+<script type="application/ld+json">{{ jsonLdJson | raw }}</script>
+<style>
+{{ stylesCss | raw }}
+{{ flavorTokens | raw }}
+{{ editorStyles | raw }}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">{{ copy.skipToContent }}</a>
+
+<div class="atmosphere" aria-hidden="true"></div>
+
+<div class="wrap">
+  <header class="top">
+    <a class="brand-mark" href="{{ home }}">
+      <img class="brand-logo" src="{{ home }}favicon.png" width="32" height="32" alt="" decoding="async">
+      <span class="brand-words">{{ copy.brandZh }}<span>{{ copy.brandEn }}</span></span>
+    </a>
+    <nav class="lang" aria-label="Language">
+      <a href="{{ langHrefEn }}"{% if locale == 'en' %} aria-current="page"{% endif %}>{{ copy.langEn }}</a>
+      <a href="{{ langHrefZh }}"{% if locale == 'zh' %} aria-current="page"{% endif %}>{{ copy.langZh }}</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <h1 id="hero-title">
+          <img class="hero-seal" src="{{ home }}favicon.png" width="64" height="64" alt="" decoding="async">
+          <span class="hero-title-text">{{ copy.brandZh }} <span class="brand-en">{{ copy.brandEn }}</span></span>
+        </h1>
+        <p class="tagline">{{ copy.tagline }}</p>
+        <div class="cta-row">
+          <a class="cta cta-primary" href="{{ releasesUrl }}">{{ copy.ctaInstall }}</a>
+          <a class="cta cta-ghost" href="{{ repoUrl }}">{{ copy.ctaSource }}</a>
+        </div>
+        <ul class="support-strip" aria-label="{{ copy.editorsTitle }}, {{ copy.terminalsTitle }}">
+          {% for item in editors %}
+          <li>{% render 'icon', id: item.id %}<span>{{ item.label }}</span></li>
+          {% endfor %}
+          {% for item in terminals %}
+          <li>{% render 'icon', id: item.id %}<span>{{ item.label }}</span></li>
+          {% endfor %}
+        </ul>
+        <div class="flavor-rail" role="group" aria-label="{{ copy.flavorsLabel }}">
+          {% for f in flavors %}
+          <button
+            type="button"
+            class="flavor-btn"
+            data-flavor="{{ f.id }}"
+            aria-pressed="false"
+            title="{{ f.label }}"
+            style="--chip-bg:{{ f.chipBg }};--chip-alt:{{ f.chipAlt }};--chip-active:{{ f.chipActive }};--chip-fg:{{ f.chipFg }};--chip-muted:{{ f.chipMuted }};--chip-border:{{ f.chipBorder }};--chip-border-strong:{{ f.chipBorderStrong }};--chip-accent:{{ f.chipAccent }}"
+          >
+            <span class="flavor-icon" aria-hidden="true"></span>
+            <span class="flavor-text">{{ f.label }}<span class="sub">{{ f.sub }}</span></span>
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="hero-stage" aria-label="{{ copy.previewLabel }}">
+        {% for f in flavors %}
+        <div class="flavor-panel" data-flavor="{{ f.id }}">
+          {{ f.editorHtml | raw }}
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="specimen" aria-labelledby="specimen-title">
+      <div class="specimen-head">
+        <h2 id="specimen-title" class="section-title">{{ copy.specimenTitle }}</h2>
+        <p>{{ copy.inspirationBody }}</p>
+      </div>
+      {% for f in flavors %}
+      <div class="flavor-panel" data-flavor="{{ f.id }}">
+        <div class="panel-label">{{ f.name }}</div>
+        <p class="panel-idea">{{ f.description }}</p>
+        <div class="panel-body">
+          {{ f.surfacesHtml | raw }}
+          <div class="swatch-gap"></div>
+          {{ f.accentsHtml | raw }}
+        </div>
+      </div>
+      {% endfor %}
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="foot-meta">
+      <span>© Inkstone</span>
+      <span>v{{ version }}</span>
+      <span>{{ copy.footerLicense }}</span>
+      <ul class="foot-chips">
+        {% for chip in chips %}
+        <li>{{ chip }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <nav>
+      <a href="{{ paletteUrl }}">{{ copy.footerPalette }}</a>
+      <a href="{{ repoUrl }}">GitHub</a>
+      <a href="{{ releasesUrl }}">Releases</a>
+    </nav>
+  </footer>
+</div>
+
+<script type="application/json" id="inkstone-site-config">{{ siteConfigJson | raw }}</script>
+<script>
+{{ appJs | raw }}
+</script>
+</body>
+</html>

@@ -1,0 +1,1254 @@
+
+<!doctype html>
+<html lang="en" data-flavor="xuanmo" data-appearance="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inkstone · Traditional Chinese color themes</title>
+<meta name="description" content="Inkstone (墨观) is a traditional Chinese color theme for VS Code, Cursor, Ghostty, WezTerm and OpenCode: six variants from the 526-color zhongguose palette.">
+<link rel="canonical" href="https://konata9.github.io/inkstone/">
+<link rel="alternate" hreflang="en" href="https://konata9.github.io/inkstone/">
+<link rel="alternate" hreflang="zh-CN" href="https://konata9.github.io/inkstone/zh/">
+<link rel="alternate" hreflang="x-default" href="https://konata9.github.io/inkstone/">
+<link rel="alternate" type="text/plain" href="https://konata9.github.io/inkstone/llms.txt">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Inkstone">
+<meta property="og:title" content="Inkstone · Traditional Chinese color themes">
+<meta property="og:description" content="Inkstone (墨观) is a traditional Chinese color theme for VS Code, Cursor, Ghostty, WezTerm and OpenCode: six variants from the 526-color zhongguose palette.">
+<meta property="og:url" content="https://konata9.github.io/inkstone/">
+<meta property="og:image" content="https://konata9.github.io/inkstone/og.jpg">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Inkstone · Traditional Chinese color themes">
+<meta name="twitter:description" content="Inkstone (墨观) is a traditional Chinese color theme for VS Code, Cursor, Ghostty, WezTerm and OpenCode: six variants from the 526-color zhongguose palette.">
+<meta name="twitter:image" content="https://konata9.github.io/inkstone/og.jpg">
+<link rel="icon" type="image/png" href="./favicon.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Inkstone","alternateName":"墨观","applicationCategory":"DeveloperApplication","operatingSystem":"VS Code 1.85+, Cursor, Windsurf, VSCodium, Ghostty, WezTerm, OpenCode","description":"Inkstone (墨观) is a traditional Chinese color theme for VS Code, Cursor, Ghostty, WezTerm and OpenCode: six variants from the 526-color zhongguose palette.","url":"https://konata9.github.io/inkstone/","downloadUrl":"https://github.com/Konata9/inkstone/releases","softwareVersion":"0.3.3","license":"https://opensource.org/licenses/MIT","author":{"@type":"Person","name":"Konata9","url":"https://github.com/Konata9"},"offers":{"@type":"Offer","price":"0","priceCurrency":"USD","availability":"https://schema.org/InStock"}}</script>
+<style>
+/* Hallmark · v2.0.0 · custom · redesign: full · genre editorial
+   P4 H4 E4 S4 R4 V4 · brand: 墨观 Inkstone · Songti + flavor tokens
+   Waiver: paper/ink surfaces are product tokens (玄墨/宣纸), not AI cream+terracotta
+   Waiver 47a: editor mock is the product surface, not decorative fake chrome
+   Waiver 48: per-flavor hex blocks ARE the token system (injected before this sheet)
+   Signature: live editor mock as the hero stage */
+
+:root {
+  --serif: "Songti SC", "Noto Serif SC", "Source Han Serif SC", Georgia, serif;
+  --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", "SF Mono", "Cascadia Code", Menlo, monospace;
+  --measure: min(1640px, 100%);
+  --gutter: clamp(28px, 3vw, 64px);
+  --ease: cubic-bezier(.4, 0, .2, 1);
+  --wash: color-mix(in srgb, var(--kw) 7%, transparent);
+  --wash-2: color-mix(in srgb, var(--cursor) 6%, transparent);
+}
+
+* { box-sizing: border-box; }
+
+html, body { overflow-x: clip; }
+html { -webkit-font-smoothing: antialiased; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  line-height: 1.55;
+  transition: background-color .25s var(--ease), color .25s var(--ease);
+  position: relative;
+}
+
+/* Soft ink / paper atmosphere — tracks active flavor tokens */
+.atmosphere {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(120% 80% at 0% 100%, var(--wash), transparent 55%),
+    radial-gradient(90% 70% at 100% 0%, var(--wash-2), transparent 50%);
+  opacity: .9;
+  transition: opacity .4s var(--ease);
+}
+
+.wrap {
+  position: relative;
+  z-index: 1;
+  width: var(--measure);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* Flavor wipe: new theme reveals bottom-left → top-right. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) {
+  z-index: 2;
+  animation: flavor-wipe .85s var(--ease) both;
+}
+@keyframes flavor-wipe {
+  from { clip-path: polygon(0 100%, 0 100%, 0 100%); }
+  to { clip-path: polygon(0 100%, 220% 100%, 0 -120%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body { transition: none; }
+  .flavor-btn, .cta, .atmosphere { transition: none !important; }
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none !important; }
+}
+
+a { color: var(--kw); text-decoration: none; }
+a:hover { color: var(--cursor); }
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--cursor);
+  outline-offset: 2px;
+}
+
+.skip {
+  position: absolute; left: -999px; top: 0;
+  background: var(--bg-alt); color: var(--fg); padding: 8px 12px; z-index: 20;
+}
+.skip:focus { left: 12px; top: 12px; }
+
+.top {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 16px; padding: 22px 0 0; flex-wrap: wrap;
+}
+
+.brand-mark {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--serif); font-size: 18px; font-weight: 500; color: var(--fg);
+  letter-spacing: .02em;
+}
+.brand-logo {
+  width: 32px; height: 32px; border-radius: 7px; flex-shrink: 0;
+  display: block;
+}
+.brand-words span {
+  font-family: var(--sans); font-size: 12px; color: var(--fg-3);
+  margin-left: 10px; font-weight: 400;
+}
+.brand-mark:hover { color: var(--fg); }
+
+.lang { display: flex; gap: 2px; font-size: 13px; }
+.lang a {
+  color: var(--fg-3); padding: 6px 12px; border-radius: 6px; border: 1px solid transparent;
+}
+.lang a[aria-current="page"] {
+  color: var(--fg); border-color: var(--border); background: var(--bg-alt);
+}
+
+/* —— Hero: brand + CTA + flavor rail | product stage —— */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.55fr) minmax(0, 1.7fr);
+  gap: clamp(32px, 4vw, 64px);
+  align-items: start;
+  padding: clamp(32px, 5vh, 56px) 0 clamp(48px, 8vh, 88px);
+}
+
+.hero-copy { min-width: 0; }
+
+.hero h1 {
+  margin: 0 0 14px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 16px;
+  font-family: var(--serif);
+  font-style: normal;
+  font-weight: 500;
+  font-size: clamp(48px, 9vw, 84px);
+  letter-spacing: .02em;
+  line-height: 1.08;
+  color: var(--fg);
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+.hero-seal {
+  width: 64px; height: 64px; border-radius: 12px;
+  flex-shrink: 0;
+  display: block;
+  margin-top: 0.12em; /* optically align with the Songti first line */
+  box-shadow: 0 8px 24px -12px color-mix(in srgb, var(--fg) 28%, transparent);
+}
+.hero-title-text { min-width: 0; flex: 1 1 auto; }
+.hero h1 .brand-en {
+  display: block;
+  margin-top: 0.12em;
+  font-family: var(--sans);
+  font-size: 0.28em;
+  font-weight: 400;
+  color: var(--fg-3);
+  letter-spacing: .06em;
+}
+
+.tagline {
+  margin: 0 0 28px;
+  max-width: 28rem;
+  font-size: clamp(15px, 2vw, 17px);
+  color: var(--fg-2);
+  text-wrap: pretty;
+}
+.tagline::after {
+  content: "";
+  display: block;
+  width: 3rem;
+  height: 1px;
+  margin-top: 14px;
+  background: var(--border-strong);
+}
+html[lang="zh-CN"] .tagline {
+  white-space: nowrap;
+  max-width: none;
+}
+
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 20px; }
+.cta {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 12px 20px; border-radius: 8px; font-size: 14px;
+  border: 1px solid var(--border-strong);
+  transition: background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease), filter .15s var(--ease);
+}
+.cta-primary { background: var(--kw); color: var(--bg); border-color: var(--kw); }
+.cta-ghost { background: transparent; color: var(--fg); }
+@media (hover: hover) {
+  .cta-primary:hover { filter: brightness(1.08); color: var(--bg); }
+  .cta-ghost:hover { background: var(--bg-alt); color: var(--fg); }
+}
+
+/* Compatibility strip — may run wider than the copy column into the stage gap */
+.support-strip {
+  list-style: none;
+  margin: 0 0 28px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  align-items: center;
+  width: max(100%, min(42rem, 140%));
+  max-width: calc(100% + 8rem);
+}
+.support-strip li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--fg-2);
+  line-height: 1.2;
+}
+.support-strip .app-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--fg-3);
+}
+
+.flavor-rail {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+.flavor-btn {
+  appearance: none; cursor: pointer; font-family: var(--sans);
+  display: flex; align-items: center; gap: 10px;
+  width: 100%;
+  height: 56px;
+  box-sizing: border-box;
+  /* Each chip keeps its own palette (inline --chip-*), not the page chrome. */
+  background: var(--chip-bg);
+  color: var(--chip-fg);
+  border: 1px solid var(--chip-border);
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 12px; text-align: left;
+  transition: background .15s var(--ease), border-color .15s var(--ease), transform .1s var(--ease), box-shadow .15s var(--ease);
+}
+.flavor-icon {
+  width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0;
+  background:
+    linear-gradient(135deg, var(--chip-accent) 0 36%, transparent 36%),
+    var(--chip-bg);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--chip-fg) 16%, transparent);
+}
+.flavor-text {
+  display: block; min-width: 0; line-height: 1.25;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.flavor-btn .sub {
+  display: block; font-size: 10px; color: var(--chip-muted); margin-top: 2px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.flavor-btn[aria-pressed="true"] {
+  background: var(--chip-active);
+  color: var(--chip-fg);
+  border-color: var(--chip-border-strong);
+  box-shadow: inset 0 2px 0 var(--chip-accent);
+}
+.flavor-btn:active { transform: translateY(1px); }
+@media (hover: hover) {
+  .flavor-btn:hover {
+    background: var(--chip-alt);
+    color: var(--chip-fg);
+    border-color: var(--chip-border-strong);
+  }
+}
+.flavor-btn:focus-visible {
+  outline: 2px solid var(--chip-accent);
+  outline-offset: 2px;
+}
+
+.hero-stage {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-alt);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--fg) 4%, transparent),
+    0 24px 48px -28px color-mix(in srgb, var(--fg) 28%, transparent);
+}
+.hero-stage .editor { border: 0; border-radius: 0; }
+.hero-stage .editor-body { grid-template-columns: 40px 128px 1fr; min-height: 420px; }
+.hero-stage .code { font-size: 12px; line-height: 1.7; }
+.hero-stage .sidebar { font-size: 11.5px; }
+
+.flavor-panel { display: none; }
+.flavor-panel.is-active { display: block; }
+
+.section-title {
+  margin: 0 0 10px;
+  font-family: var(--serif);
+  font-style: normal;
+  font-weight: 500;
+  font-size: clamp(22px, 3vw, 28px);
+  color: var(--fg);
+  letter-spacing: .02em;
+}
+.app-icon {
+  width: 15px; height: 15px; flex-shrink: 0; color: var(--fg-3);
+}
+
+/* —— Specimen: shared source lede + active flavor idea + swatches —— */
+.specimen {
+  border-top: 1px solid var(--border-subtle);
+  padding: clamp(40px, 7vh, 64px) 0 clamp(56px, 9vh, 88px);
+}
+.specimen-head { margin: 0 0 28px; max-width: 40rem; }
+.specimen-head p {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 15px;
+  text-wrap: pretty;
+}
+.panel-label {
+  font-size: 13px;
+  color: var(--fg-3);
+  margin: 0 0 6px;
+}
+.panel-idea {
+  margin: 0 0 16px;
+  max-width: 36rem;
+  font-size: 15px;
+  color: var(--fg-2);
+  text-wrap: pretty;
+}
+.panel-body { min-width: 0; }
+.swatch-gap { height: 14px; }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 8px; }
+.chip { border: 1px solid var(--border-subtle); border-radius: 6px; overflow: hidden; background: var(--bg-alt); }
+.chip-color { height: 44px; display: flex; align-items: flex-end; justify-content: flex-end; padding: 4px 6px; }
+.chip-sample { font-family: var(--serif); font-size: 11px; opacity: .5; }
+.chip-body { padding: 7px 8px 8px; }
+.chip-name { font-size: 11px; color: var(--fg); display: flex; justify-content: space-between; gap: 4px; }
+.chip-cn { color: var(--fg-3); font-size: 10px; white-space: nowrap; }
+.chip-meta { display: flex; justify-content: space-between; gap: 4px; margin-top: 2px; font-size: 9.5px; color: var(--fg-3); }
+.chip-meta code { font-family: var(--mono); font-size: 9px; color: var(--fg-2); }
+
+.foot {
+  border-top: 1px solid var(--border-subtle);
+  padding: 28px 0 48px;
+  display: flex; flex-wrap: wrap; gap: 14px 28px;
+  justify-content: space-between; align-items: flex-start;
+  color: var(--fg-3); font-size: 13px;
+}
+.foot-meta { display: flex; flex-direction: column; gap: 4px; max-width: 36rem; }
+.foot-chips {
+  list-style: none; margin: 8px 0 0; padding: 0;
+  display: flex; flex-wrap: wrap; gap: 8px 16px;
+  font-size: 12px; color: var(--fg-4);
+}
+.foot nav { display: flex; flex-wrap: wrap; gap: 16px; }
+
+/* Site is PC-first (editor / terminal themes). Narrow viewports stack as a fallback. */
+@media (max-width: 1100px) {
+  .hero {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    align-items: start;
+  }
+  .hero-stage { order: -1; }
+}
+
+html[data-flavor="xuanmo"]{--bg:#14131a;--bg-alt:#1a1922;--activity:#0f0e14;--bg-sunken:#0f0e14;--sel:#332f46;--active:#302e3c;--border:#343240;--border-subtle:#262430;--border-strong:#4a4557;--fg:#d4cec4;--fg-2:#ada599;--fg-3:#8b8597;--fg-4:#6f6979;--cursor:#619ac3;--kw:#da5761;--fn:#619ac3;--str:#2bae85;--num:#f28e16;--type:#d6a01d;--cm:#85809e;--dec:#c08eaf;--var:#d4cec4;--param:#c08eaf;--prop:#c9c3b9;--ansi-1:#e1505d;--ansi-2:#2bae85;--ansi-3:#e2c027;--ansi-4:#619ac3;--ansi-5:#c08eaf;--ansi-6:#57c3c2;--diff-add:#2bae8526;--diff-del:#e2573726;--lens:rgba(255,255,255,0.06)}
+html[data-flavor="xuanmo-dimmed"]{--bg:#19181e;--bg-alt:#1e1d24;--activity:#151419;--bg-sunken:#151419;--sel:#363347;--active:#2e2c36;--border:#393643;--border-subtle:#2a2832;--border-strong:#4f4a5b;--fg:#d8d2c6;--fg-2:#b0a99f;--fg-3:#8f8996;--fg-4:#726c7a;--cursor:#619ac3;--kw:#c27c88;--fn:#66a9c9;--str:#69a794;--num:#b78b26;--type:#d6a01d;--cm:#85809e;--dec:#c08eaf;--var:#d8d2c6;--param:#bc84a8;--prop:#c5bfb4;--ansi-1:#c27c88;--ansi-2:#61ac85;--ansi-3:#b78b26;--ansi-4:#66a9c9;--ansi-5:#bc84a8;--ansi-6:#12aa9c;--diff-add:#69a79426;--diff-del:#e2573726;--lens:rgba(255,255,255,0.06)}
+html[data-flavor="xuanzhi"]{--bg:#f7f4ed;--bg-alt:#f1ece2;--activity:#eae3d5;--bg-sunken:#fffdf8;--sel:#dfd3ba;--active:#e4dbcc;--border:#d6ccb9;--border-subtle:#e7dfd1;--border-strong:#b9ad97;--fg:#35322d;--fg-2:#5b564c;--fg-3:#746b5e;--fg-4:#8f8577;--cursor:#126e82;--kw:#c34435;--fn:#0f59a4;--str:#1a6840;--num:#b14b28;--type:#813c85;--cm:#65706f;--dec:#806332;--var:#35322d;--param:#813c85;--prop:#4b463d;--ansi-1:#c83c2d;--ansi-2:#1a6840;--ansi-3:#806332;--ansi-4:#0f59a4;--ansi-5:#813c85;--ansi-6:#126e82;--diff-add:#1a684021;--diff-del:#c231421f;--lens:rgba(43,39,35,0.05)}
+html[data-flavor="xuanzhi-dimmed"]{--bg:#e9e2d4;--bg-alt:#e3dbcb;--activity:#dcd3c1;--bg-sunken:#f1ebdf;--sel:#d3c7ae;--active:#d8cebb;--border:#cbc0ab;--border-subtle:#ded4c2;--border-strong:#ada18a;--fg:#2f2b25;--fg-2:#4f4a40;--fg-3:#665f53;--fg-4:#847c6e;--cursor:#126e82;--kw:#894e54;--fn:#144a74;--str:#1a6840;--num:#66462a;--type:#525288;--cm:#73575c;--dec:#894276;--var:#2f2b25;--param:#5d3f51;--prop:#4f4a41;--ansi-1:#894e54;--ansi-2:#1a6840;--ansi-3:#66462a;--ansi-4:#144a74;--ansi-5:#894276;--ansi-6:#134857;--diff-add:#1a684021;--diff-del:#82111f1f;--lens:rgba(43,39,35,0.05)}
+html[data-flavor="canghai"]{--bg:#0d1822;--bg-alt:#12202b;--activity:#0a131b;--bg-sunken:#0a131b;--sel:#1d3644;--active:#20323f;--border:#29404f;--border-subtle:#1b2b36;--border-strong:#3d5a6d;--fg:#c8d4dd;--fg-2:#9aadbb;--fg-3:#788d9f;--fg-4:#5e7385;--cursor:#66a9c9;--kw:#dc5e41;--fn:#63bbd0;--str:#1ba784;--num:#d6a01d;--type:#c08eaf;--cm:#648e93;--dec:#c08eaf;--var:#c8d4dd;--param:#c08eaf;--prop:#b3c2ce;--ansi-1:#e25737;--ansi-2:#1ba784;--ansi-3:#e2c027;--ansi-4:#22a2c3;--ansi-5:#c08eaf;--ansi-6:#57c3c2;--diff-add:#1ba78426;--diff-del:#e2573726;--lens:rgba(255,255,255,0.06)}
+html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg-sunken:#f2f8f4;--sel:#c7d9cf;--active:#d7e2da;--border:#c7d5cc;--border-subtle:#dbe6df;--border-strong:#a8bab0;--fg:#2b333e;--fg-2:#4f5b5a;--fg-3:#5f6b67;--fg-4:#7d8983;--cursor:#126e82;--kw:#bc3a46;--fn:#126e82;--str:#1a6840;--num:#66462a;--type:#813c85;--cm:#495c69;--dec:#5d3f51;--var:#2b333e;--param:#5d3f51;--prop:#3f4a46;--ansi-1:#c23142;--ansi-2:#1a6840;--ansi-3:#66462a;--ansi-4:#126e82;--ansi-5:#813c85;--ansi-6:#495c69;--diff-add:#1a684021;--diff-del:#82111f1f;--lens:rgba(43,39,35,0.05)}
+
+  .editor { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--bg); }
+  .titlebar { height: 32px; background: var(--bg-alt); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px; padding: 0 12px; }
+  .dots { display: flex; gap: 5px; }
+  .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--border-strong); display: block; }
+  .title { font-size: 10.5px; color: var(--fg-3); letter-spacing: .02em; }
+  .editor-body { display: grid; grid-template-columns: 42px 132px 1fr; min-height: 0; }
+  .activity { background: var(--activity); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 12px 0; }
+  .glyph { color: var(--fg-3); font-size: 14px; opacity: .8; }
+  .sidebar { background: var(--bg-alt); border-right: 1px solid var(--border-subtle); padding: 10px 8px; font-size: 10.5px; color: var(--fg-2); }
+  .side-title { font-size: 10px; letter-spacing: 0; color: var(--fg-3); padding: 4px 8px 8px; }
+  .side-row { padding: 3px 6px; border-radius: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .side-row.file { padding-left: 20px; color: var(--fg-2); }
+  .side-active { background: var(--active); color: var(--fg); }
+  .side-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--kw); margin-left: 6px; vertical-align: middle; }
+  .side-muted { color: var(--fg-4); padding-left: 20px; }
+
+  .editor-main { min-width: 0; display: flex; flex-direction: column; }
+  .tabs { display: flex; background: var(--bg-alt); border-bottom: 1px solid var(--border-subtle); }
+  .tab { font-size: 10.5px; color: var(--fg-3); padding: 7px 14px; border-right: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 8px; }
+  .tab.active { background: var(--bg); color: var(--fg); box-shadow: inset 0 1px 0 var(--kw); }
+  .close { opacity: .5; font-size: 12px; }
+  .breadcrumb { display: flex; gap: 6px; align-items: center; padding: 6px 14px; font-size: 10px; color: var(--fg-3); border-bottom: 1px solid var(--border-subtle); }
+  .breadcrumb i { font-style: normal; opacity: .5; }
+
+  .code { font-family: var(--mono); font-size: 11px; line-height: 1.72; padding: 10px 0; overflow-x: auto; }
+  .line { display: flex; white-space: pre; min-width: max-content; }
+  .ln { width: 38px; text-align: right; padding-right: 12px; color: var(--fg-4); flex: 0 0 auto; user-select: none; }
+  .lc { padding-right: 16px; }
+  .line-active { background: var(--lens); }
+  .line-selected { background: var(--sel); }
+  .line-selected .ln { color: var(--fg-2); }
+
+  .kw { color: var(--kw); }
+  .fn { color: var(--fn); }
+  .str { color: var(--str); }
+  .num { color: var(--num); }
+  .type { color: var(--type); }
+  .cm { color: var(--cm); font-style: italic; }
+  .dec { color: var(--dec); }
+  .var { color: var(--var); }
+  .param { color: var(--param); font-style: italic; }
+  .prop { color: var(--prop); }
+
+  .statusbar { display: flex; justify-content: space-between; gap: 8px; background: var(--active); color: var(--fg); font-size: 9.5px; padding: 4px 12px; border-top: 1px solid var(--border-subtle); }
+  .sb-left b { color: var(--kw); font-weight: 500; }
+  .sb-sep { opacity: .35; margin: 0 6px; }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="atmosphere" aria-hidden="true"></div>
+
+<div class="wrap">
+  <header class="top">
+    <a class="brand-mark" href="./">
+      <img class="brand-logo" src="./favicon.png" width="32" height="32" alt="" decoding="async">
+      <span class="brand-words">墨观<span>Inkstone</span></span>
+    </a>
+    <nav class="lang" aria-label="Language">
+      <a href="./" aria-current="page">EN</a>
+      <a href="./zh/">中文</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <h1 id="hero-title">
+          <img class="hero-seal" src="./favicon.png" width="64" height="64" alt="" decoding="async">
+          <span class="hero-title-text">墨观 <span class="brand-en">Inkstone</span></span>
+        </h1>
+        <p class="tagline">Six variants share one hue skeleton, so switching feels like the same painting under a different light.</p>
+        <div class="cta-row">
+          <a class="cta cta-primary" href="https://github.com/Konata9/inkstone/releases">Install from Releases</a>
+          <a class="cta cta-ghost" href="https://github.com/Konata9/inkstone">Source on GitHub</a>
+        </div>
+        <ul class="support-strip" aria-label="Editors, Terminals">
+          
+          <li>
+
+<svg class="app-icon" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><path fill="currentColor" d="M70.9119 99.3171C72.4869 99.9307 74.2828 99.8914 75.8725 99.1264L96.4608 89.2197C98.6242 88.1787 100 85.9892 100 83.5872V16.4133C100 14.0113 98.6243 11.8218 96.4609 10.7808L75.8725 0.873756C73.7862 -0.130129 71.3446 0.11576 69.5135 1.44695C69.252 1.63711 69.0028 1.84943 68.769 2.08341L29.3551 38.0415L12.1872 25.0096C10.589 23.7965 8.35363 23.8959 6.86933 25.2461L1.36303 30.2549C-0.452552 31.9064 -0.454633 34.7627 1.35853 36.417L16.2471 50.0001L1.35853 63.5832C-0.454633 65.2374 -0.452552 68.0938 1.36303 69.7453L6.86933 74.7541C8.35363 76.1043 10.589 76.2037 12.1872 74.9905L29.3551 61.9587L68.769 97.9167C69.3925 98.5406 70.1246 99.0104 70.9119 99.3171ZM75.0152 27.2989L45.1091 50.0001L75.0152 72.7012V27.2989Z"/></svg>
+
+<span>VS Code</span></li>
+          
+          <li>
+
+<svg class="app-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M11.503.131 1.891 5.678a.84.84 0 0 0-.42.726v11.188c0 .3.162.575.42.724l9.609 5.55a1 1 0 0 0 .998 0l9.61-5.55a.84.84 0 0 0 .42-.724V6.404a.84.84 0 0 0-.42-.726L12.497.131a1.01 1.01 0 0 0-.996 0M2.657 6.338h18.55c.263 0 .43.287.297.515L12.23 22.918c-.062.107-.229.064-.229-.06V12.335a.59.59 0 0 0-.295-.51l-9.11-5.257c-.109-.063-.064-.23.061-.23"/></svg>
+
+<span>Cursor</span></li>
+          
+          <li>
+
+<svg class="app-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23.55 5.067c-1.2038-.002-2.1806.973-2.1806 2.1765v4.8676c0 .972-.8035 1.7594-1.7597 1.7594-.568 0-1.1352-.286-1.4718-.7659l-4.9713-7.1003c-.4125-.5896-1.0837-.941-1.8103-.941-1.1334 0-2.1533.9635-2.1533 2.153v4.8957c0 .972-.7969 1.7594-1.7596 1.7594-.57 0-1.1363-.286-1.4728-.7658L.4076 5.1598C.2822 4.9798 0 5.0688 0 5.2882v4.2452c0 .2147.0656.4228.1884.599l5.4748 7.8183c.3234.462.8006.8052 1.3509.9298 1.3771.313 2.6446-.747 2.6446-2.0977v-4.893c0-.972.7875-1.7593 1.7596-1.7593h.003a1.798 1.798 0 0 1 1.4718.7658l4.9723 7.0994c.4135.5905 1.05.941 1.8093.941 1.1587 0 2.1515-.9645 2.1515-2.153v-4.8948c0-.972.7875-1.7594 1.7596-1.7594h.194a.22.22 0 0 0 .2204-.2202v-4.622a.22.22 0 0 0-.2203-.2203Z"/></svg>
+
+<span>Windsurf</span></li>
+          
+          <li>
+
+<svg class="app-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M11.583.54a1.467 1.467 0 0 0-.441 2.032c2.426 3.758 2.999 6.592 2.75 9.075-1.004 4.756-3.187 5.721-5.094 5.721-1.863 0-1.364-3.065.036-3.962.836-.522 1.906-.861 2.728-.861.814 0 1.474-.658 1.474-1.47 0-.812-.66-1.47-1.474-1.47-.96 0-1.901.202-2.78.545.18-.847.246-1.762.014-2.735-.352-1.477-1.367-2.889-3.128-4.257a1.476 1.476 0 0 0-2.069.256c-.5.64-.384 1.564.259 2.063 1.435 1.114 1.908 1.939 2.07 2.618.162.679.032 1.407-.293 2.408-.416 1.349-.9 2.553-1.11 3.708-.105.568-.114 1.187-.14 1.68-1.034-1.006-1.438-2.336-1.438-4.279 0-.811-.66-1.47-1.474-1.47-.814.001-1.473.659-1.473 1.47 0 2.654.776 5.179 2.855 6.863 1.883 1.793 6.67 1.13 6.67 4.01 0 .812 1.19 1.208 2.004 1.208.834 0 1.885-.558 1.885-1.208 0-3.267 3.443-5.253 9.11-5.244A1.472 1.472 0 0 0 24 15.773 1.472 1.472 0 0 0 22.53 14.3c-.388 0-.765.013-1.138.035.634-1.49.915-3.13.857-4.903a1.473 1.473 0 0 0-1.522-1.42 1.472 1.472 0 0 0-1.425 1.517c.076 2.32-.01 4.393-1.74 5.485-.49.31-1.062.58-1.604.58.42-1.145.738-2.353.869-3.655.083-.83.091-1.818-.003-2.585-.148-1.188-.325-2.535.126-3.55.405-.874 1.313-1.24 2.645-1.24.814 0 1.473-.659 1.473-1.47 0-.811-.659-1.47-1.473-1.47-1.98 0-3.481 1.042-4.332 2.3-.445-.95-.987-1.929-1.642-2.943a1.474 1.474 0 0 0-2.037-.44z"/></svg>
+
+<span>VSCodium</span></li>
+          
+          
+          <li>
+
+<svg class="app-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 0C6.7 0 2.4 4.3 2.4 9.6v11.146c0 1.772 1.45 3.267 3.222 3.254a3.18 3.18 0 0 0 1.955-.686 1.96 1.96 0 0 1 2.444 0 3.18 3.18 0 0 0 1.976.686c.75 0 1.436-.257 1.98-.686.715-.563 1.71-.587 2.419-.018.59.476 1.355.743 2.182.699 1.705-.094 3.022-1.537 3.022-3.244V9.601C21.6 4.3 17.302 0 12 0M6.069 6.562a1 1 0 0 1 .46.131l3.578 2.065v.002a.974.974 0 0 1 0 1.687L6.53 12.512a.975.975 0 0 1-.976-1.687L7.67 9.602 5.553 8.38a.975.975 0 0 1 .515-1.818m7.438 2.063h4.7a.975.975 0 1 1 0 1.95h-4.7a.975.975 0 0 1 0-1.95"/></svg>
+
+<span>Ghostty</span></li>
+          
+          <li>
+
+<svg class="app-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M3.27 8.524c0-.623.62-1.007 2.123-1.007l-.5 2.757c-.931-.623-1.624-1.199-1.624-1.75zm4.008 6.807c0 .647-.644 1.079-2.123 1.15l.524-2.924c.931.624 1.6 1.175 1.6 1.774zm-2.625 5.992.454-2.708c3.603-.336 5.01-1.798 5.01-3.404 0-1.653-2.004-2.948-3.841-4.074l.668-3.548c.764.072 1.67.216 2.744.432l.31-2.469c-.81-.12-1.575-.168-2.29-.216L8.257 2.7l-2.363-.024-.453 2.684C1.838 5.648.43 7.158.43 8.764c0 1.63 2.004 2.876 3.841 3.954l-.668 3.716c-.859-.048-1.908-.192-3.125-.408L0 18.495c1.026.12 1.98.192 2.84.216l-.525 2.588zm15.553-1.894h2.673c.334-2.804.81-8.46 1.121-14.86h-2.553c-.071 1.51-.334 10.498-.43 11.241h-.071c-.644-2.42-1.169-4.386-1.813-6.782h-1.456c-.62 2.396-1.05 4.194-1.694 6.782h-.096c-.071-.743-.477-9.73-.525-11.24h-2.648c.31 6.399.763 12.055 1.097 14.86h2.625l1.838-7.12z"/></svg>
+
+<span>Kaku / WezTerm</span></li>
+          
+          <li>
+
+<svg class="app-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M22 24H2V0h20zM17 4.8H7v14.4h10z"/></svg>
+
+<span>OpenCode</span></li>
+          
+        </ul>
+        <div class="flavor-rail" role="group" aria-label="Variants">
+          
+          <button
+            type="button"
+            class="flavor-btn"
+            data-flavor="xuanmo"
+            aria-pressed="false"
+            title="Xuanmo"
+            style="--chip-bg:#14131a;--chip-alt:#1a1922;--chip-active:#302e3c;--chip-fg:#d4cec4;--chip-muted:#ada599;--chip-border:#343240;--chip-border-strong:#4a4557;--chip-accent:#da5761"
+          >
+            <span class="flavor-icon" aria-hidden="true"></span>
+            <span class="flavor-text">Xuanmo<span class="sub">玄墨</span></span>
+          </button>
+          
+          <button
+            type="button"
+            class="flavor-btn"
+            data-flavor="xuanmo-dimmed"
+            aria-pressed="false"
+            title="Xuanmo Dimmed"
+            style="--chip-bg:#19181e;--chip-alt:#1e1d24;--chip-active:#2e2c36;--chip-fg:#d8d2c6;--chip-muted:#b0a99f;--chip-border:#393643;--chip-border-strong:#4f4a5b;--chip-accent:#c27c88"
+          >
+            <span class="flavor-icon" aria-hidden="true"></span>
+            <span class="flavor-text">Xuanmo Dimmed<span class="sub">玄墨 Dimmed</span></span>
+          </button>
+          
+          <button
+            type="button"
+            class="flavor-btn"
+            data-flavor="xuanzhi"
+            aria-pressed="false"
+            title="Xuanzhi"
+            style="--chip-bg:#f7f4ed;--chip-alt:#f1ece2;--chip-active:#e4dbcc;--chip-fg:#35322d;--chip-muted:#5b564c;--chip-border:#d6ccb9;--chip-border-strong:#b9ad97;--chip-accent:#c34435"
+          >
+            <span class="flavor-icon" aria-hidden="true"></span>
+            <span class="flavor-text">Xuanzhi<span class="sub">宣纸</span></span>
+          </button>
+          
+          <button
+            type="button"
+            class="flavor-btn"
+            data-flavor="xuanzhi-dimmed"
+            aria-pressed="false"
+            title="Xuanzhi Dimmed"
+            style="--chip-bg:#e9e2d4;--chip-alt:#e3dbcb;--chip-active:#d8cebb;--chip-fg:#2f2b25;--chip-muted:#4f4a40;--chip-border:#cbc0ab;--chip-border-strong:#ada18a;--chip-accent:#894e54"
+          >
+            <span class="flavor-icon" aria-hidden="true"></span>
+            <span class="flavor-text">Xuanzhi Dimmed<span class="sub">宣纸 Dimmed</span></span>
+          </button>
+          
+          <button
+            type="button"
+            class="flavor-btn"
+            data-flavor="canghai"
+            aria-pressed="false"
+            title="Canghai"
+            style="--chip-bg:#0d1822;--chip-alt:#12202b;--chip-active:#20323f;--chip-fg:#c8d4dd;--chip-muted:#9aadbb;--chip-border:#29404f;--chip-border-strong:#3d5a6d;--chip-accent:#dc5e41"
+          >
+            <span class="flavor-icon" aria-hidden="true"></span>
+            <span class="flavor-text">Canghai<span class="sub">沧海</span></span>
+          </button>
+          
+          <button
+            type="button"
+            class="flavor-btn"
+            data-flavor="qingci"
+            aria-pressed="false"
+            title="Qingci"
+            style="--chip-bg:#e8f0ec;--chip-alt:#e1eae4;--chip-active:#d7e2da;--chip-fg:#2b333e;--chip-muted:#4f5b5a;--chip-border:#c7d5cc;--chip-border-strong:#a8bab0;--chip-accent:#bc3a46"
+          >
+            <span class="flavor-icon" aria-hidden="true"></span>
+            <span class="flavor-text">Qingci<span class="sub">青瓷</span></span>
+          </button>
+          
+        </div>
+      </div>
+
+      <div class="hero-stage" aria-label="Editor">
+        
+        <div class="flavor-panel" data-flavor="xuanmo">
+          
+  <div class="editor">
+    <div class="titlebar">
+      <span class="dots"><i></i><i></i><i></i></span>
+      <span class="title">inkstone · theme.ts</span>
+    </div>
+    <div class="editor-body">
+      <div class="activity">
+        <span class="glyph">◫</span>
+        <span class="glyph">⌕</span>
+        <span class="glyph">⑂</span>
+        <span class="glyph">▷</span>
+        <span class="glyph">◈</span>
+      </div>
+      <div class="sidebar">
+        <div class="side-title">Inkstone</div>
+        <div class="side-row side-active"><span class="chev">▾</span> src</div>
+        <div class="side-row file side-active">theme.ts<span class="side-dot"></span></div><div class="side-row file ">palette.ts</div><div class="side-row file ">ghostty</div><div class="side-row file ">kaku.lua</div><div class="side-row file ">README.md</div>
+        <div class="side-row side-muted">node_modules</div>
+      </div>
+      <div class="editor-main">
+        <div class="tabs">
+          <div class="tab active">theme.ts <span class="close">×</span></div>
+          <div class="tab">palette.ts</div>
+          <div class="tab">kaku.lua</div>
+        </div>
+        <div class="breadcrumb"><span>src</span><i>›</i><span>theme.ts</span><i>›</i><span>contrast</span></div>
+        <div class="code"><div class="line"><span class="ln">1</span><span class="lc"><span class="cm">// 墨观 Inkstone · 把传统色写进代码</span></span></div>
+<div class="line"><span class="ln">2</span><span class="lc"><span class="kw">import</span> { <span class="fn">named</span> } <span class="kw">from</span> <span class="str">"./palette"</span>;</span></div>
+<div class="line"><span class="ln">3</span><span class="lc"> </span></div>
+<div class="line"><span class="ln">4</span><span class="lc"><span class="kw">interface</span> <span class="type">Ink</span> {</span></div>
+<div class="line"><span class="ln">5</span><span class="lc">  <span class="prop">name</span>: <span class="type">string</span>;</span></div>
+<div class="line"><span class="ln">6</span><span class="lc">  <span class="prop">hex</span>: <span class="str">`#${string}`</span>;</span></div>
+<div class="line"><span class="ln">7</span><span class="lc">}</span></div>
+<div class="line"><span class="ln">8</span><span class="lc"> </span></div>
+<div class="line line-selected"><span class="ln">9</span><span class="lc"><span class="kw">const</span> <span class="var">墨色</span>: <span class="type">Ink</span> = {</span></div>
+<div class="line"><span class="ln">10</span><span class="lc">  <span class="prop">name</span>: <span class="str">"玄墨"</span>, <span class="prop">hex</span>: <span class="str">"#14131a"</span>,</span></div>
+<div class="line"><span class="ln">11</span><span class="lc">};</span></div>
+<div class="line"><span class="ln">12</span><span class="lc"> </span></div>
+<div class="line"><span class="ln">13</span><span class="lc"><span class="cm">/** 计算 WCAG 对比度 */</span></span></div>
+<div class="line line-active"><span class="ln">14</span><span class="lc"><span class="kw">export function</span> <span class="fn">contrast</span>(<span class="param">a</span>: <span class="type">Ink</span>, <span class="param">b</span>: <span class="type">Ink</span>): <span class="type">number</span> {</span></div>
+<div class="line"><span class="ln">15</span><span class="lc">  <span class="kw">const</span> <span class="fn">lum</span> = (<span class="param">c</span>: <span class="type">Ink</span>) =&gt; {</span></div>
+<div class="line"><span class="ln">16</span><span class="lc">    <span class="kw">const</span> [<span class="var">r</span>, <span class="var">g</span>, <span class="var">b</span>] = [<span class="num">0</span>, <span class="num">1</span>, <span class="num">2</span>].<span class="fn">map</span>((<span class="param">i</span>) =&gt; <span class="fn">channel</span>(c.hex, i));</span></div>
+<div class="line"><span class="ln">17</span><span class="lc">    <span class="kw">return</span> <span class="num">0.2126</span> * r + <span class="num">0.7152</span> * g + <span class="num">0.0722</span> * b;</span></div>
+<div class="line"><span class="ln">18</span><span class="lc">  };</span></div>
+<div class="line"><span class="ln">19</span><span class="lc">  <span class="kw">const</span> [<span class="var">hi</span>, <span class="var">lo</span>] = [<span class="fn">lum</span>(a), <span class="fn">lum</span>(b)].<span class="fn">sort</span>((<span class="param">x</span>, <span class="param">y</span>) =&gt; y - x);</span></div>
+<div class="line"><span class="ln">20</span><span class="lc">  <span class="kw">return</span> (hi + <span class="num">0.05</span>) / (lo + <span class="num">0.05</span>);</span></div>
+<div class="line"><span class="ln">21</span><span class="lc">}</span></div>
+<div class="line"><span class="ln">22</span><span class="lc"> </span></div></div>
+        <div class="statusbar">
+          <span class="sb-left"><b>main*</b><span class="sb-sep">|</span>0 errors<span class="sb-sep">|</span>1 warning</span>
+          <span class="sb-right">TypeScript<span class="sb-sep">|</span>墨观 · 玄墨<span class="sb-sep">|</span>UTF-8</span>
+        </div>
+      </div>
+    </div>
+  </div>
+        </div>
+        
+        <div class="flavor-panel" data-flavor="xuanmo-dimmed">
+          
+  <div class="editor">
+    <div class="titlebar">
+      <span class="dots"><i></i><i></i><i></i></span>
+      <span class="title">inkstone · theme.ts</span>
+    </div>
+    <div class="editor-body">
+      <div class="activity">
+        <span class="glyph">◫</span>
+        <span class="glyph">⌕</span>
+        <span class="glyph">⑂</span>
+        <span class="glyph">▷</span>
+        <span class="glyph">◈</span>
+      </div>
+      <div class="sidebar">
+        <div class="side-title">Inkstone</div>
+        <div class="side-row side-active"><span class="chev">▾</span> src</div>
+        <div class="side-row file side-active">theme.ts<span class="side-dot"></span></div><div class="side-row file ">palette.ts</div><div class="side-row file ">ghostty</div><div class="side-row file ">kaku.lua</div><div class="side-row file ">README.md</div>
+        <div class="side-row side-muted">node_modules</div>
+      </div>
+      <div class="editor-main">
+        <div class="tabs">
+          <div class="tab active">theme.ts <span class="close">×</span></div>
+          <div class="tab">palette.ts</div>
+          <div class="tab">kaku.lua</div>
+        </div>
+        <div class="breadcrumb"><span>src</span><i>›</i><span>theme.ts</span><i>›</i><span>contrast</span></div>
+        <div class="code"><div class="line"><span class="ln">1</span><span class="lc"><span class="cm">// 墨观 Inkstone · 把传统色写进代码</span></span></div>
+<div class="line"><span class="ln">2</span><span class="lc"><span class="kw">import</span> { <span class="fn">named</span> } <span class="kw">from</span> <span class="str">"./palette"</span>;</span></div>
+<div class="line"><span class="ln">3</span><span class="lc"> </span></div>
+<div class="line"><span class="ln">4</span><span class="lc"><span class="kw">interface</span> <span class="type">Ink</span> {</span></div>
+<div class="line"><span class="ln">5</span><span class="lc">  <span class="prop">name</span>: <span class="type">string</span>;</span></div>
+<div class="line"><span class="ln">6</span><span class="lc">  <span class="prop">hex</span>: <span class="str">`#${string}`</span>;</span></div>
+<div class="line"><span class="ln">7</span><span class="lc">}</span></div>
+<div class="line"><span class="ln">8</span><span class="lc"> </span></div>
+<div class="line line-selected"><span class="ln">9</span><span class="lc"><span class="kw">const</span> <span class="var">墨色</span>: <span class="type">Ink</span> = {</span></div>
+<div class="line"><span class="ln">10</span><span class="lc">  <span class="prop">name</span>: <span class="str">"玄墨"</span>, <span class="prop">hex</span>: <span class="str">"#19181e"</span>,</span></div>
+<div class="line"><span class="ln">11</span><span class="lc">};</span></div>
+<div class="line"><span class="ln">12</span><span class="lc"> </span></div>
+<div class="line"><span class="ln">13</span><span class="lc"><span class="cm">/** 计算 WCAG 对比度 */</span></span></div>
+<div class="line line-active"><span class="ln">14</span><span class="lc"><span class="kw">export function</span> <span class="fn">contrast</span>(<span class="param">a</span>: <span class="type">Ink</span>, <span class="param">b</span>: <span class="type">Ink</span>): <span class="type">number</span> {</span></div>
+<div class="line"><span class="ln">15</span><span class="lc">  <span class="kw">const</span> <span class="fn">lum</span> = (<span class="param">c</span>: <span class="type">Ink</span>) =&gt; {</span></div>
+<div class="line"><span class="ln">16</span><span class="lc">    <span class="kw">const</span> [<span class="var">r</span>, <span class="var">g</span>, <span class="var">b</span>] = [<span class="num">0</span>, <span class="num">1</span>, <span class="num">2</span>].<span class="fn">map</span>((<span class="param">i</span>) =&gt; <span class="fn">channel</span>(c.hex, i));</span></div>
+<div class="line"><span class="ln">17</span><span class="lc">    <span class="kw">return</span> <span class="num">0.2126</span> * r + <span class="num">0.7152</span> * g + <span class="num">0.0722</span> * b;</span></div>
+<div class="line"><span class="ln">18</span><span class="lc">  };</span></div>
+<div class="line"><span class="ln">19</span><span class="lc">  <span class="kw">const</span> [<span class="var">hi</span>, <span class="var">lo</span>] = [<span class="fn">lum</span>(a), <span class="fn">lum</span>(b)].<span class="fn">sort</span>((<span class="param">x</span>, <span class="param">y</span>) =&gt; y - x);</span></div>
+<div class="line"><span class="ln">20</span><span class="lc">  <span class="kw">return</span> (hi + <span class="num">0.05</span>) / (lo + <span class="num">0.05</span>);</span></div>
+<div class="line"><span class="ln">21</span><span class="lc">}</span></div>
+<div class="line"><span class="ln">22</span><span class="lc"> </span></div></div>
+        <div class="statusbar">
+          <span class="sb-left"><b>main*</b><span class="sb-sep">|</span>0 errors<span class="sb-sep">|</span>1 warning</span>
+          <span class="sb-right">TypeScript<span class="sb-sep">|</span>墨观 · 玄墨<span class="sb-sep">|</span>UTF-8</span>
+        </div>
+      </div>
+    </div>
+  </div>
+        </div>
+        
+        <div class="flavor-panel" data-flavor="xuanzhi">
+          
+  <div class="editor">
+    <div class="titlebar">
+      <span class="dots"><i></i><i></i><i></i></span>
+      <span class="title">inkstone · theme.ts</span>
+    </div>
+    <div class="editor-body">
+      <div class="activity">
+        <span class="glyph">◫</span>
+        <span class="glyph">⌕</span>
+        <span class="glyph">⑂</span>
+        <span class="glyph">▷</span>
+        <span class="glyph">◈</span>
+      </div>
+      <div class="sidebar">
+        <div class="side-title">Inkstone</div>
+        <div class="side-row side-active"><span class="chev">▾</span> src</div>
+        <div class="side-row file side-active">theme.ts<span class="side-dot"></span></div><div class="side-row file ">palette.ts</div><div class="side-row file ">ghostty</div><div class="side-row file ">kaku.lua</div><div class="side-row file ">README.md</div>
+        <div class="side-row side-muted">node_modules</div>
+      </div>
+      <div class="editor-main">
+        <div class="tabs">
+          <div class="tab active">theme.ts <span class="close">×</span></div>
+          <div class="tab">palette.ts</div>
+          <div class="tab">kaku.lua</div>
+        </div>
+        <div class="breadcrumb"><span>src</span><i>›</i><span>theme.ts</span><i>›</i><span>contrast</span></div>
+        <div class="code"><div class="line"><span class="ln">1</span><span class="lc"><span class="cm">// 墨观 Inkstone · 把传统色写进代码</span></span></div>
+<div class="line"><span class="ln">2</span><span class="lc"><span class="kw">import</span> { <span class="fn">named</span> } <span class="kw">from</span> <span class="str">"./palette"</span>;</span></div>
+<div class="line"><span class="ln">3</span><span class="lc"> </span></div>
+<div class="line"><span class="ln">4</span><span class="lc"><span class="kw">interface</span> <span class="type">Ink</span> {</span></div>
+<div class="line"><span class="ln">5</span><span class="lc">  <span class="prop">name</span>: <span class="type">string</span>;</span></div>
+<div class="line"><span class="ln">6</span><span class="lc">  <span class="prop">hex</span>: <span class="str">`#${string}`</span>;</span></div>
+<div class="line"><span class="ln">7</span><span class="lc">}</span></div>
+<div class="line"><span class="ln">8</span><span class="lc"> </span></div>
+<div class="line line-selected"><span class="ln">9</span><span class="lc"><span class="kw">const</span> <span class="var">墨色</span>: <span class="type">Ink</span> = {</span></div>
+<div class="line"><span class="ln">10</span><span class="lc">  <span class="prop">name</span>: <span class="str">"宣纸"</span>, <span class="prop">hex</span>: <span class="str">"#f7f4ed"</span>,</span></div>
+<div class="line"><span class="ln">11</span><span class="lc">};</span></div>
+<div class="line"><span class="ln">12</span><span class="lc"> </span></div>
+<div class="line"><span class="ln">13</span><span class="lc"><span class="cm">/** 计算 WCAG 对比度 */</span></span></div>
+<div class="line line-active"><span class="ln">14</span><span class="lc"><span class="kw">export function</span> <span class="fn">contrast</span>(<span class="param">a</span>: <span class="type">Ink</span>, <span class="param">b</span>: <span class="type">Ink</span>): <span class="type">number</span> {</span></div>
+<div class="line"><span class="ln">15</span><span class="lc">  <span class="kw">const</span> <span class="fn">lum</span> = (<span class="param">c</span>: <span class="type">Ink</span>) =&gt; {</span></div>
+<div class="line"><span class="ln">16</span><span class="lc">    <span class="kw">const</span> [<span class="var">r</span>, <span class="var">g</span>, <span class="var">b</span>] = [<span class="num">0</span>, <span class="num">1</span>, <span class="num">2</span>].<span class="fn">map</span>((<span class="param">i</span>) =&gt; <span class="fn">channel</span>(c.hex, i));</span></div>
+<div class="line"><span class="ln">17</span><span class="lc">    <span class="kw">return</span> <span class="num">0.2126</span> * r + <span class="num">0.7152</span> * g + <span class="num">0.0722</span> * b;</span></div>
+<div class="line"><span class="ln">18</span><span class="lc">  };</span></div>
+<div class="line"><span class="ln">19</span><span class="lc">  <span class="kw">const</span> [<span class="var">hi</span>, <span class="var">lo</span>] = [<span class="fn">lum</span>(a), <span class="fn">lum</span>(b)].<span class="fn">sort</span>((<span class="param">x</span>, <span class="param">y</span>) =&gt; y - x);</span></div>
+<div class="line"><span class="ln">20</span><span class="lc">  <span class="kw">return</span> (hi + <span class="num">0.05</span>) / (lo + <span class="num">0.05</span>);</span></div>
+<div class="line"><span class="ln">21</span><span class="lc">}</span></div>
+<div class="line"><span class="ln">22</span><span class="lc"> </span></div></div>
+        <div class="statusbar">
+          <span class="sb-left"><b>main*</b><span class="sb-sep">|</span>0 errors<span class="sb-sep">|</span>1 warning</span>
+          <span class="sb-right">TypeScript<span class="sb-sep">|</span>墨观 · 宣纸<span class="sb-sep">|</span>UTF-8</span>
+        </div>
+      </div>
+    </div>
+  </div>
+        </div>
+        
+        <div class="flavor-panel" data-flavor="xuanzhi-dimmed">
+          
+  <div class="editor">
+    <div class="titlebar">
+      <span class="dots"><i></i><i></i><i></i></span>
+      <span class="title">inkstone · theme.ts</span>
+    </div>
+    <div class="editor-body">
+      <div class="activity">
+        <span class="glyph">◫</span>
+        <span class="glyph">⌕</span>
+        <span class="glyph">⑂</span>
+        <span class="glyph">▷</span>
+        <span class="glyph">◈</span>
+      </div>
+      <div class="sidebar">
+        <div class="side-title">Inkstone</div>
+        <div class="side-row side-active"><span class="chev">▾</span> src</div>
+        <div class="side-row file side-active">theme.ts<span class="side-dot"></span></div><div class="side-row file ">palette.ts</div><div class="side-row file ">ghostty</div><div class="side-row file ">kaku.lua</div><div class="side-row file ">README.md</div>
+        <div class="side-row side-muted">node_modules</div>
+      </div>
+      <div class="editor-main">
+        <div class="tabs">
+          <div class="tab active">theme.ts <span class="close">×</span></div>
+          <div class="tab">palette.ts</div>
+          <div class="tab">kaku.lua</div>
+        </div>
+        <div class="breadcrumb"><span>src</span><i>›</i><span>theme.ts</span><i>›</i><span>contrast</span></div>
+        <div class="code"><div class="line"><span class="ln">1</span><span class="lc"><span class="cm">// 墨观 Inkstone · 把传统色写进代码</span></span></div>
+<div class="line"><span class="ln">2</span><span class="lc"><span class="kw">import</span> { <span class="fn">named</span> } <span class="kw">from</span> <span class="str">"./palette"</span>;</span></div>
+<div class="line"><span class="ln">3</span><span class="lc"> </span></div>
+<div class="line"><span class="ln">4</span><span class="lc"><span class="kw">interface</span> <span class="type">Ink</span> {</span></div>
+<div class="line"><span class="ln">5</span><span class="lc">  <span class="prop">name</span>: <span class="type">string</span>;</span></div>
+<div class="line"><span class="ln">6</span><span class="lc">  <span class="prop">hex</span>: <span class="str">`#${string}`</span>;</span></div>
+<div class="line"><span class="ln">7</span><span class="lc">}</span></div>
+<div class="line"><span class="ln">8</span><span class="lc"> </span></div>
+<div class="line line-selected"><span class="ln">9</span><span class="lc"><span class="kw">const</span> <span class="var">墨色</span>: <span class="type">Ink</span> = {</span></div>
+<div class="line"><span class="ln">10</span><span class="lc">  <span class="prop">name</span>: <span class="str">"宣纸"</span>, <span class="prop">hex</span>: <span class="str">"#e9e2d4"</span>,</span></div>
+<div class="line"><span class="ln">11</span><span class="lc">};</span></div>
+<div class="line"><span class="ln">12</span><span class="lc"> </span></div>
+<div class="line"><span class="ln">13</span><span class="lc"><span class="cm">/** 计算 WCAG 对比度 */</span></span></div>
+<div class="line line-active"><span class="ln">14</span><span class="lc"><span class="kw">export function</span> <span class="fn">contrast</span>(<span class="param">a</span>: <span class="type">Ink</span>, <span class="param">b</span>: <span class="type">Ink</span>): <span class="type">number</span> {</span></div>
+<div class="line"><span class="ln">15</span><span class="lc">  <span class="kw">const</span> <span class="fn">lum</span> = (<span class="param">c</span>: <span class="type">Ink</span>) =&gt; {</span></div>
+<div class="line"><span class="ln">16</span><span class="lc">    <span class="kw">const</span> [<span class="var">r</span>, <span class="var">g</span>, <span class="var">b</span>] = [<span class="num">0</span>, <span class="num">1</span>, <span class="num">2</span>].<span class="fn">map</span>((<span class="param">i</span>) =&gt; <span class="fn">channel</span>(c.hex, i));</span></div>
+<div class="line"><span class="ln">17</span><span class="lc">    <span class="kw">return</span> <span class="num">0.2126</span> * r + <span class="num">0.7152</span> * g + <span class="num">0.0722</span> * b;</span></div>
+<div class="line"><span class="ln">18</span><span class="lc">  };</span></div>
+<div class="line"><span class="ln">19</span><span class="lc">  <span class="kw">const</span> [<span class="var">hi</span>, <span class="var">lo</span>] = [<span class="fn">lum</span>(a), <span class="fn">lum</span>(b)].<span class="fn">sort</span>((<span class="param">x</span>, <span class="param">y</span>) =&gt; y - x);</span></div>
+<div class="line"><span class="ln">20</span><span class="lc">  <span class="kw">return</span> (hi + <span class="num">0.05</span>) / (lo + <span class="num">0.05</span>);</span></div>
+<div class="line"><span class="ln">21</span><span class="lc">}</span></div>
+<div class="line"><span class="ln">22</span><span class="lc"> </span></div></div>
+        <div class="statusbar">
+          <span class="sb-left"><b>main*</b><span class="sb-sep">|</span>0 errors<span class="sb-sep">|</span>1 warning</span>
+          <span class="sb-right">TypeScript<span class="sb-sep">|</span>墨观 · 宣纸<span class="sb-sep">|</span>UTF-8</span>
+        </div>
+      </div>
+    </div>
+  </div>
+        </div>
+        
+        <div class="flavor-panel" data-flavor="canghai">
+          
+  <div class="editor">
+    <div class="titlebar">
+      <span class="dots"><i></i><i></i><i></i></span>
+      <span class="title">inkstone · theme.ts</span>
+    </div>
+    <div class="editor-body">
+      <div class="activity">
+        <span class="glyph">◫</span>
+        <span class="glyph">⌕</span>
+        <span class="glyph">⑂</span>
+        <span class="glyph">▷</span>
+        <span class="glyph">◈</span>
+      </div>
+      <div class="sidebar">
+        <div class="side-title">Inkstone</div>
+        <div class="side-row side-active"><span class="chev">▾</span> src</div>
+        <div class="side-row file side-active">theme.ts<span class="side-dot"></span></div><div class="side-row file ">palette.ts</div><div class="side-row file ">ghostty</div><div class="side-row file ">kaku.lua</div><div class="side-row file ">README.md</div>
+        <div class="side-row side-muted">node_modules</div>
+      </div>
+      <div class="editor-main">
+        <div class="tabs">
+          <div class="tab active">theme.ts <span class="close">×</span></div>
+          <div class="tab">palette.ts</div>
+          <div class="tab">kaku.lua</div>
+        </div>
+        <div class="breadcrumb"><span>src</span><i>›</i><span>theme.ts</span><i>›</i><span>contrast</span></div>
+        <div class="code"><div class="line"><span class="ln">1</span><span class="lc"><span class="cm">// 墨观 Inkstone · 把传统色写进代码</span></span></div>
+<div class="line"><span class="ln">2</span><span class="lc"><span class="kw">import</span> { <span class="fn">named</span> } <span class="kw">from</span> <span class="str">"./palette"</span>;</span></div>
+<div class="line"><span class="ln">3</span><span class="lc"> </span></div>
+<div class="line"><span class="ln">4</span><span class="lc"><span class="kw">interface</span> <span class="type">Ink</span> {</span></div>
+<div class="line"><span class="ln">5</span><span class="lc">  <span class="prop">name</span>: <span class="type">string</span>;</span></div>
+<div class="line"><span class="ln">6</span><span class="lc">  <span class="prop">hex</span>: <span class="str">`#${string}`</span>;</span></div>
+<div class="line"><span class="ln">7</span><span class="lc">}</span></div>
+<div class="line"><span class="ln">8</span><span class="lc"> </span></div>
+<div class="line line-selected"><span class="ln">9</span><span class="lc"><span class="kw">const</span> <span class="var">墨色</span>: <span class="type">Ink</span> = {</span></div>
+<div class="line"><span class="ln">10</span><span class="lc">  <span class="prop">name</span>: <span class="str">"沧海"</span>, <span class="prop">hex</span>: <span class="str">"#0d1822"</span>,</span></div>
+<div class="line"><span class="ln">11</span><span class="lc">};</span></div>
+<div class="line"><span class="ln">12</span><span class="lc"> </span></div>
+<div class="line"><span class="ln">13</span><span class="lc"><span class="cm">/** 计算 WCAG 对比度 */</span></span></div>
+<div class="line line-active"><span class="ln">14</span><span class="lc"><span class="kw">export function</span> <span class="fn">contrast</span>(<span class="param">a</span>: <span class="type">Ink</span>, <span class="param">b</span>: <span class="type">Ink</span>): <span class="type">number</span> {</span></div>
+<div class="line"><span class="ln">15</span><span class="lc">  <span class="kw">const</span> <span class="fn">lum</span> = (<span class="param">c</span>: <span class="type">Ink</span>) =&gt; {</span></div>
+<div class="line"><span class="ln">16</span><span class="lc">    <span class="kw">const</span> [<span class="var">r</span>, <span class="var">g</span>, <span class="var">b</span>] = [<span class="num">0</span>, <span class="num">1</span>, <span class="num">2</span>].<span class="fn">map</span>((<span class="param">i</span>) =&gt; <span class="fn">channel</span>(c.hex, i));</span></div>
+<div class="line"><span class="ln">17</span><span class="lc">    <span class="kw">return</span> <span class="num">0.2126</span> * r + <span class="num">0.7152</span> * g + <span class="num">0.0722</span> * b;</span></div>
+<div class="line"><span class="ln">18</span><span class="lc">  };</span></div>
+<div class="line"><span class="ln">19</span><span class="lc">  <span class="kw">const</span> [<span class="var">hi</span>, <span class="var">lo</span>] = [<span class="fn">lum</span>(a), <span class="fn">lum</span>(b)].<span class="fn">sort</span>((<span class="param">x</span>, <span class="param">y</span>) =&gt; y - x);</span></div>
+<div class="line"><span class="ln">20</span><span class="lc">  <span class="kw">return</span> (hi + <span class="num">0.05</span>) / (lo + <span class="num">0.05</span>);</span></div>
+<div class="line"><span class="ln">21</span><span class="lc">}</span></div>
+<div class="line"><span class="ln">22</span><span class="lc"> </span></div></div>
+        <div class="statusbar">
+          <span class="sb-left"><b>main*</b><span class="sb-sep">|</span>0 errors<span class="sb-sep">|</span>1 warning</span>
+          <span class="sb-right">TypeScript<span class="sb-sep">|</span>墨观 · 沧海<span class="sb-sep">|</span>UTF-8</span>
+        </div>
+      </div>
+    </div>
+  </div>
+        </div>
+        
+        <div class="flavor-panel" data-flavor="qingci">
+          
+  <div class="editor">
+    <div class="titlebar">
+      <span class="dots"><i></i><i></i><i></i></span>
+      <span class="title">inkstone · theme.ts</span>
+    </div>
+    <div class="editor-body">
+      <div class="activity">
+        <span class="glyph">◫</span>
+        <span class="glyph">⌕</span>
+        <span class="glyph">⑂</span>
+        <span class="glyph">▷</span>
+        <span class="glyph">◈</span>
+      </div>
+      <div class="sidebar">
+        <div class="side-title">Inkstone</div>
+        <div class="side-row side-active"><span class="chev">▾</span> src</div>
+        <div class="side-row file side-active">theme.ts<span class="side-dot"></span></div><div class="side-row file ">palette.ts</div><div class="side-row file ">ghostty</div><div class="side-row file ">kaku.lua</div><div class="side-row file ">README.md</div>
+        <div class="side-row side-muted">node_modules</div>
+      </div>
+      <div class="editor-main">
+        <div class="tabs">
+          <div class="tab active">theme.ts <span class="close">×</span></div>
+          <div class="tab">palette.ts</div>
+          <div class="tab">kaku.lua</div>
+        </div>
+        <div class="breadcrumb"><span>src</span><i>›</i><span>theme.ts</span><i>›</i><span>contrast</span></div>
+        <div class="code"><div class="line"><span class="ln">1</span><span class="lc"><span class="cm">// 墨观 Inkstone · 把传统色写进代码</span></span></div>
+<div class="line"><span class="ln">2</span><span class="lc"><span class="kw">import</span> { <span class="fn">named</span> } <span class="kw">from</span> <span class="str">"./palette"</span>;</span></div>
+<div class="line"><span class="ln">3</span><span class="lc"> </span></div>
+<div class="line"><span class="ln">4</span><span class="lc"><span class="kw">interface</span> <span class="type">Ink</span> {</span></div>
+<div class="line"><span class="ln">5</span><span class="lc">  <span class="prop">name</span>: <span class="type">string</span>;</span></div>
+<div class="line"><span class="ln">6</span><span class="lc">  <span class="prop">hex</span>: <span class="str">`#${string}`</span>;</span></div>
+<div class="line"><span class="ln">7</span><span class="lc">}</span></div>
+<div class="line"><span class="ln">8</span><span class="lc"> </span></div>
+<div class="line line-selected"><span class="ln">9</span><span class="lc"><span class="kw">const</span> <span class="var">墨色</span>: <span class="type">Ink</span> = {</span></div>
+<div class="line"><span class="ln">10</span><span class="lc">  <span class="prop">name</span>: <span class="str">"青瓷"</span>, <span class="prop">hex</span>: <span class="str">"#e8f0ec"</span>,</span></div>
+<div class="line"><span class="ln">11</span><span class="lc">};</span></div>
+<div class="line"><span class="ln">12</span><span class="lc"> </span></div>
+<div class="line"><span class="ln">13</span><span class="lc"><span class="cm">/** 计算 WCAG 对比度 */</span></span></div>
+<div class="line line-active"><span class="ln">14</span><span class="lc"><span class="kw">export function</span> <span class="fn">contrast</span>(<span class="param">a</span>: <span class="type">Ink</span>, <span class="param">b</span>: <span class="type">Ink</span>): <span class="type">number</span> {</span></div>
+<div class="line"><span class="ln">15</span><span class="lc">  <span class="kw">const</span> <span class="fn">lum</span> = (<span class="param">c</span>: <span class="type">Ink</span>) =&gt; {</span></div>
+<div class="line"><span class="ln">16</span><span class="lc">    <span class="kw">const</span> [<span class="var">r</span>, <span class="var">g</span>, <span class="var">b</span>] = [<span class="num">0</span>, <span class="num">1</span>, <span class="num">2</span>].<span class="fn">map</span>((<span class="param">i</span>) =&gt; <span class="fn">channel</span>(c.hex, i));</span></div>
+<div class="line"><span class="ln">17</span><span class="lc">    <span class="kw">return</span> <span class="num">0.2126</span> * r + <span class="num">0.7152</span> * g + <span class="num">0.0722</span> * b;</span></div>
+<div class="line"><span class="ln">18</span><span class="lc">  };</span></div>
+<div class="line"><span class="ln">19</span><span class="lc">  <span class="kw">const</span> [<span class="var">hi</span>, <span class="var">lo</span>] = [<span class="fn">lum</span>(a), <span class="fn">lum</span>(b)].<span class="fn">sort</span>((<span class="param">x</span>, <span class="param">y</span>) =&gt; y - x);</span></div>
+<div class="line"><span class="ln">20</span><span class="lc">  <span class="kw">return</span> (hi + <span class="num">0.05</span>) / (lo + <span class="num">0.05</span>);</span></div>
+<div class="line"><span class="ln">21</span><span class="lc">}</span></div>
+<div class="line"><span class="ln">22</span><span class="lc"> </span></div></div>
+        <div class="statusbar">
+          <span class="sb-left"><b>main*</b><span class="sb-sep">|</span>0 errors<span class="sb-sep">|</span>1 warning</span>
+          <span class="sb-right">TypeScript<span class="sb-sep">|</span>墨观 · 青瓷<span class="sb-sep">|</span>UTF-8</span>
+        </div>
+      </div>
+    </div>
+  </div>
+        </div>
+        
+      </div>
+    </section>
+
+    <section class="specimen" aria-labelledby="specimen-title">
+      <div class="specimen-head">
+        <h2 id="specimen-title" class="section-title">Active palette</h2>
+        <p>Colours come from the 526-entry zhongguose chart. Ink & paper (玄墨 / 宣纸) and sea & celadon (沧海 / 青瓷) keep the same hue order; Dimmed lowers the room light, not the ink.</p>
+      </div>
+      
+      <div class="flavor-panel" data-flavor="xuanmo">
+        <div class="panel-label">Xuanmo</div>
+        <p class="panel-idea">Pine-soot ink ground, cinnabar annotations, mineral pigments layered on top.</p>
+        <div class="panel-body">
+          
+    <div class="swatches">
+      <div class="chip"><div class="chip-color" style="background:#14131a;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">画布<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#14131a</code><span>canvas</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#1a1922;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">面板<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#1a1922</code><span>panel</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#22212c;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">浮起<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#22212c</code><span>raised</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#2b2a36;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">浮层<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#2b2a36</code><span>overlay</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#343240;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">边框<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#343240</code><span>border</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#d4cec4;color:#2a2723"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">正文<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#d4cec4</code><span>11.80:1</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#ada599;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">次要文字<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#ada599</code><span>7.57:1</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#8b8597;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">弱化文字<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#8b8597</code><span>5.19:1</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#619ac3;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">光标<span class="chip-cn">羽扇豆蓝</span></div><div class="chip-meta"><code>#619ac3</code><span>6.08:1</span></div></div></div>
+    </div>
+          <div class="swatch-gap"></div>
+          
+    <div class="swatches">
+      <div class="chip"><div class="chip-color" style="background:#da5761;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">关键字<span class="chip-cn">海棠红 · 降彩</span></div><div class="chip-meta"><code>#da5761</code><span>4.85:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#619ac3;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">函数<span class="chip-cn">羽扇豆蓝</span></div><div class="chip-meta"><code>#619ac3</code><span>6.08:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#2bae85;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">字符串<span class="chip-cn">铜绿</span></div><div class="chip-meta"><code>#2bae85</code><span>6.59:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#f28e16;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">数字<span class="chip-cn">杏黄</span></div><div class="chip-meta"><code>#f28e16</code><span>7.61:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#d6a01d;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">类型<span class="chip-cn">土黄</span></div><div class="chip-meta"><code>#d6a01d</code><span>7.83:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#f28e16;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">常量<span class="chip-cn">杏黄</span></div><div class="chip-meta"><code>#f28e16</code><span>7.61:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#85809e;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">注释<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#85809e</code><span>4.90:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#c08eaf;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">装饰器<span class="chip-cn">萝兰紫</span></div><div class="chip-meta"><code>#c08eaf</code><span>6.79:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#e45f6f;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">标签<span class="chip-cn">山茶红 · 降彩</span></div><div class="chip-meta"><code>#e45f6f</code><span>5.42:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#e25737;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">错误<span class="chip-cn">银朱 · 降彩</span></div><div class="chip-meta"><code>#e25737</code><span>4.97:1</span></div></div></div>
+    </div>
+        </div>
+      </div>
+      
+      <div class="flavor-panel" data-flavor="xuanmo-dimmed">
+        <div class="panel-label">Xuanmo Dimmed</div>
+        <p class="panel-idea">A deeper ink room with pigments softened one step — the same painting, lights turned down.</p>
+        <div class="panel-body">
+          
+    <div class="swatches">
+      <div class="chip"><div class="chip-color" style="background:#19181e;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">画布<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#19181e</code><span>canvas</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#1e1d24;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">面板<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#1e1d24</code><span>panel</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#24222b;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">浮起<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#24222b</code><span>raised</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#2b2933;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">浮层<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#2b2933</code><span>overlay</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#393643;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">边框<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#393643</code><span>border</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#d8d2c6;color:#2a2723"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">正文<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#d8d2c6</code><span>11.72:1</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#b0a99f;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">次要文字<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#b0a99f</code><span>7.58:1</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#8f8996;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">弱化文字<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#8f8996</code><span>5.20:1</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#619ac3;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">光标<span class="chip-cn">羽扇豆蓝</span></div><div class="chip-meta"><code>#619ac3</code><span>5.81:1</span></div></div></div>
+    </div>
+          <div class="swatch-gap"></div>
+          
+    <div class="swatches">
+      <div class="chip"><div class="chip-color" style="background:#c27c88;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">关键字<span class="chip-cn">山黎豆红</span></div><div class="chip-meta"><code>#c27c88</code><span>5.49:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#66a9c9;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">函数<span class="chip-cn">涧石蓝</span></div><div class="chip-meta"><code>#66a9c9</code><span>6.79:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#69a794;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">字符串<span class="chip-cn">梧枝绿</span></div><div class="chip-meta"><code>#69a794</code><span>6.35:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#b78b26;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">数字<span class="chip-cn">山鸡黄</span></div><div class="chip-meta"><code>#b78b26</code><span>5.66:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#d6a01d;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">类型<span class="chip-cn">土黄</span></div><div class="chip-meta"><code>#d6a01d</code><span>7.48:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#d6a01d;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">常量<span class="chip-cn">土黄</span></div><div class="chip-meta"><code>#d6a01d</code><span>7.48:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#85809e;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">注释<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#85809e</code><span>4.69:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#c08eaf;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">装饰器<span class="chip-cn">萝兰紫</span></div><div class="chip-meta"><code>#c08eaf</code><span>6.49:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#de7897;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">标签<span class="chip-cn">白芨红</span></div><div class="chip-meta"><code>#de7897</code><span>6.08:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#e25737;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">错误<span class="chip-cn">银朱 · 降彩</span></div><div class="chip-meta"><code>#e25737</code><span>4.75:1</span></div></div></div>
+    </div>
+        </div>
+      </div>
+      
+      <div class="flavor-panel" data-flavor="xuanzhi">
+        <div class="panel-label">Xuanzhi</div>
+        <p class="panel-idea">Raw xuan paper, pine-soot ink, blue-green mineral washes.</p>
+        <div class="panel-body">
+          
+    <div class="swatches">
+      <div class="chip"><div class="chip-color" style="background:#f7f4ed;color:#2a2723"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">画布<span class="chip-cn">鱼肚白</span></div><div class="chip-meta"><code>#f7f4ed</code><span>canvas</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#f1ece2;color:#2a2723"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">面板<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#f1ece2</code><span>panel</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#eae3d5;color:#2a2723"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">浮起<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#eae3d5</code><span>raised</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#e3dacb;color:#2a2723"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">浮层<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#e3dacb</code><span>overlay</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#d6ccb9;color:#2a2723"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">边框<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#d6ccb9</code><span>border</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#35322d;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">正文<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#35322d</code><span>11.62:1</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#5b564c;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">次要文字<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#5b564c</code><span>6.64:1</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#746b5e;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">弱化文字<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#746b5e</code><span>4.77:1</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#126e82;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">光标<span class="chip-cn">玉鈫蓝</span></div><div class="chip-meta"><code>#126e82</code><span>5.34:1</span></div></div></div>
+    </div>
+          <div class="swatch-gap"></div>
+          
+    <div class="swatches">
+      <div class="chip"><div class="chip-color" style="background:#c34435;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">关键字<span class="chip-cn">鹤顶红 · 降彩</span></div><div class="chip-meta"><code>#c34435</code><span>4.55:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#0f59a4;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">函数<span class="chip-cn">飞燕草蓝</span></div><div class="chip-meta"><code>#0f59a4</code><span>6.40:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#1a6840;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">字符串<span class="chip-cn">荷叶绿</span></div><div class="chip-meta"><code>#1a6840</code><span>6.17:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#b14b28;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">数字<span class="chip-cn">蟹蝥红</span></div><div class="chip-meta"><code>#b14b28</code><span>4.89:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#813c85;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">类型<span class="chip-cn">桔梗紫</span></div><div class="chip-meta"><code>#813c85</code><span>6.55:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#b14b28;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">常量<span class="chip-cn">蟹蝥红</span></div><div class="chip-meta"><code>#b14b28</code><span>4.89:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#65706f;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">注释<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#65706f</code><span>4.66:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#806332;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">装饰器<span class="chip-cn">苍黄</span></div><div class="chip-meta"><code>#806332</code><span>5.10:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#b23c7a;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">标签<span class="chip-cn">玫瑰紫 · 降彩</span></div><div class="chip-meta"><code>#b23c7a</code><span>5.00:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#c23142;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">错误<span class="chip-cn">尖晶玉红 · 降彩</span></div><div class="chip-meta"><code>#c23142</code><span>5.02:1</span></div></div></div>
+    </div>
+        </div>
+      </div>
+      
+      <div class="flavor-panel" data-flavor="xuanzhi-dimmed">
+        <div class="panel-label">Xuanzhi Dimmed</div>
+        <p class="panel-idea">Aged xuan paper and deeper ink, one stop softer than raw paper.</p>
+        <div class="panel-body">
+          
+    <div class="swatches">
+      <div class="chip"><div class="chip-color" style="background:#e9e2d4;color:#2a2723"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">画布<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#e9e2d4</code><span>canvas</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#e3dbcb;color:#2a2723"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">面板<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#e3dbcb</code><span>panel</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#dcd3c1;color:#2a2723"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">浮起<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#dcd3c1</code><span>raised</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#d5cbb7;color:#2a2723"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">浮层<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#d5cbb7</code><span>overlay</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#cbc0ab;color:#2a2723"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">边框<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#cbc0ab</code><span>border</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#2f2b25;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">正文<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#2f2b25</code><span>10.91:1</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#4f4a40;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">次要文字<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#4f4a40</code><span>6.83:1</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#665f53;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">弱化文字<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#665f53</code><span>4.90:1</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#126e82;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">光标<span class="chip-cn">玉鈫蓝</span></div><div class="chip-meta"><code>#126e82</code><span>4.55:1</span></div></div></div>
+    </div>
+          <div class="swatch-gap"></div>
+          
+    <div class="swatches">
+      <div class="chip"><div class="chip-color" style="background:#894e54;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">关键字<span class="chip-cn">烟红</span></div><div class="chip-meta"><code>#894e54</code><span>4.97:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#144a74;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">函数<span class="chip-cn">鷃蓝</span></div><div class="chip-meta"><code>#144a74</code><span>7.21:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#1a6840;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">字符串<span class="chip-cn">荷叶绿</span></div><div class="chip-meta"><code>#1a6840</code><span>5.26:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#66462a;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">数字<span class="chip-cn">驼色</span></div><div class="chip-meta"><code>#66462a</code><span>6.58:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#525288;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">类型<span class="chip-cn">野菊紫</span></div><div class="chip-meta"><code>#525288</code><span>5.58:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#645822;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">常量<span class="chip-cn">潭水绿</span></div><div class="chip-meta"><code>#645822</code><span>5.50:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#73575c;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">注释<span class="chip-cn">鼠背灰</span></div><div class="chip-meta"><code>#73575c</code><span>5.02:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#894276;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">装饰器<span class="chip-cn">芓紫</span></div><div class="chip-meta"><code>#894276</code><span>5.25:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#894276;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">标签<span class="chip-cn">芓紫</span></div><div class="chip-meta"><code>#894276</code><span>5.25:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#82111f;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">错误<span class="chip-cn">殷红</span></div><div class="chip-meta"><code>#82111f</code><span>7.95:1</span></div></div></div>
+    </div>
+        </div>
+      </div>
+      
+      <div class="flavor-panel" data-flavor="canghai">
+        <div class="panel-label">Canghai</div>
+        <p class="panel-idea">Deep-sea twilight, blue-green minerals, a touch of cinnabar.</p>
+        <div class="panel-body">
+          
+    <div class="swatches">
+      <div class="chip"><div class="chip-color" style="background:#0d1822;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">画布<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#0d1822</code><span>canvas</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#12202b;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">面板<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#12202b</code><span>panel</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#182833;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">浮起<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#182833</code><span>raised</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#1f3340;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">浮层<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#1f3340</code><span>overlay</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#29404f;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">边框<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#29404f</code><span>border</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#c8d4dd;color:#2a2723"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">正文<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#c8d4dd</code><span>11.89:1</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#9aadbb;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">次要文字<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#9aadbb</code><span>7.75:1</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#788d9f;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">弱化文字<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#788d9f</code><span>5.22:1</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#66a9c9;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">光标<span class="chip-cn">涧石蓝</span></div><div class="chip-meta"><code>#66a9c9</code><span>6.90:1</span></div></div></div>
+    </div>
+          <div class="swatch-gap"></div>
+          
+    <div class="swatches">
+      <div class="chip"><div class="chip-color" style="background:#dc5e41;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">关键字<span class="chip-cn">银朱 · 降彩</span></div><div class="chip-meta"><code>#dc5e41</code><span>4.89:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#63bbd0;color:#2a2723"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">函数<span class="chip-cn">霁青</span></div><div class="chip-meta"><code>#63bbd0</code><span>8.16:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#1ba784;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">字符串<span class="chip-cn">竹绿</span></div><div class="chip-meta"><code>#1ba784</code><span>5.90:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#d6a01d;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">数字<span class="chip-cn">土黄</span></div><div class="chip-meta"><code>#d6a01d</code><span>7.61:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#c08eaf;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">类型<span class="chip-cn">萝兰紫</span></div><div class="chip-meta"><code>#c08eaf</code><span>6.60:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#d6a01d;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">常量<span class="chip-cn">土黄</span></div><div class="chip-meta"><code>#d6a01d</code><span>7.61:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#648e93;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">注释<span class="chip-cn">晚波蓝</span></div><div class="chip-meta"><code>#648e93</code><span>4.98:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#c08eaf;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">装饰器<span class="chip-cn">萝兰紫</span></div><div class="chip-meta"><code>#c08eaf</code><span>6.60:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#e45f6f;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">标签<span class="chip-cn">山茶红 · 降彩</span></div><div class="chip-meta"><code>#e45f6f</code><span>5.27:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#e25737;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">错误<span class="chip-cn">银朱 · 降彩</span></div><div class="chip-meta"><code>#e25737</code><span>4.83:1</span></div></div></div>
+    </div>
+        </div>
+      </div>
+      
+      <div class="flavor-panel" data-flavor="qingci">
+        <div class="panel-label">Qingci</div>
+        <p class="panel-idea">Moon-white celadon glaze, cool grey ink, sky after rain.</p>
+        <div class="panel-body">
+          
+    <div class="swatches">
+      <div class="chip"><div class="chip-color" style="background:#e8f0ec;color:#2a2723"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">画布<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#e8f0ec</code><span>canvas</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#e1eae4;color:#2a2723"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">面板<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#e1eae4</code><span>panel</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#d9e3dc;color:#2a2723"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">浮起<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#d9e3dc</code><span>raised</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#d1dcd4;color:#2a2723"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">浮层<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#d1dcd4</code><span>overlay</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#c7d5cc;color:#2a2723"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">边框<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#c7d5cc</code><span>border</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#2b333e;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">正文<span class="chip-cn">青灰</span></div><div class="chip-meta"><code>#2b333e</code><span>11.00:1</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#4f5b5a;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">次要文字<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#4f5b5a</code><span>6.08:1</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#5f6b67;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">弱化文字<span class="chip-cn">派生色</span></div><div class="chip-meta"><code>#5f6b67</code><span>4.78:1</span></div></div></div>
+      <div class="chip"><div class="chip-color" style="background:#126e82;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">光标<span class="chip-cn">玉鈫蓝</span></div><div class="chip-meta"><code>#126e82</code><span>5.06:1</span></div></div></div>
+    </div>
+          <div class="swatch-gap"></div>
+          
+    <div class="swatches">
+      <div class="chip"><div class="chip-color" style="background:#bc3a46;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">关键字<span class="chip-cn">尖晶玉红 · 降彩</span></div><div class="chip-meta"><code>#bc3a46</code><span>4.73:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#126e82;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">函数<span class="chip-cn">玉鈫蓝</span></div><div class="chip-meta"><code>#126e82</code><span>5.06:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#1a6840;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">字符串<span class="chip-cn">荷叶绿</span></div><div class="chip-meta"><code>#1a6840</code><span>5.84:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#66462a;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">数字<span class="chip-cn">驼色</span></div><div class="chip-meta"><code>#66462a</code><span>7.32:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#813c85;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">类型<span class="chip-cn">桔梗紫</span></div><div class="chip-meta"><code>#813c85</code><span>6.20:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#645822;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">常量<span class="chip-cn">潭水绿</span></div><div class="chip-meta"><code>#645822</code><span>6.12:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#495c69;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">注释<span class="chip-cn">战舰灰</span></div><div class="chip-meta"><code>#495c69</code><span>6.00:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#5d3f51;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">装饰器<span class="chip-cn">紫灰</span></div><div class="chip-meta"><code>#5d3f51</code><span>7.89:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#894276;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">标签<span class="chip-cn">芓紫</span></div><div class="chip-meta"><code>#894276</code><span>5.83:1</span></div></div></div><div class="chip"><div class="chip-color" style="background:#82111f;color:#f7f4ed"><span class="chip-sample">Aa</span></div><div class="chip-body"><div class="chip-name">错误<span class="chip-cn">殷红</span></div><div class="chip-meta"><code>#82111f</code><span>8.84:1</span></div></div></div>
+    </div>
+        </div>
+      </div>
+      
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="foot-meta">
+      <span>© Inkstone</span>
+      <span>v0.3.3</span>
+      <span>MIT License</span>
+      <ul class="foot-chips">
+        
+        <li>526 zhongguose</li>
+        
+        <li>6 variants</li>
+        
+        <li>846 contrast checks</li>
+        
+        <li>Konata9.inkstone</li>
+        
+      </ul>
+    </div>
+    <nav>
+      <a href="https://github.com/Konata9/inkstone/blob/main/docs/palette.md">Palette reference</a>
+      <a href="https://github.com/Konata9/inkstone">GitHub</a>
+      <a href="https://github.com/Konata9/inkstone/releases">Releases</a>
+    </nav>
+  </footer>
+</div>
+
+<script type="application/json" id="inkstone-site-config">{"storageKey":"inkstone.site.flavor","flavorIds":["xuanmo","xuanmo-dimmed","xuanzhi","xuanzhi-dimmed","canghai","qingci"],"appearance":{"xuanmo":"dark","xuanmo-dimmed":"dark","xuanzhi":"light","xuanzhi-dimmed":"light","canghai":"dark","qingci":"light"},"defaultDark":"xuanmo","defaultLight":"xuanzhi","softRedirectZh":"./zh/"}</script>
+<script>
+/**
+ * Flavor switcher for the product site.
+ * Config is injected as JSON in #inkstone-site-config at build time.
+ */
+(function () {
+  const el = document.getElementById('inkstone-site-config');
+  if (!el) return;
+
+  /** @type {{
+   *   storageKey: string,
+   *   flavorIds: string[],
+   *   appearance: Record<string, string>,
+   *   defaultDark: string,
+   *   defaultLight: string,
+   *   softRedirectZh: string | null
+   * }} */
+  const config = JSON.parse(el.textContent || '{}');
+
+  if (config.softRedirectZh) {
+    try {
+      const prefersZh = (navigator.languages || [navigator.language]).some((l) =>
+        /^zh\b/i.test(l || ''),
+      );
+      if (prefersZh && !sessionStorage.getItem('inkstone.site.langPrompted')) {
+        sessionStorage.setItem('inkstone.site.langPrompted', '1');
+        location.replace(config.softRedirectZh);
+      }
+    } catch (_) {}
+  }
+
+  function systemFlavor() {
+    return window.matchMedia('(prefers-color-scheme: light)').matches
+      ? config.defaultLight
+      : config.defaultDark;
+  }
+
+  function resolveFlavor(id) {
+    return config.flavorIds.includes(id) ? id : systemFlavor();
+  }
+
+  function readStored() {
+    try {
+      const value = localStorage.getItem(config.storageKey);
+      return config.flavorIds.includes(value) ? value : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /** Sync DOM (and optionally localStorage) to a flavor id. */
+  function applyFlavor(id, persist) {
+    const flavorId = resolveFlavor(id);
+    const root = document.documentElement;
+    root.dataset.flavor = flavorId;
+    root.dataset.appearance = config.appearance[flavorId] || 'dark';
+
+    document.querySelectorAll('.flavor-btn').forEach((btn) => {
+      btn.setAttribute('aria-pressed', btn.dataset.flavor === flavorId ? 'true' : 'false');
+    });
+    document.querySelectorAll('.flavor-panel').forEach((panel) => {
+      panel.classList.toggle('is-active', panel.dataset.flavor === flavorId);
+    });
+
+    if (persist) {
+      try {
+        localStorage.setItem(config.storageKey, flavorId);
+      } catch (_) {}
+    }
+  }
+
+  /**
+   * User-driven switches wipe BL→TR via View Transitions; initial / system
+   * sync stay instant (persist=false or reduced-motion / no API).
+   */
+  function setFlavor(id, persist) {
+    const next = resolveFlavor(id);
+    const run = () => applyFlavor(next, persist);
+    const prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const skipWipe =
+      !persist ||
+      next === document.documentElement.dataset.flavor ||
+      prefersReduce ||
+      typeof document.startViewTransition !== 'function';
+
+    if (skipWipe) {
+      run();
+      return;
+    }
+    document.startViewTransition(run);
+  }
+
+  applyFlavor(readStored() || systemFlavor(), false);
+
+  document.querySelectorAll('.flavor-btn').forEach((btn) => {
+    btn.addEventListener('click', () => setFlavor(btn.dataset.flavor, true));
+  });
+
+  try {
+    window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
+      if (!readStored()) applyFlavor(systemFlavor(), false);
+    });
+  } catch (_) {}
+})();
+
+</script>
+</body>
+</html>

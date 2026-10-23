@@ -187,15 +187,19 @@ src/
     ghostty.ts            Ghostty 主题
     kaku.ts               Kaku / WezTerm Lua 色表
     opencode.ts           OpenCode V2 主题（base + hue scale）
-    preview.ts            预览页
+    preview.ts            预览页 / gallery
+    site.ts · site-copy.ts 官网数据注入（文案 / 版本 / 色板）
     docs.ts               色板文档
+templates/site/           官网 Liquid 模板（结构 / CSS / JS）
 scripts/                  安装脚本、VSIX 与 Release 打包
 packages/vscode/          VS Code 扩展（VSIX）
 dist/                     生成物：Ghostty 主题、Kaku 色表、OpenCode 主题、VSIX
 preview/index.html        本地预览页（生成物）
 preview/gallery.html      README / Marketplace 用的编辑器总览（生成物）
+site/                     官网静态页（生成物，GitHub Pages）
 docs/palette.md           色板对照表（生成物）
 docs/preview.png          六个编辑器窗口截图（`pnpm capture:preview`）
+docs/site-design.md       官网设计冻结说明
 .github/workflows/        构建 + 打包 CI
 ```
 
@@ -210,9 +214,10 @@ pnpm test         # 色板审计 + 产物检查（与 build 的检查一致）
 pnpm typecheck
 pnpm preview      # 构建并在浏览器打开预览页
 pnpm capture:preview  # 从 gallery.html 截取 docs/preview.png（需 Playwright）
+pnpm site         # 构建并打开官网（site/index.html）
 ```
 
-生成器保证各端一致：改一处色板，VS Code、Ghostty、Kaku、OpenCode 同时更新。构建会拒绝落在对比度区间或彩度预算之外的配色。
+生成器保证各端一致：改一处色板，VS Code、Ghostty、Kaku、OpenCode 与官网同时更新。构建会拒绝落在对比度区间或彩度预算之外的配色。官网页面结构与样式在 `templates/site/`，构建只注入文案、版本与色板数据；默认英文（`site/`），中文在 `site/zh/`；页面 chrome 跟随系统明暗选用玄墨 / 宣纸，可切换六个变体。设计说明见 [docs/site-design.md](docs/site-design.md)。
 
 ### 设计约束
 

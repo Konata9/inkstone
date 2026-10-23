@@ -3,6 +3,12 @@
 ## Unreleased
 
 - **Shorter README preview**: `docs/preview.png` is an editor-only 3×2 gallery captured from `preview/gallery.html`, instead of the full compare page.
+- **Product site**: static EN/ZH pages under `site/` (GitHub Pages), with flavor switching, system light/dark defaults (宣纸 / 玄墨), hreflang, JSON-LD, `llms.txt`, and sitemap.
+- **Site icons**: editor/terminal support rows use monochrome brand marks; each flavor button shows a canvas + keyword swatch.
+- **Site flavor wipe**: clicking a variant reveals the new palette with a bottom-left → top-right View Transition; reduced-motion and unsupported browsers skip the wipe.
+- **Site templates**: page structure/CSS/JS live under `templates/site/` (LiquidJS); `src/targets/site.ts` only injects locale, version, support lists and flavor data.
+- **Site redesign**: Stage hero with brand + CTAs + flavor rail beside the live editor mock; support lists and swatches move below the fold; ink/paper wash atmosphere tracks the active flavor.
+- **Site specimen**: Source/灵感 merges into Active palette (shared lede + per-flavor `meta.description`); Chinese tagline stays one line with a short hairline underline.
 
 ## 0.3.3
 - **Cursor chrome outlines**: `contrastActiveBorder` is transparent. Cursor paints that token as a 1px outline around editor tabs, activity-bar items and auxiliary actions such as New Agent; VS Code and VSCodium only use it in high contrast, where the dark default is already null.

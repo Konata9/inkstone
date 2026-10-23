@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://konata9.github.io/inkstone/sitemap.xml

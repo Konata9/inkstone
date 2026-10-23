@@ -12,10 +12,11 @@
  *   dist/opencode/*.json
  *   preview/index.html
  *   preview/gallery.html   (editor-only shot source for docs/preview.png)
+ *   site/                  (product site for GitHub Pages)
  *   docs/palette.md
  */
 
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -26,6 +27,7 @@ import { generateGhostty } from './targets/ghostty.ts';
 import { generateKaku } from './targets/kaku.ts';
 import { generateOpencode } from './targets/opencode.ts';
 import { renderGallery, renderPreview } from './targets/preview.ts';
+import { generateSite, SITE_FAVICON_SOURCE } from './targets/site.ts';
 import { generateVscode } from './targets/vscode.ts';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -62,6 +64,7 @@ const files = [
   ...generateOpencode(),
   { path: 'preview/index.html', content: renderPreview() },
   { path: 'preview/gallery.html', content: renderGallery() },
+  ...generateSite(),
   { path: 'docs/palette.md', content: renderPaletteDoc() },
 ];
 
@@ -72,9 +75,15 @@ for (const file of files) {
   console.log(`  ✓ ${file.path}`);
 }
 
+mkdirSync(join(root, 'site'), { recursive: true });
+copyFileSync(SITE_FAVICON_SOURCE, join(root, 'site', 'favicon.png'));
+writeFileSync(join(root, 'site', '.nojekyll'), '');
+console.log('  ✓ site/favicon.png');
+console.log('  ✓ site/.nojekyll');
+
 console.log(
   `\nBuilt ${files.length} files for ${flavors.length} flavors ` +
     `(${checks.audit.checks} palette checks, ${flavors.length} VS Code themes, ` +
     `${flavors.length} Ghostty themes, ${flavors.length} Kaku schemes, ` +
-    `${flavors.length} OpenCode themes).\n`,
+    `${flavors.length} OpenCode themes, site pages).\n`,
 );

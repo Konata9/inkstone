@@ -23,6 +23,7 @@
     "test": "pnpm validate",
     "typecheck": "tsc --noEmit",
     "preview": "pnpm build && open preview/index.html",
+    "site": "pnpm build && open site/index.html",
     "capture:preview": "tsx scripts/capture-preview.ts",
     "package:vscode": "pnpm build && tsx scripts/package-vscode.ts",
     "package:release": "tsx scripts/package-release.ts",
@@ -36,6 +37,7 @@
   "devDependencies": {
     "@types/luaparse": "^0.2.13",
     "@types/node": "^22.10.2",
+    "liquidjs": "^10.30.0",
     "luaparse": "^0.3.1",
     "playwright": "^1.64.1",
     "tsx": "^4.19.2",

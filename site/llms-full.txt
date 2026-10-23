@@ -1,0 +1,50 @@
+# Inkstone (墨观) — full summary for assistants
+
+Version 0.3.3. MIT. Publisher Konata9. Extension ID `Konata9.inkstone`.
+
+## Overview
+
+Inkstone is a traditional Chinese color theme family. Colours are taken from the
+526-entry zhongguose chart (and the matching Figma community chart). Six
+variants share one hue skeleton (cinnabar → blue → green → ochre → violet →
+cyan → crimson). Switching variants changes light and saturation, not the hue
+order.
+
+Families:
+
+- **Ink & paper** — 玄墨 Xuanmo, 玄墨 Dimmed, 宣纸 Xuanzhi, 宣纸 Dimmed
+- **Sea & celadon** — 沧海 Canghai, 青瓷 Qingci
+
+Dimmed variants lower ambient light while keeping body text ≥ 10.5:1 and
+pigments recognisable. The build runs 846 contrast and chroma checks.
+
+## Features
+
+- Full VS Code / Cursor workbench colors, TextMate scopes, semantic tokens
+- Matching terminal ANSI palettes (Ghostty, Kaku / WezTerm)
+- OpenCode V2 theme JSON for all six flavors
+- Cursor-specific: `contrastActiveBorder` is transparent so editor tabs are not outlined
+
+## Install
+
+1. Open https://github.com/Konata9/inkstone/releases
+2. Download `Konata9.inkstone-<version>.vsix`
+3. `code --install-extension Konata9.inkstone-<version>.vsix` (or Cursor / VSCodium equivalent)
+4. Preferences: Color Theme → pick a 墨观 / Inkstone variant
+
+Terminal themes: use the Ghostty / Kaku zip assets from the same release, or
+`pnpm install:ghostty` / `pnpm install:kaku` / `pnpm install:opencode` from source.
+
+## Comparison notes
+
+- Not a generic dark/light pair: six curated rooms on one skeleton
+- Keywords use annotation reds (朱批) on ink/paper; sea/celadon uses seal-like reds on glaze
+- Cursor color is a cool interaction blue, not the keyword red
+
+## Links
+
+- Site (EN): https://konata9.github.io/inkstone/
+- Site (ZH): https://konata9.github.io/inkstone/zh/
+- Palette reference: https://github.com/Konata9/inkstone/blob/main/docs/palette.md
+- Changelog: https://github.com/Konata9/inkstone/blob/main/CHANGELOG.md
+- Issues: https://github.com/Konata9/inkstone/issues
