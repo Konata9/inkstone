@@ -212,8 +212,6 @@ pnpm preview      # 构建并在浏览器打开预览页
 
 生成器保证各端一致：改一处色板，VS Code、Ghostty、Kaku、OpenCode 同时更新。构建会拒绝落在对比度区间或彩度预算之外的配色。
 
-发布流程（tag → GitHub Release）见 [docs/releasing.md](docs/releasing.md)。VS Code Marketplace 的上架文案与发布物见 [docs/marketplace.md](docs/marketplace.md)。
-
 ### 设计约束
 
 1. **三组光线**：墨纸组以墨与纸为底，Dimmed 把灯调暗而不是蒙灰；海瓷组以深海与青瓷釉为底。
