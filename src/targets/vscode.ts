@@ -69,7 +69,11 @@ function workbench(flavor: Flavor): Record<string, string> {
     'selection.background': s.selection,
     'sash.hoverBorder': b.focus,
     contrastBorder: b.strong,
-    contrastActiveBorder: y.keyword,
+    // Cursor draws this as a 1px outline on every editor tab, checked
+    // activity-bar item and auxiliary action (including New Agent).
+    // VS Code and VSCodium leave the token null outside high contrast,
+    // so a visible value only appears in Cursor. Focus rings use focusBorder.
+    contrastActiveBorder: transparent,
 
     // --------------------------------------------------------------- links
     'textLink.foreground': y.function,

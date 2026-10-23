@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **Cursor chrome outlines**: `contrastActiveBorder` is transparent. Cursor paints that token as a 1px outline around editor tabs, activity-bar items and auxiliary actions such as New Agent; VS Code and VSCodium only use it in high contrast, where the dark default is already null.
+
 ## 0.3.2
 - **Palette comfort pass**: the audit now checks contrast bands and OKLCH chroma budgets, not just minimum ratios. Body text moves from 13.5–14.3:1 to ≈11.5:1, and syntax colors above 9:1 are brought back into range.
 - **Cinnabar, softened**: the red family keeps its traditional hue and lightness but drops to C≈0.165 (errors 0.18), so 海棠红 / 银朱 / 鹤顶红 / 尖晶玉红 read as pigment instead of neon. `soften()` records the source color for the docs.

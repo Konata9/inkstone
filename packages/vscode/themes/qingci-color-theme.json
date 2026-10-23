@@ -15,7 +15,7 @@
     "selection.background": "#c7d9cf",
     "sash.hoverBorder": "#126e82",
     "contrastBorder": "#a8bab0",
-    "contrastActiveBorder": "#bc3a46",
+    "contrastActiveBorder": "#00000000",
     "textLink.foreground": "#126e82",
     "textLink.activeForeground": "#15559a",
     "textPreformat.foreground": "#1a6840",
