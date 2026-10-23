@@ -11,6 +11,7 @@
  *   dist/kaku/*.lua
  *   dist/opencode/*.json
  *   preview/index.html
+ *   preview/gallery.html   (editor-only shot source for docs/preview.png)
  *   docs/palette.md
  */
 
@@ -24,7 +25,7 @@ import { renderPaletteDoc } from './targets/docs.ts';
 import { generateGhostty } from './targets/ghostty.ts';
 import { generateKaku } from './targets/kaku.ts';
 import { generateOpencode } from './targets/opencode.ts';
-import { renderPreview } from './targets/preview.ts';
+import { renderGallery, renderPreview } from './targets/preview.ts';
 import { generateVscode } from './targets/vscode.ts';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -60,6 +61,7 @@ const files = [
   ...generateKaku(),
   ...generateOpencode(),
   { path: 'preview/index.html', content: renderPreview() },
+  { path: 'preview/gallery.html', content: renderGallery() },
   { path: 'docs/palette.md', content: renderPaletteDoc() },
 ];
 

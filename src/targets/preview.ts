@@ -1,9 +1,13 @@
 /**
- * Static preview page.
+ * Static preview pages.
  *
  * Everything is inlined: no fonts, no scripts from the network, no build step
- * in the browser. Open preview/index.html and all four flavors render with real
- * code, a terminal, a diff and a Markdown pane.
+ * in the browser.
+ *
+ * - `preview/index.html` — full compare page (surfaces, pigments, editor,
+ *   terminal, diff, Markdown).
+ * - `preview/gallery.html` — editor-only 3×2 grid for README / Marketplace
+ *   screenshots (`docs/preview.png`).
  */
 
 import { alpha, contrast, formatRatio, luminance } from '../color.ts';
@@ -209,7 +213,13 @@ function ansiStrip(f: Flavor) {
     </div>`;
 }
 
-function editorMock(f: Flavor) {
+/** Drop the trailing Palette class so the gallery editors stay short. */
+function galleryTsLines(f: Flavor): string[] {
+  return tsLines(f).slice(0, 22);
+}
+
+function editorMock(f: Flavor, options: { lines?: string[] } = {}) {
+  const lines = options.lines ?? tsLines(f);
   const files = [
     ['theme.ts', true],
     ['palette.ts', false],
@@ -251,7 +261,7 @@ function editorMock(f: Flavor) {
           <div class="tab">kaku.lua</div>
         </div>
         <div class="breadcrumb"><span>src</span><i>›</i><span>theme.ts</span><i>›</i><span>contrast</span></div>
-        <div class="code">${codeBlock(tsLines(f), { active: 14, selected: 9 })}</div>
+        <div class="code">${codeBlock(lines, { active: 14, selected: 9 })}</div>
         <div class="statusbar">
           <span class="sb-left"><b>main*</b><span class="sb-sep">|</span>0 errors<span class="sb-sep">|</span>1 warning</span>
           <span class="sb-right">TypeScript<span class="sb-sep">|</span>墨观 · ${f.meta.zh}<span class="sb-sep">|</span>UTF-8</span>
@@ -259,6 +269,57 @@ function editorMock(f: Flavor) {
       </div>
     </div>
   </div>`;
+}
+
+/** Shared editor chrome styles used by both the full preview and the gallery. */
+function editorStyles(): string {
+  return `
+  .editor { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--bg); }
+  .titlebar { height: 32px; background: var(--bg-alt); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px; padding: 0 12px; }
+  .dots { display: flex; gap: 5px; }
+  .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--border-strong); display: block; }
+  .title { font-size: 10.5px; color: var(--fg-3); letter-spacing: .02em; }
+  .editor-body { display: grid; grid-template-columns: 42px 132px 1fr; min-height: 0; }
+  .activity { background: var(--activity); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 12px 0; }
+  .glyph { color: var(--fg-3); font-size: 14px; opacity: .8; }
+  .sidebar { background: var(--bg-alt); border-right: 1px solid var(--border-subtle); padding: 10px 8px; font-size: 10.5px; color: var(--fg-2); }
+  .side-title { font-size: 9px; letter-spacing: .18em; color: var(--fg-3); padding: 2px 6px 8px; }
+  .side-row { padding: 3px 6px; border-radius: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .side-row.file { padding-left: 20px; color: var(--fg-2); }
+  .side-active { background: var(--active); color: var(--fg); }
+  .side-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--kw); margin-left: 6px; vertical-align: middle; }
+  .side-muted { color: var(--fg-4); padding-left: 20px; }
+
+  .editor-main { min-width: 0; display: flex; flex-direction: column; }
+  .tabs { display: flex; background: var(--bg-alt); border-bottom: 1px solid var(--border-subtle); }
+  .tab { font-size: 10.5px; color: var(--fg-3); padding: 7px 14px; border-right: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 8px; }
+  .tab.active { background: var(--bg); color: var(--fg); box-shadow: inset 0 1px 0 var(--kw); }
+  .close { opacity: .5; font-size: 12px; }
+  .breadcrumb { display: flex; gap: 6px; align-items: center; padding: 6px 14px; font-size: 10px; color: var(--fg-3); border-bottom: 1px solid var(--border-subtle); }
+  .breadcrumb i { font-style: normal; opacity: .5; }
+
+  .code { font-family: var(--mono); font-size: 11px; line-height: 1.72; padding: 10px 0; overflow-x: auto; }
+  .line { display: flex; white-space: pre; min-width: max-content; }
+  .ln { width: 38px; text-align: right; padding-right: 12px; color: var(--fg-4); flex: 0 0 auto; user-select: none; }
+  .lc { padding-right: 16px; }
+  .line-active { background: var(--lens); }
+  .line-selected { background: var(--sel); }
+  .line-selected .ln { color: var(--fg-2); }
+
+  .kw { color: var(--kw); }
+  .fn { color: var(--fn); }
+  .str { color: var(--str); }
+  .num { color: var(--num); }
+  .type { color: var(--type); }
+  .cm { color: var(--cm); font-style: italic; }
+  .dec { color: var(--dec); }
+  .var { color: var(--var); }
+  .param { color: var(--param); font-style: italic; }
+  .prop { color: var(--prop); }
+
+  .statusbar { display: flex; justify-content: space-between; gap: 8px; background: var(--active); color: var(--fg); font-size: 9.5px; padding: 4px 12px; border-top: 1px solid var(--border-subtle); }
+  .sb-left b { color: var(--kw); font-weight: 500; }
+  .sb-sep { opacity: .35; margin: 0 6px; }`;
 }
 
 function terminalMock(f: Flavor) {
@@ -466,52 +527,7 @@ export function renderPreview(): string {
   .showcase { padding: 10px 28px 28px; display: flex; flex-direction: column; gap: 12px; }
   .showcase-side { display: grid; grid-template-columns: 1fr; gap: 12px; }
 
-  .editor { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--bg); }
-  .titlebar { height: 32px; background: var(--bg-alt); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px; padding: 0 12px; }
-  .dots { display: flex; gap: 5px; }
-  .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--border-strong); display: block; }
-  .title { font-size: 10.5px; color: var(--fg-3); letter-spacing: .02em; }
-  .editor-body { display: grid; grid-template-columns: 42px 132px 1fr; min-height: 0; }
-  .activity { background: var(--activity); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 12px 0; }
-  .glyph { color: var(--fg-3); font-size: 14px; opacity: .8; }
-  .sidebar { background: var(--bg-alt); border-right: 1px solid var(--border-subtle); padding: 10px 8px; font-size: 10.5px; color: var(--fg-2); }
-  .side-title { font-size: 9px; letter-spacing: .18em; color: var(--fg-3); padding: 2px 6px 8px; }
-  .side-row { padding: 3px 6px; border-radius: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .side-row.file { padding-left: 20px; color: var(--fg-2); }
-  .side-active { background: var(--active); color: var(--fg); }
-  .side-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--kw); margin-left: 6px; vertical-align: middle; }
-  .side-muted { color: var(--fg-4); padding-left: 20px; }
-
-  .editor-main { min-width: 0; display: flex; flex-direction: column; }
-  .tabs { display: flex; background: var(--bg-alt); border-bottom: 1px solid var(--border-subtle); }
-  .tab { font-size: 10.5px; color: var(--fg-3); padding: 7px 14px; border-right: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 8px; }
-  .tab.active { background: var(--bg); color: var(--fg); box-shadow: inset 0 1px 0 var(--kw); }
-  .close { opacity: .5; font-size: 12px; }
-  .breadcrumb { display: flex; gap: 6px; align-items: center; padding: 6px 14px; font-size: 10px; color: var(--fg-3); border-bottom: 1px solid var(--border-subtle); }
-  .breadcrumb i { font-style: normal; opacity: .5; }
-
-  .code { font-family: var(--mono); font-size: 11px; line-height: 1.72; padding: 10px 0; overflow-x: auto; }
-  .line { display: flex; white-space: pre; min-width: max-content; }
-  .ln { width: 38px; text-align: right; padding-right: 12px; color: var(--fg-4); flex: 0 0 auto; user-select: none; }
-  .lc { padding-right: 16px; }
-  .line-active { background: var(--lens); }
-  .line-selected { background: var(--sel); }
-  .line-selected .ln { color: var(--fg-2); }
-
-  .kw { color: var(--kw); }
-  .fn { color: var(--fn); }
-  .str { color: var(--str); }
-  .num { color: var(--num); }
-  .type { color: var(--type); }
-  .cm { color: var(--cm); font-style: italic; }
-  .dec { color: var(--dec); }
-  .var { color: var(--var); }
-  .param { color: var(--param); font-style: italic; }
-  .prop { color: var(--prop); }
-
-  .statusbar { display: flex; justify-content: space-between; gap: 8px; background: var(--active); color: var(--fg); font-size: 9.5px; padding: 4px 12px; border-top: 1px solid var(--border-subtle); }
-  .sb-left b { color: var(--kw); font-weight: 500; }
-  .sb-sep { opacity: .35; margin: 0 6px; }
+  ${editorStyles()}
 
   .terminal { background: var(--bg-sunken); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
   .terminal-bar { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; background: var(--bg-alt); border-bottom: 1px solid var(--border-subtle); }
@@ -619,6 +635,106 @@ export function renderPreview(): string {
     });
   }
 </script>
+</body>
+</html>`;
+}
+
+function galleryCard(f: Flavor): string {
+  return `
+  <article class="card" style="${cssVars(f)}">
+    <header class="card-head">
+      <h2>${f.meta.zh}<span>${flavorName(f, 'en')}</span></h2>
+      <span class="card-tone">${f.meta.appearance === 'dark' ? 'DARK' : 'LIGHT'}${f.meta.dimmed ? ' · DIMMED' : ''}</span>
+    </header>
+    ${editorMock(f, { lines: galleryTsLines(f) })}
+  </article>`;
+}
+
+/**
+ * Compact 3×2 editor gallery used for README and Marketplace screenshots.
+ * Capture with `pnpm capture:preview`.
+ */
+export function renderGallery(): string {
+  return `<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>墨观 Inkstone · gallery</title>
+<style>
+  :root {
+    --page-bg: #0e0d13;
+    --page-fg: #e9e3d7;
+    --page-dim: #8f8899;
+    --serif: "Songti SC", "Noto Serif SC", "Source Han Serif SC", Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Segoe UI", sans-serif;
+    --mono: "JetBrains Mono", "SF Mono", "Cascadia Code", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body {
+    margin: 0;
+    background: var(--page-bg);
+    color: var(--page-fg);
+    font-family: var(--sans);
+  }
+  .gallery {
+    width: 1680px;
+    margin: 0 auto;
+    padding: 28px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+  .card {
+    background: var(--bg);
+    color: var(--fg);
+    border: 1px solid #262430;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, .32);
+  }
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .card-head h2 {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: .04em;
+  }
+  .card-head h2 span {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--fg-3);
+    letter-spacing: .06em;
+    margin-left: 8px;
+  }
+  .card-tone {
+    font-size: 10px;
+    letter-spacing: .16em;
+    color: var(--fg-3);
+    white-space: nowrap;
+  }
+  .card .editor { border: 0; border-radius: 0; }
+  .card .editor-body { grid-template-columns: 36px 108px 1fr; }
+  .card .sidebar { font-size: 10px; padding: 8px 6px; }
+  .card .code { font-size: 10.5px; line-height: 1.65; padding: 8px 0; }
+  .card .ln { width: 32px; padding-right: 10px; }
+  ${editorStyles()}
+</style>
+</head>
+<body>
+  <div class="gallery">
+    ${flavors.map(galleryCard).join('\n')}
+  </div>
 </body>
 </html>`;
 }

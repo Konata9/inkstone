@@ -42,7 +42,7 @@ A traditional Chinese color theme for editors and terminals, built from the 526-
 
 | 产物 | 用途 |
 | --- | --- |
-| `moguan.inkstone-<version>.vsix` | VS Code / Cursor / Windsurf / VSCodium |
+| `Konata9.inkstone-<version>.vsix` | VS Code / Cursor / Windsurf / VSCodium |
 | `inkstone-ghostty-<version>.zip` | Ghostty 主题文件 |
 | `inkstone-kaku-<version>.zip` | Kaku / WezTerm Lua 色表 |
 | `inkstone-opencode-<version>.zip` | OpenCode V2 主题 |
@@ -60,12 +60,12 @@ pnpm install
 pnpm package:vscode
 ```
 
-产物在 `dist/moguan.inkstone-<version>.vsix`。安装：
+产物在 `dist/Konata9.inkstone-<version>.vsix`。安装：
 
 ```bash
-code --install-extension dist/moguan.inkstone-0.3.0.vsix
+code --install-extension dist/Konata9.inkstone-0.3.2.vsix
 # Cursor:
-cursor --install-extension dist/moguan.inkstone-0.3.0.vsix
+cursor --install-extension dist/Konata9.inkstone-0.3.2.vsix
 ```
 
 然后在命令面板执行 **Preferences: Color Theme**，选择：
@@ -77,7 +77,7 @@ cursor --install-extension dist/moguan.inkstone-0.3.0.vsix
 - `墨观 · 沧海 (Inkstone Canghai)`
 - `墨观 · 青瓷 (Inkstone Qingci)`
 
-扩展 ID 为 `moguan.inkstone`，同一份 VSIX 适用于所有 VS Code 衍生编辑器。
+扩展 ID 为 `Konata9.inkstone`，同一份 VSIX 适用于所有 VS Code 衍生编辑器。
 
 ### Ghostty
 
@@ -193,8 +193,9 @@ scripts/                  安装脚本、VSIX 与 Release 打包
 packages/vscode/          VS Code 扩展（VSIX）
 dist/                     生成物：Ghostty 主题、Kaku 色表、OpenCode 主题、VSIX
 preview/index.html        本地预览页（生成物）
+preview/gallery.html      README / Marketplace 用的编辑器总览（生成物）
 docs/palette.md           色板对照表（生成物）
-docs/preview.png          预览页截图（生成物）
+docs/preview.png          六个编辑器窗口截图（`pnpm capture:preview`）
 .github/workflows/        构建 + 打包 CI
 ```
 
@@ -208,6 +209,7 @@ pnpm build        # 审计色板 → 生成全部产物
 pnpm test         # 色板审计 + 产物检查（与 build 的检查一致）
 pnpm typecheck
 pnpm preview      # 构建并在浏览器打开预览页
+pnpm capture:preview  # 从 gallery.html 截取 docs/preview.png（需 Playwright）
 ```
 
 生成器保证各端一致：改一处色板，VS Code、Ghostty、Kaku、OpenCode 同时更新。构建会拒绝落在对比度区间或彩度预算之外的配色。

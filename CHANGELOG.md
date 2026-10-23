@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **Shorter README preview**: `docs/preview.png` is an editor-only 3×2 gallery captured from `preview/gallery.html`, instead of the full compare page.
+
 ## 0.3.3
 - **Cursor chrome outlines**: `contrastActiveBorder` is transparent. Cursor paints that token as a 1px outline around editor tabs, activity-bar items and auxiliary actions such as New Agent; VS Code and VSCodium only use it in high contrast, where the dark default is already null.
 

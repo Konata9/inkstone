@@ -12,7 +12,7 @@
  *   inkstone-kaku-<version>.zip
  *   inkstone-opencode-<version>.zip
  *   inkstone-<version>.zip          (all targets + manifest)
- *   moguan.inkstone-<version>.vsix
+ *   Konata9.inkstone-<version>.vsix
  *   manifest.json
  *   SHA256SUMS
  *

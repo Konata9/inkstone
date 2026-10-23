@@ -31,7 +31,7 @@ export function repoUrl(pkg: PackageJson): string {
     .replace(/^git@github\.com:/, 'https://github.com/');
 }
 
-/** VSIX asset name, e.g. `moguan.inkstone-0.3.1.vsix`. */
+/** VSIX asset name, e.g. `Konata9.inkstone-0.3.2.vsix`. */
 export function vsixFileName(pkg: PackageJson): string {
   if (!pkg.publisher) throw new Error(`${pkg.name} has no publisher; cannot name the VSIX`);
   return `${pkg.publisher}.${pkg.name}-${pkg.version}.vsix`;
