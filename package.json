@@ -40,6 +40,7 @@
     "liquidjs": "^10.30.0",
     "luaparse": "^0.3.1",
     "playwright": "^1.64.1",
+    "smol-toml": "^1.9.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   },

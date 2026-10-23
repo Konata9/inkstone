@@ -19,6 +19,16 @@ export function kakuFileName(flavor: Flavor): string {
   return `inkstone-${flavor.meta.id}.lua`;
 }
 
+/** Kaku `colors` directory file name: `inkstone-xuanmo.toml`. */
+export function kakuTomlFileName(flavor: Flavor): string {
+  return `inkstone-${flavor.meta.id}.toml`;
+}
+
+/** Scheme name inside the Lua and TOML files: `Inkstone Xuanmo`. */
+export function kakuSchemeName(flavor: Flavor): string {
+  return `Inkstone ${flavorName(flavor, 'en')}`;
+}
+
 /** VS Code theme JSON file name: `xuanmo-color-theme.json`. */
 export function vscodeFileName(flavor: Flavor): string {
   return `${flavor.meta.id}-color-theme.json`;

@@ -8,7 +8,8 @@
  *   packages/vscode/themes/*.json
  *   packages/vscode/CHANGELOG.md   (copy of the root CHANGELOG.md)
  *   dist/ghostty/Inkstone *
- *   dist/kaku/*.lua
+ *   dist/kaku/*.lua                (WezTerm-compatible Lua tables)
+ *   dist/kaku/*.toml               (Kaku `colors/` directory schemes)
  *   dist/opencode/*.json
  *   preview/index.html
  *   preview/gallery.html   (editor-only shot source for docs/preview.png)
@@ -24,7 +25,7 @@ import { reportFailures, runChecks } from './checks.ts';
 import { flavors } from './palette/index.ts';
 import { renderPaletteDoc } from './targets/docs.ts';
 import { generateGhostty } from './targets/ghostty.ts';
-import { generateKaku } from './targets/kaku.ts';
+import { generateKaku, generateKakuToml } from './targets/kaku.ts';
 import { generateOpencode } from './targets/opencode.ts';
 import { renderGallery, renderPreview } from './targets/preview.ts';
 import { generateSite, SITE_FAVICON_SOURCE } from './targets/site.ts';
@@ -61,6 +62,7 @@ const files = [
   },
   ...generateGhostty(),
   ...generateKaku(),
+  ...generateKakuToml(),
   ...generateOpencode(),
   { path: 'preview/index.html', content: renderPreview() },
   { path: 'preview/gallery.html', content: renderGallery() },
@@ -84,6 +86,6 @@ console.log('  ✓ site/.nojekyll');
 console.log(
   `\nBuilt ${files.length} files for ${flavors.length} flavors ` +
     `(${checks.audit.checks} palette checks, ${flavors.length} VS Code themes, ` +
-    `${flavors.length} Ghostty themes, ${flavors.length} Kaku schemes, ` +
+    `${flavors.length} Ghostty themes, ${flavors.length} Kaku schemes (Lua + TOML), ` +
     `${flavors.length} OpenCode themes, site pages).\n`,
 );

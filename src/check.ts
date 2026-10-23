@@ -7,12 +7,14 @@
  */
 
 import { parse as parseLua } from 'luaparse';
+import { parse as parseToml } from 'smol-toml';
 
 import { contrast, isValidHex } from './color.ts';
 import { flavors } from './palette/index.ts';
 import { ANSI_NAMES } from './palette/types.ts';
 import { generateGhostty } from './targets/ghostty.ts';
-import { generateKaku } from './targets/kaku.ts';
+import { generateKaku, generateKakuToml } from './targets/kaku.ts';
+import { kakuTomlFileName } from './targets/naming.ts';
 import {
   generateOpencode,
   OPENCODE_HUES,
@@ -166,6 +168,69 @@ export function checkThemes(): string[] {
     }
     const ansiCount = (file.content.match(/^    '#[0-9a-f]{6}',$/gm) ?? []).length;
     if (ansiCount !== 16) issues.push(`kaku ${file.path}: expected 16 ANSI colors, found ${ansiCount}`);
+  }
+
+  // --- Kaku / WezTerm TOML ---------------------------------------------
+  const kakuTomlFiles = generateKakuToml();
+  for (const file of kakuTomlFiles) {
+    let document: Record<string, unknown>;
+    try {
+      document = parseToml(file.content) as unknown as Record<string, unknown>;
+    } catch (error) {
+      issues.push(`kaku toml ${file.path}: TOML syntax error — ${(error as Error).message}`);
+      continue;
+    }
+
+    const colors = document.colors as Record<string, unknown> | undefined;
+    if (!colors) {
+      issues.push(`kaku toml ${file.path}: missing [colors]`);
+      continue;
+    }
+
+    for (const required of [
+      'foreground',
+      'background',
+      'cursor_bg',
+      'cursor_fg',
+      'selection_bg',
+      'ansi',
+      'brights',
+      'tab_bar',
+    ]) {
+      if (colors[required] === undefined) {
+        issues.push(`kaku toml ${file.path}: missing colors.${required}`);
+      }
+    }
+
+    for (const key of ['background', 'foreground', 'cursor_bg', 'cursor_fg', 'selection_bg']) {
+      const value = colors[key];
+      if (typeof value !== 'string' || !isValidHex(value)) {
+        issues.push(`kaku toml ${file.path}: invalid colors.${key}`);
+      }
+    }
+
+    const metadata = document.metadata as Record<string, unknown> | undefined;
+    if (typeof metadata?.name !== 'string' || metadata.name === '') {
+      issues.push(`kaku toml ${file.path}: missing [metadata].name`);
+    }
+
+    const ansi = Array.isArray(colors.ansi) ? colors.ansi : [];
+    const brights = Array.isArray(colors.brights) ? colors.brights : [];
+    if (ansi.length !== 8 || brights.length !== 8) {
+      issues.push(`kaku toml ${file.path}: expected 8 ansi and 8 bright colors`);
+    } else {
+      // Both formats come from one palette, so a drift here means one of the
+      // two generators lost a slot.
+      const flavor = flavors.find((candidate) => file.path.endsWith(kakuTomlFileName(candidate)));
+      const slots = [...ansi, ...brights];
+      if (flavor && slots.some((value, index) => value !== flavor.ansi[index])) {
+        issues.push(`kaku toml ${file.path}: ANSI palette drifted from the flavor`);
+      }
+    }
+
+    if (/#[0-9a-f]{8}\b/i.test(file.content)) {
+      issues.push(`kaku toml ${file.path}: 8-digit hex colors are not supported by WezTerm/Kaku`);
+    }
   }
 
   // --- OpenCode --------------------------------------------------------
