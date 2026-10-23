@@ -38,6 +38,7 @@ import { flavors } from '../src/palette/index.ts';
 import {
   ghosttyThemeName,
   kakuFileName,
+  kakuTomlFileName,
   opencodeFileName,
   themeDisplayName,
   vscodeFileName,
@@ -61,6 +62,7 @@ interface ThemeManifest {
   files: {
     ghostty: string;
     kaku: string;
+    kakuToml: string;
     opencode: string;
     vscode: string;
   };
@@ -111,10 +113,12 @@ mkdirSync(releaseDir, { recursive: true });
 
 const ghosttyFiles = flavors.map(ghosttyThemeName);
 const kakuFiles = flavors.map(kakuFileName);
+const kakuTomlFiles = flavors.map(kakuTomlFileName);
 const opencodeFiles = flavors.map(opencodeFileName);
 
 for (const file of ghosttyFiles) assertFile(join(root, 'dist', 'ghostty', file));
 for (const file of kakuFiles) assertFile(join(root, 'dist', 'kaku', file));
+for (const file of kakuTomlFiles) assertFile(join(root, 'dist', 'kaku', file));
 for (const file of opencodeFiles) assertFile(join(root, 'dist', 'opencode', file));
 
 const ghosttyArchive = `inkstone-ghostty-${version}.zip`;
@@ -134,7 +138,7 @@ function zipFlat(archive: string, directory: string, files: string[]): void {
 }
 
 zipFlat(ghosttyArchive, join(root, 'dist', 'ghostty'), ghosttyFiles);
-zipFlat(kakuArchive, join(root, 'dist', 'kaku'), kakuFiles);
+zipFlat(kakuArchive, join(root, 'dist', 'kaku'), [...kakuFiles, ...kakuTomlFiles]);
 zipFlat(opencodeArchive, join(root, 'dist', 'opencode'), opencodeFiles);
 copyFileSync(vsixPath, join(releaseDir, vsixName));
 
@@ -147,6 +151,7 @@ const themes: ThemeManifest[] = flavors.map((flavor) => ({
   files: {
     ghostty: ghosttyThemeName(flavor),
     kaku: kakuFileName(flavor),
+    kakuToml: kakuTomlFileName(flavor),
     opencode: opencodeFileName(flavor),
     vscode: vscodeFileName(flavor),
   },
@@ -168,6 +173,7 @@ const manifest = {
     },
     kaku: {
       directory: '~/.config/kaku',
+      tomlDirectory: '~/.config/kaku/colors',
       archive: kakuArchive,
       format: 'lua',
     },
@@ -216,10 +222,14 @@ theme = light:Inkstone Qingci,dark:Inkstone Canghai
 ## Kaku
 
 \`\`\`bash
+mkdir -p ~/.config/kaku/colors
 cp kaku/*.lua ~/.config/kaku/
+cp kaku/*.toml ~/.config/kaku/colors/
 \`\`\`
 
-Add one variant to \`~/.config/kaku/kaku.lua\`:
+Open Settings (Cmd+,) and pick \`Inkstone Xuanmo\` from Theme; Kaku writes
+\`config.color_scheme\` for you. A Kaku that does not list these files yet, and
+WezTerm, can reference the Lua table instead:
 
 \`\`\`lua
 config.color_schemes = config.color_schemes or {}
@@ -268,6 +278,9 @@ for (const file of ghosttyFiles) {
   copyFileSync(join(root, 'dist', 'ghostty', file), join(stagingDir, 'ghostty', file));
 }
 for (const file of kakuFiles) {
+  copyFileSync(join(root, 'dist', 'kaku', file), join(stagingDir, 'kaku', file));
+}
+for (const file of kakuTomlFiles) {
   copyFileSync(join(root, 'dist', 'kaku', file), join(stagingDir, 'kaku', file));
 }
 for (const file of opencodeFiles) {

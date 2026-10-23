@@ -44,7 +44,7 @@ A traditional Chinese color theme for editors and terminals, built from the 526-
 | --- | --- |
 | `Konata9.inkstone-<version>.vsix` | VS Code / Cursor / Windsurf / VSCodium |
 | `inkstone-ghostty-<version>.zip` | Ghostty 主题文件 |
-| `inkstone-kaku-<version>.zip` | Kaku / WezTerm Lua 色表 |
+| `inkstone-kaku-<version>.zip` | Kaku / WezTerm 色表（Lua + TOML） |
 | `inkstone-opencode-<version>.zip` | OpenCode V2 主题 |
 | `inkstone-<version>.zip` | 全部产物 + `manifest.json` + 安装说明 |
 | `manifest.json` / `SHA256SUMS` | 机器可读索引与校验和 |
@@ -121,7 +121,18 @@ theme = light:Inkstone Qingci,dark:Inkstone Canghai
 pnpm install:kaku
 ```
 
-然后把下面三行追加到 `~/.config/kaku/kaku.lua`（Kaku 会自动重载）：
+脚本会把六个 `.lua` 装到 `~/.config/kaku/`，把六个 `.toml` 装到 `~/.config/kaku/colors/`。打开 Settings（`Cmd + ,`），Theme 列表里会直接出现六个变体，选中即可，Kaku 会自己写入 `config.color_scheme`。
+
+| 变体 | Settings 里的名称 |
+| --- | --- |
+| 玄墨（dark） | `Inkstone Xuanmo` |
+| 玄墨 Dimmed（muted dark） | `Inkstone Xuanmo Dimmed` |
+| 宣纸（warm light） | `Inkstone Xuanzhi` |
+| 宣纸 Dimmed（muted warm light） | `Inkstone Xuanzhi Dimmed` |
+| 沧海（deep-sea dark） | `Inkstone Canghai` |
+| 青瓷（celadon light） | `Inkstone Qingci` |
+
+旧版 Kaku（Settings 里还是只有 Auto / Kaku Dark / Kaku Light）和 WezTerm 继续用 Lua 表，把下面三行追加到 `~/.config/kaku/kaku.lua`（Kaku 会自动重载）：
 
 ```lua
 config.color_schemes = config.color_schemes or {}
@@ -129,11 +140,9 @@ config.color_schemes['Inkstone Xuanmo'] = dofile(wezterm.config_dir .. '/inkston
 config.color_scheme = 'Inkstone Xuanmo'
 ```
 
-想用暖色就换成 `inkstone-xuanzhi.lua` 与 `'Inkstone Xuanzhi'`；低饱和版本换成 `inkstone-xuanmo-dimmed.lua` / `'Inkstone Xuanmo Dimmed'`，或 `inkstone-xuanzhi-dimmed.lua` / `'Inkstone Xuanzhi Dimmed'`。
+想要暖色就把 `inkstone-xuanmo.lua` 与 `'Inkstone Xuanmo'` 换成上表里对应的文件与名称。
 
-海瓷组用 `inkstone-canghai.lua` / `'Inkstone Canghai'` 与 `inkstone-qingci.lua` / `'Inkstone Qingci'`。
-
-WezTerm 用户把六个 `.lua` 文件放到 `~/.config/wezterm/`，接入方式相同；色表同时包含 `tab_bar` 与 `split`。
+WezTerm 用户把六个 `.lua` 文件放到 `~/.config/wezterm/`，接入方式相同；也可以把 `.toml` 放进 `~/.config/wezterm/colors/`，再让 `config.color_scheme` 等于表里的名称。两种格式都同时包含 `tab_bar` 与 `split`。
 
 ### OpenCode
 
@@ -185,7 +194,7 @@ src/
     naming.ts             各端文件名与主题显示名（唯一来源）
     vscode.ts             workbench + TextMate + 语义 token
     ghostty.ts            Ghostty 主题
-    kaku.ts               Kaku / WezTerm Lua 色表
+    kaku.ts               Kaku / WezTerm 色表（Lua + TOML）
     opencode.ts           OpenCode V2 主题（base + hue scale）
     preview.ts            预览页 / gallery
     site.ts · site-copy.ts 官网数据注入（文案 / 版本 / 色板）

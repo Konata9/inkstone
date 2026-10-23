@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- **Kaku TOML target**: every flavor also ships a WezTerm-compatible `.toml` scheme, so Kaku's Settings → Theme lists it without a `dofile` block; `pnpm install:kaku` now installs both formats.
 - **Shorter README preview**: `docs/preview.png` is an editor-only 3×2 gallery captured from `preview/gallery.html`, instead of the full compare page.
 - **Product site**: static EN/ZH pages under `site/` (GitHub Pages), with flavor switching, system light/dark defaults (宣纸 / 玄墨), hreflang, JSON-LD, `llms.txt`, and sitemap.
 - **Site icons**: editor/terminal support rows use monochrome brand marks; each flavor button shows a canvas + keyword swatch.
