@@ -1,7 +1,6 @@
 # Changelog
 
-## Unreleased
-
+## 0.3.3
 - **Cursor chrome outlines**: `contrastActiveBorder` is transparent. Cursor paints that token as a 1px outline around editor tabs, activity-bar items and auxiliary actions such as New Agent; VS Code and VSCodium only use it in high contrast, where the dark default is already null.
 
 ## 0.3.2
