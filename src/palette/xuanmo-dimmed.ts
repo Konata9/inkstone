@@ -11,6 +11,10 @@
 import { named, soften } from './data.ts';
 import type { Flavor } from './types.ts';
 
+// 涧石蓝 is the dimmed interaction blue: one hue for functions, links,
+// focus, buttons, badges and progress.
+const interaction = named('涧石蓝');
+
 export const xuanmoDimmed: Flavor = {
   meta: {
     id: 'xuanmo-dimmed',
@@ -45,7 +49,7 @@ export const xuanmoDimmed: Flavor = {
     subtle: '#2a2832',
     normal: '#393643',
     strong: '#4f4a5b',
-    focus: named('晴山蓝'),
+    focus: interaction,
   },
 
   text: {
@@ -59,13 +63,16 @@ export const xuanmoDimmed: Flavor = {
     cursor: named('羽扇豆蓝'),
   },
 
+  // 涧石蓝 carries UI actions; 山黎豆红 stays a pigment mark.
+  action: interaction,
+
   syntax: {
     // 螺甸紫, dimmed by the deeper canvas rather than a new hue.
     comment: '#85809e',
     keyword: named('山黎豆红'),
     storage: named('山黎豆红'),
     // Pigments keep their hue identity: only ~25% of the chroma is given up.
-    function: named('涧石蓝'),
+    function: interaction,
     method: named('羽扇豆蓝'),
     string: named('梧枝绿'),
     number: named('山鸡黄'),

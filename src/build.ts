@@ -17,7 +17,7 @@
  *   docs/palette.md
  */
 
-import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -38,6 +38,11 @@ if (!checks.ok) {
   reportFailures(checks, 'Build stopped');
   process.exit(1);
 }
+
+// Start from a clean output directory: renamed or retired flavors must not
+// leave stale theme files behind for install scripts and release packaging.
+rmSync(join(root, 'dist'), { recursive: true, force: true });
+console.log('  ✓ dist/ cleaned');
 
 /** Keep the extension manifest on the root version; the file stays committed. */
 function syncVscodeVersion(): string {

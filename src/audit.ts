@@ -234,6 +234,20 @@ export function audit(): AuditReport {
     expect(flavor, 'text.inverse / status.error', text.inverse, status.error, 3, true);
     expect(flavor, 'text.inverse / keyword', text.inverse, syntax.keyword, 3, true);
 
+    // --- Action ----------------------------------------------------------
+    // The action colour is a filled surface as well as a foreground, so it
+    // earns both contracts: text on the fill, and the fill on the canvas.
+    expect(flavor, 'text.inverse / action', text.inverse, flavor.action, 4.5);
+    expect(flavor, 'action / canvas', flavor.action, surface.base, BAND.syntax.min, false, BAND.syntax.max);
+    expect(flavor, 'action / panel', flavor.action, surface.alt, 4);
+    expectChroma(flavor, 'action chroma', flavor.action, 0, CHROMA.red);
+    if (flavor.meta.dimmed) {
+      expectChroma(flavor, 'action chroma (dimmed floor)', flavor.action, CHROMA.dimmedFloor, CHROMA.red, true);
+    }
+    if (flavor.action !== syntax.function) {
+      warnings.push(`${flavor.meta.id}: action (${flavor.action}) should stay aligned with syntax.function (${syntax.function})`);
+    }
+
     // Elevation ramp: each step must be visibly distinct and ordered.
     const ramp = [
       ['base', surface.base],

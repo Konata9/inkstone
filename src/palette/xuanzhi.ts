@@ -10,6 +10,10 @@
 import { named, soften } from './data.ts';
 import type { Flavor } from './types.ts';
 
+// 飞燕草蓝 is the paper-side interaction blue: functions, links, focus,
+// buttons, badges and progress share one hue.
+const interaction = named('飞燕草蓝');
+
 export const xuanzhi: Flavor = {
   meta: {
     id: 'xuanzhi',
@@ -42,7 +46,7 @@ export const xuanzhi: Flavor = {
     subtle: '#e7dfd1',
     normal: '#d6ccb9',
     strong: '#b9ad97',
-    focus: named('飞燕草蓝'),
+    focus: interaction,
   },
 
   text: {
@@ -56,6 +60,9 @@ export const xuanzhi: Flavor = {
     cursor: named('玉鈫蓝'),
   },
 
+  // Actions use 飞燕草蓝; 鹤顶红 remains the seal and the annotation mark.
+  action: interaction,
+
   syntax: {
     // 垩灰, cooled and darkened one step so comments read as pencil notes
     // and stay clear of 苍黄 (decorators) on paper.
@@ -63,7 +70,7 @@ export const xuanzhi: Flavor = {
     // 鹤顶红 kept, chroma compressed: still the seal red, no longer a siren.
     keyword: soften('鹤顶红', 0.165),
     storage: soften('鹤顶红', 0.165),
-    function: named('飞燕草蓝'),
+    function: interaction,
     method: named('品蓝'),
     string: named('荷叶绿'),
     number: named('蟹蝥红'),

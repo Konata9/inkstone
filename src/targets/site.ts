@@ -51,7 +51,7 @@ const TERMINALS = [
   { id: 'opencode', label: 'OpenCode' },
 ] as const;
 
-const CHIPS = ['526 zhongguose', '6 variants', '846 contrast checks', 'Konata9.inkstone'];
+const CHIPS = ['526 zhongguose', '6 variants', '872 contrast checks', 'Konata9.inkstone'];
 
 const engine = new Liquid({
   root: templateRoot,
@@ -100,6 +100,7 @@ function buildFlavors(locale: SiteLocale) {
       chipBorder: f.border.normal,
       chipBorderStrong: f.border.strong,
       chipAccent: f.syntax.keyword,
+      chipAction: f.action,
       surfacesHtml: surfaces(f),
       accentsHtml: accents(f),
       editorHtml: editorMock(f, { lines: galleryTsLines(f) }),
@@ -272,7 +273,7 @@ Families:
 - **Sea & celadon** — 沧海 Canghai, 青瓷 Qingci
 
 Dimmed variants lower ambient light while keeping body text ≥ 10.5:1 and
-pigments recognisable. The build runs 846 contrast and chroma checks.
+pigments recognisable. The build runs 872 contrast and chroma checks.
 
 ## Features
 

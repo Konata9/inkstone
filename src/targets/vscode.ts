@@ -5,8 +5,8 @@
  * TextMate scopes and semantic tokens all read from the same flavor object.
  */
 
-import { alpha, darken, lighten } from '../color.ts';
-import { flavors } from '../palette/index.ts';
+import { alpha } from '../color.ts';
+import { actionHover, flavors } from '../palette/index.ts';
 import type { Flavor } from '../palette/types.ts';
 import { themeDisplayName, vscodeFileName } from './naming.ts';
 
@@ -37,11 +37,6 @@ interface ThemeFile {
 }
 
 const transparent = '#00000000';
-
-/** Shift a color toward the ambient light of the flavor. */
-function lift(flavor: Flavor, color: string, amount = 0.14): string {
-  return flavor.meta.appearance === 'dark' ? lighten(color, amount) : darken(color, amount);
-}
 
 function shadow(flavor: Flavor, opacity: number): string {
   return alpha(flavor.meta.appearance === 'dark' ? '#000000' : flavor.text.primary, opacity);
@@ -159,7 +154,7 @@ function workbench(flavor: Flavor): Record<string, string> {
     'editorSuggestWidget.selectedBackground': s.active,
     'editorSuggestWidget.selectedForeground': t.primary,
     'editorSuggestWidget.highlightForeground': y.function,
-    'editorSuggestWidget.focusHighlightForeground': y.keyword,
+    'editorSuggestWidget.focusHighlightForeground': f.action,
     'editorHoverWidget.background': s.raised,
     'editorHoverWidget.foreground': t.primary,
     'editorHoverWidget.border': b.normal,
@@ -209,9 +204,9 @@ function workbench(flavor: Flavor): Record<string, string> {
     'tab.inactiveForeground': t.muted,
     'tab.border': b.subtle,
     'tab.activeBorder': s.base,
-    'tab.activeBorderTop': y.keyword,
+    'tab.activeBorderTop': f.action,
     'tab.unfocusedActiveBorder': s.base,
-    'tab.unfocusedActiveBorderTop': alpha(y.keyword, 0.4),
+    'tab.unfocusedActiveBorderTop': alpha(f.action, 0.4),
     'tab.selectedBackground': s.raised,
     'tab.selectedForeground': t.primary,
     'tab.hoverBackground': s.raised,
@@ -233,10 +228,10 @@ function workbench(flavor: Flavor): Record<string, string> {
     'activityBar.foreground': t.primary,
     'activityBar.inactiveForeground': t.faint,
     'activityBar.border': b.subtle,
-    'activityBar.activeBorder': y.keyword,
-    'activityBar.activeBackground': alpha(y.keyword, 0.08),
-    'activityBar.dropBorder': y.keyword,
-    'activityBarBadge.background': y.keyword,
+    'activityBar.activeBorder': f.action,
+    'activityBar.activeBackground': alpha(f.action, 0.08),
+    'activityBar.dropBorder': f.action,
+    'activityBarBadge.background': f.action,
     'activityBarBadge.foreground': t.inverse,
     'list.activeSelectionBackground': s.active,
     'list.activeSelectionForeground': t.primary,
@@ -248,7 +243,7 @@ function workbench(flavor: Flavor): Record<string, string> {
     'list.focusForeground': t.primary,
     'list.focusOutline': b.focus,
     'list.highlightForeground': y.function,
-    'list.focusHighlightForeground': y.keyword,
+    'list.focusHighlightForeground': f.action,
     'list.invalidItemForeground': st.error,
     'list.errorForeground': st.error,
     'list.warningForeground': st.warning,
@@ -257,7 +252,7 @@ function workbench(flavor: Flavor): Record<string, string> {
     'tree.indentGuidesStroke': b.normal,
     'tree.inactiveIndentGuidesStroke': b.subtle,
     'tree.tableColumnsBorder': alpha(b.subtle, 0.6),
-    'badge.background': y.keyword,
+    'badge.background': f.action,
     'badge.foreground': t.inverse,
 
     // ---------------------------------------------------------- title bar
@@ -300,7 +295,7 @@ function workbench(flavor: Flavor): Record<string, string> {
     'statusBarItem.errorForeground': t.inverse,
     'statusBarItem.warningBackground': st.warning,
     'statusBarItem.warningForeground': t.inverse,
-    'statusBarItem.remoteBackground': y.function,
+    'statusBarItem.remoteBackground': f.action,
     'statusBarItem.remoteForeground': t.inverse,
     'statusBarItem.offlineBackground': st.error,
     'statusBarItem.offlineForeground': t.inverse,
@@ -310,7 +305,7 @@ function workbench(flavor: Flavor): Record<string, string> {
     'panel.border': b.subtle,
     'panel.dropBorder': y.function,
     'panelTitle.activeForeground': t.primary,
-    'panelTitle.activeBorder': y.keyword,
+    'panelTitle.activeBorder': f.action,
     'panelTitle.inactiveForeground': t.muted,
     'panelSection.border': b.subtle,
     'panelSectionHeader.background': s.alt,
@@ -370,9 +365,9 @@ function workbench(flavor: Flavor): Record<string, string> {
     'inputValidation.infoBorder': st.info,
 
     // ------------------------------------------------------------ buttons
-    'button.background': y.keyword,
+    'button.background': f.action,
     'button.foreground': t.inverse,
-    'button.hoverBackground': lift(f, y.keyword, 0.12),
+    'button.hoverBackground': actionHover(f),
     'button.border': transparent,
     'button.secondaryBackground': s.raised,
     'button.secondaryForeground': t.primary,
@@ -390,7 +385,7 @@ function workbench(flavor: Flavor): Record<string, string> {
     'quickInput.foreground': t.primary,
     'quickInputList.focusBackground': s.active,
     'quickInputList.focusForeground': t.primary,
-    'quickInputList.focusIconForeground': y.keyword,
+    'quickInputList.focusIconForeground': f.action,
     'quickInputTitle.background': s.raised,
     'pickerGroup.foreground': t.muted,
     'pickerGroup.border': b.normal,
@@ -536,9 +531,9 @@ function workbench(flavor: Flavor): Record<string, string> {
     'walkThrough.embeddedEditorBackground': s.sunken,
 
     // ---------------------------------------------------------- extension
-    'extensionButton.prominentBackground': y.keyword,
+    'extensionButton.prominentBackground': f.action,
     'extensionButton.prominentForeground': t.inverse,
-    'extensionButton.prominentHoverBackground': lift(f, y.keyword, 0.12),
+    'extensionButton.prominentHoverBackground': actionHover(f),
     'extensionBadge.remoteBackground': y.function,
     'extensionBadge.remoteForeground': t.inverse,
     'extensionIcon.starForeground': st.warning,
@@ -551,12 +546,12 @@ function workbench(flavor: Flavor): Record<string, string> {
     'banner.iconForeground': y.function,
     'gauge.background': b.normal,
     'gauge.foreground': y.function,
-    'progressBar.background': y.keyword,
+    'progressBar.background': f.action,
     'ports.iconRunningProcessForeground': st.success,
     'notebook.editorBackground': s.base,
     'notebook.cellBorderColor': b.subtle,
     'notebook.cellEditorBackground': s.base,
-    'notebook.cellInsertionIndicator': y.keyword,
+    'notebook.cellInsertionIndicator': f.action,
     'notebook.focusedCellBorder': b.focus,
     'notebook.focusedCellBackground': s.alt,
     'notebook.selectedCellBackground': s.alt,

@@ -197,7 +197,7 @@ function buildTheme(flavor: Flavor): OpencodeTheme {
     cyan: hueScale(f, y.regexp),
     blue: hueScale(f, y.function),
     purple: hueScale(f, y.decorator),
-    accent: '$hue.red',
+    accent: '$hue.blue',
     interactive: '$hue.blue',
     neutral: '$hue.gray',
   };
@@ -258,7 +258,7 @@ function buildTheme(flavor: Flavor): OpencodeTheme {
           primary: {
             base: 'transparent',
             $hovered: s.raised,
-            $focused: y.keyword,
+            $focused: y.function,
             $pressed: s.overlay,
             $selected: 'transparent',
             $disabled: s.input,

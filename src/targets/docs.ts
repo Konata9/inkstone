@@ -6,7 +6,7 @@
 import { contrast, formatRatio } from '../color.ts';
 import { colorLabel, traditionalColors } from '../palette/data.ts';
 import { borderLabels, statusLabels, surfaceLabels, syntaxLabels, textLabels } from '../palette/labels.ts';
-import { flavorFamilies, flavorName, flavors } from '../palette/index.ts';
+import { actionHover, flavorFamilies, flavorName, flavors } from '../palette/index.ts';
 import type { Flavor } from '../palette/types.ts';
 import { ANSI_NAMES } from '../palette/types.ts';
 
@@ -66,6 +66,13 @@ function flavorSection(flavor: Flavor): string {
       ...Object.entries(flavor.border).map(([key, hex]) => [borderLabels[key as keyof Flavor['border']]!, hex] as [string, string]),
     ])),
     '',
+    '### 交互',
+    '',
+    table(rows([
+      ['主按钮 / 动作', flavor.action],
+      ['主按钮悬停', actionHover(flavor)],
+    ])),
+    '',
     '### 语法',
     '',
     table(rows(Object.entries(flavor.syntax).map(([key, hex]) => [syntaxLabels[key as keyof Flavor['syntax']]!, hex]))),
@@ -123,6 +130,9 @@ export function renderPaletteDoc(): string {
         });
         return `| ${label} | ${cells.join(' | ')} |`;
       }),
+      `| 动作 / 交互 | ${family.flavors
+        .map((flavor) => `\`${flavor.action}\` ${colorLabel(flavor.action) ?? '派生'}`)
+        .join(' | ')} |`,
       '',
     ]),
     '## 审计阈值',
@@ -136,6 +146,7 @@ export function renderPaletteDoc(): string {
     '| 运算符、标点 | 4–7:1 | — |',
     '| 注释 | 4.5–9:1 | ≤ 0.175（Dimmed ≥ 0.03） |',
     '| 光标 | 4.5–7:1 | ≤ 0.105 |',
+    '| 主按钮 / 动作 | 文字 ≥ 4.5:1，填充 4.5–9:1 | ≤ 0.175 |',
     '| 选区填充 | 1.25–1.5:1 | — |',
     '| Dimmed 强调色 | 4.5–9:1 | ≥ 0.045 |',
     '| 终端彩色槽位 | 3:1（黄/白槽位 2.5:1 / 2:1） | ≤ 0.2 |',

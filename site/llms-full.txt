@@ -16,7 +16,7 @@ Families:
 - **Sea & celadon** — 沧海 Canghai, 青瓷 Qingci
 
 Dimmed variants lower ambient light while keeping body text ≥ 10.5:1 and
-pigments recognisable. The build runs 846 contrast and chroma checks.
+pigments recognisable. The build runs 872 contrast and chroma checks.
 
 ## Features
 

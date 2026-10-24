@@ -12,7 +12,7 @@
 
 import { alpha, contrast, formatRatio, luminance } from '../color.ts';
 import { colorLabel, nameOf } from '../palette/data.ts';
-import { flavorFamilies, flavors, flavorName } from '../palette/index.ts';
+import { actionHover, flavorFamilies, flavors, flavorName } from '../palette/index.ts';
 import { syntaxLabels } from '../palette/labels.ts';
 import type { Flavor } from '../palette/types.ts';
 import { ANSI_NAMES } from '../palette/types.ts';
@@ -40,6 +40,8 @@ export function cssVars(f: Flavor): string {
     `--fg-3:${t.muted}`,
     `--fg-4:${t.faint}`,
     `--cursor:${t.cursor}`,
+    `--action:${f.action}`,
+    `--action-hover:${actionHover(f)}`,
     `--kw:${y.keyword}`,
     `--fn:${y.function}`,
     `--str:${y.string}`,
@@ -293,7 +295,7 @@ export function editorStyles(): string {
   .editor-main { min-width: 0; display: flex; flex-direction: column; }
   .tabs { display: flex; background: var(--bg-alt); border-bottom: 1px solid var(--border-subtle); }
   .tab { font-size: 10.5px; color: var(--fg-3); padding: 7px 14px; border-right: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 8px; }
-  .tab.active { background: var(--bg); color: var(--fg); box-shadow: inset 0 1px 0 var(--kw); }
+  .tab.active { background: var(--bg); color: var(--fg); box-shadow: inset 0 1px 0 var(--action); }
   .close { opacity: .5; font-size: 12px; }
   .breadcrumb { display: flex; gap: 6px; align-items: center; padding: 6px 14px; font-size: 10px; color: var(--fg-3); border-bottom: 1px solid var(--border-subtle); }
   .breadcrumb i { font-style: normal; opacity: .5; }

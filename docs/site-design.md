@@ -26,6 +26,7 @@ Injected per flavor (same names as preview):
 - Surfaces: `--bg`, `--bg-alt`, `--activity`, `--bg-sunken`, `--sel`, `--active`
 - Borders: `--border`, `--border-subtle`, `--border-strong`
 - Text: `--fg`, `--fg-2`, `--fg-3`, `--fg-4`, `--cursor`
+- Action: `--action`, `--action-hover` (the flavor's interaction blue)
 - Syntax: `--kw`, `--fn`, `--str`, `--num`, `--type`, `--cm`, `--dec`, `--var`, `--param`, `--prop`
 - Lens: `--lens`
 
@@ -37,7 +38,8 @@ Fonts (2+1):
 | Body | `-apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Segoe UI", sans-serif` |
 | Mono | `"JetBrains Mono", "SF Mono", "Cascadia Code", Menlo, monospace` |
 
-No italic headings. Accent for selection/focus = `--kw` or `--cursor`.
+No italic headings. Links, CTAs, focus and selected chrome use `--action`;
+`--kw` stays a code/annotation mark, never a command.
 Atmosphere wash uses `color-mix` from `--kw` / `--cursor` over the canvas.
 
 Waiver: paper/ink surfaces are product tokens (玄墨 / 宣纸), not generic AI cream.
@@ -62,9 +64,9 @@ No tracked-capital labels.
 | --- | --- |
 | default | hairline border, `--fg-2` label |
 | hover | `--bg-alt` fill (only under `@media (hover: hover)`) |
-| `:focus-visible` | 2px outline `--cursor` |
+| `:focus-visible` | 2px outline `--chip-action` |
 | `:active` | slightly pressed (`translateY(1px)`) |
-| selected (current) | inset top rule `--kw`, `--fg` label, `--active` fill |
+| selected (current) | inset top rule `--chip-action`, `--fg` label, `--active` fill |
 
 ## Flavor switch motion
 

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **Red marks, blue acts**: buttons, badges, progress, focus rings and selected chrome now use each flavor's interaction blue (羽扇豆蓝 / 涧石蓝 / 飞燕草蓝 / 鷃蓝 / 霁青 / 玉鈫蓝); cinnabar stays reserved for keywords, errors, deletions, the seal and syntax marks. Adds a first-class `action` token plus a hover step, and points OpenCode `accent` at the blue hue.
+- **Safer action hover**: the site CTA and links use the generated `--action` / `--action-hover` pair instead of `brightness(1.08)`, so hover no longer drops 宣纸 to 4.39:1.
+- **Clean dist on build**: `pnpm build` now clears `dist/` before writing, so renamed or retired flavors never leave stale files behind for install scripts or release packaging.
 - **Kaku TOML target**: every flavor also ships a WezTerm-compatible `.toml` scheme, so Kaku's Settings → Theme lists it without a `dofile` block; `pnpm install:kaku` now installs both formats.
 - **Shorter README preview**: `docs/preview.png` is an editor-only 3×2 gallery captured from `preview/gallery.html`, instead of the full compare page.
 - **Product site**: static EN/ZH pages under `site/` (GitHub Pages), with flavor switching, system light/dark defaults (宣纸 / 玄墨), hreflang, JSON-LD, `llms.txt`, and sitemap.

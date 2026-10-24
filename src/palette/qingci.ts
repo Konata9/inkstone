@@ -10,6 +10,10 @@
 import { named, soften } from './data.ts';
 import type { Flavor } from './types.ts';
 
+// 玉鈫蓝 is the celadon interaction blue: functions, links, focus, buttons,
+// badges and progress share one hue.
+const interaction = named('玉鈫蓝');
+
 export const qingci: Flavor = {
   meta: {
     id: 'qingci',
@@ -42,7 +46,7 @@ export const qingci: Flavor = {
     subtle: '#dbe6df',
     normal: '#c7d5cc',
     strong: '#a8bab0',
-    focus: named('玉鈫蓝'),
+    focus: interaction,
   },
 
   text: {
@@ -52,8 +56,11 @@ export const qingci: Flavor = {
     muted: '#5f6b67',
     faint: '#7d8983',
     inverse: '#f2f8f4',
-    cursor: named('玉鈫蓝'),
+    cursor: interaction,
   },
+
+  // 玉鈫蓝 carries actions; 尖晶玉红 stays the seal and the annotation mark.
+  action: interaction,
 
   syntax: {
     // 战舰灰 — the dimmest note that still clears 4.5:1 on glaze.
@@ -61,7 +68,7 @@ export const qingci: Flavor = {
     // 尖晶玉红 kept as the seal, compressed to screen chroma.
     keyword: soften('尖晶玉红', 0.165),
     storage: soften('尖晶玉红', 0.165),
-    function: named('玉鈫蓝'),
+    function: interaction,
     method: named('海涛蓝'),
     string: named('荷叶绿'),
     number: named('驼色'),

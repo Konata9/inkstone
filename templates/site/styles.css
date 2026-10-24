@@ -76,8 +76,8 @@ body {
   ::view-transition-new(root) { animation: none !important; }
 }
 
-a { color: var(--kw); text-decoration: none; }
-a:hover { color: var(--cursor); }
+a { color: var(--action); text-decoration: none; }
+a:hover { color: var(--action-hover); }
 a:focus-visible,
 button:focus-visible {
   outline: 2px solid var(--cursor);
@@ -189,12 +189,16 @@ html[lang="zh-CN"] .tagline {
   display: inline-flex; align-items: center; justify-content: center;
   padding: 12px 20px; border-radius: 8px; font-size: 14px;
   border: 1px solid var(--border-strong);
-  transition: background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease), filter .15s var(--ease);
+  transition: background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease);
 }
-.cta-primary { background: var(--kw); color: var(--bg); border-color: var(--kw); }
+.cta-primary { background: var(--action); color: var(--bg); border-color: var(--action); }
 .cta-ghost { background: transparent; color: var(--fg); }
 @media (hover: hover) {
-  .cta-primary:hover { filter: brightness(1.08); color: var(--bg); }
+  .cta-primary:hover {
+    background: var(--action-hover);
+    border-color: var(--action-hover);
+    color: var(--bg);
+  }
   .cta-ghost:hover { background: var(--bg-alt); color: var(--fg); }
 }
 
@@ -264,7 +268,7 @@ html[lang="zh-CN"] .tagline {
   background: var(--chip-active);
   color: var(--chip-fg);
   border-color: var(--chip-border-strong);
-  box-shadow: inset 0 2px 0 var(--chip-accent);
+  box-shadow: inset 0 2px 0 var(--chip-action);
 }
 .flavor-btn:active { transform: translateY(1px); }
 @media (hover: hover) {
@@ -275,7 +279,7 @@ html[lang="zh-CN"] .tagline {
   }
 }
 .flavor-btn:focus-visible {
-  outline: 2px solid var(--chip-accent);
+  outline: 2px solid var(--chip-action);
   outline-offset: 2px;
 }
 

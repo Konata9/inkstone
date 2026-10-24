@@ -1,3 +1,4 @@
+import { darken, lighten } from '../color.ts';
 import type { Flavor, FlavorFamily } from './types.ts';
 import { canghai } from './canghai.ts';
 import { qingci } from './qingci.ts';
@@ -18,4 +19,17 @@ export const flavorFamilies: Array<{ id: FlavorFamily; zh: string; en: string; f
 export function flavorName(flavor: Flavor, lang: 'zh' | 'en' = 'zh'): string {
   const base = lang === 'zh' ? flavor.meta.zh : flavor.meta.en;
   return flavor.meta.dimmed ? `${base} Dimmed` : base;
+}
+
+/**
+ * Hover/pressed step for the action colour.
+ *
+ * Dark flavors lift toward white, light flavors sink toward black: both
+ * directions increase contrast with the button label, so hover never dips
+ * below the resting ratio.
+ */
+export function actionHover(flavor: Flavor): string {
+  return flavor.meta.appearance === 'dark'
+    ? lighten(flavor.action, 0.12)
+    : darken(flavor.action, 0.12);
 }

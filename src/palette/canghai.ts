@@ -10,6 +10,10 @@
 import { named, soften } from './data.ts';
 import type { Flavor } from './types.ts';
 
+// 霁青 is the sea-side interaction blue: functions, links, focus, buttons,
+// badges and progress share one hue.
+const interaction = named('霁青');
+
 export const canghai: Flavor = {
   meta: {
     id: 'canghai',
@@ -42,7 +46,7 @@ export const canghai: Flavor = {
     subtle: '#1b2b36',
     normal: '#29404f',
     strong: '#3d5a6d',
-    focus: named('霁青'),
+    focus: interaction,
   },
 
   text: {
@@ -56,6 +60,9 @@ export const canghai: Flavor = {
     cursor: named('涧石蓝'),
   },
 
+  // 霁青 carries actions; 银朱 stays the seal and the annotation mark.
+  action: interaction,
+
   syntax: {
     // 晚波蓝 — the quiet note of the tide.
     comment: named('晚波蓝'),
@@ -63,7 +70,7 @@ export const canghai: Flavor = {
     // strength so the cinnabar seal still reads as cinnabar.
     keyword: soften('银朱', 0.165),
     storage: soften('银朱', 0.165),
-    function: named('霁青'),
+    function: interaction,
     method: named('海青'),
     string: named('竹绿'),
     number: named('土黄'),

@@ -31,8 +31,9 @@ A traditional Chinese color theme for editors and terminals, built from the 526-
 - 朱砂系保留传统色相与明度，只把彩度压到屏幕友好的范围，标注为「降彩」；错误态保留更高一档彩度。
 - Dimmed 只用于墨纸组：**降环境光，不降墨色**。画布更沉、墨色仍 ≥ 10.5:1，强调色保留可辨识的色相（C ≥ 0.045），避免褪成灰雾。
 - 光标改用各变体的冷色交互色（羽扇豆蓝 / 涧石蓝 / 玉鈫蓝），不再复用关键字红。
+- **红做记号，青做动作**：关键字、错误、删除保留朱砂；按钮、徽标、进度、焦点与选中态统一用各变体的交互蓝（羽扇豆蓝 / 涧石蓝 / 飞燕草蓝 / 鷃蓝 / 霁青 / 玉鈫蓝），主操作与危险操作不再共用色相。
 - 强调色尽量保留传统色原值；中性表面、弱化前景与降彩颜料均在 [色板文档](docs/palette.md) 中标注。
-- 846 项检查：对比度上下限 + OKLCH 彩度带，六个变体执行同一套阈值。
+- 872 项检查：对比度上下限 + OKLCH 彩度带，六个变体执行同一套阈值。
 
 ## 安装
 
@@ -170,7 +171,7 @@ pnpm install:opencode
 | `inkstone-canghai` | 沧海 | 暗 |
 | `inkstone-qingci` | 青瓷 | 亮 |
 
-OpenCode 的语义 token 全部从同一份色板映射：正文、背景层、语法、diff、Markdown、反馈色与九级 hue scale 都由生成器输出；`accent` 沿用各变体的关键字红，`interactive` 用晴山蓝。新增主题文件后需要重启 OpenCode。
+OpenCode 的语义 token 全部从同一份色板映射：正文、背景层、语法、diff、Markdown、反馈色与九级 hue scale 都由生成器输出；`accent` 与 `interactive` 都指向各变体的交互蓝，`destructive` 独占错误红。新增主题文件后需要重启 OpenCode。
 
 ## 仓库结构
 
@@ -218,7 +219,7 @@ docs/site-design.md       官网设计冻结说明
 
 ```bash
 pnpm install
-pnpm build        # 审计色板 → 生成全部产物
+pnpm build        # 审计色板 → 清空 dist/ → 生成全部产物
 pnpm test         # 色板审计 + 产物检查（与 build 的检查一致）
 pnpm typecheck
 pnpm preview      # 构建并在浏览器打开预览页
@@ -236,6 +237,7 @@ pnpm site         # 构建并打开官网（site/index.html）
 4. **传统色可追溯**：`nameOf()` 反查原值，降彩颜料通过 `soften()` 记录来源，`docs/palette.md` 自动列出。
 5. **同一骨架**：六个变体的色相顺序一致（朱 → 蓝 → 绿 → 橙 → 紫 → 青 → 绛），切换只换光线与饱和度。
 6. **不做花活**：无渐变、无斜体注释、无玻璃拟态；只做耐看的纸墨与海色。
+7. **红做记号，青做动作**：朱砂只留在语法、印章与危险态；按钮、徽标、进度、焦点与选中态用交互蓝，主操作和危险操作各占一个色相。
 
 ## 许可与致谢
 
@@ -260,3 +262,5 @@ pnpm site         # 构建并打开官网（site/index.html）
 Install the VSIX from `dist/`, or install the Ghostty / Kaku / OpenCode themes with the scripts above. The same Lua scheme also works in WezTerm.
 
 Built with a generator: one semantic palette produces the VS Code themes, the Ghostty themes and the terminal ANSI schemes, and the build fails if any token leaves its contrast band or OKLCH chroma budget.
+
+Red stays a mark (keywords, errors, deletions, the seal) while each flavor's interaction blue carries buttons, badges, progress, focus and selected chrome, so confirmation and destruction never share a hue.

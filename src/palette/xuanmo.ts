@@ -11,6 +11,10 @@
 import { named, soften } from './data.ts';
 import type { Flavor } from './types.ts';
 
+// 羽扇豆蓝 is both the function hue and the UI interaction colour: links,
+// focus, buttons, badges and progress all share this blue.
+const interaction = named('羽扇豆蓝');
+
 export const xuanmo: Flavor = {
   meta: {
     id: 'xuanmo',
@@ -43,7 +47,7 @@ export const xuanmo: Flavor = {
     subtle: '#262430',
     normal: '#343240',
     strong: '#4a4557',
-    focus: named('羽扇豆蓝'),
+    focus: interaction,
   },
 
   text: {
@@ -56,8 +60,11 @@ export const xuanmo: Flavor = {
     inverse: '#14131a',
     // 羽扇豆蓝 — a cool caret keeps the blinking element away from the
     // annotation red without becoming a second syntax colour.
-    cursor: named('羽扇豆蓝'),
+    cursor: interaction,
   },
+
+  // The same cool blue carries UI actions: red is a brush mark, not a command.
+  action: interaction,
 
   syntax: {
     // 螺甸紫 — the muted violet of inlaid shell, used for prose annotations.
@@ -67,7 +74,7 @@ export const xuanmo: Flavor = {
     // chroma so it reads as pigment instead of neon on a dark canvas.
     keyword: soften('海棠红', 0.165),
     storage: soften('海棠红', 0.165),
-    function: named('羽扇豆蓝'),
+    function: interaction,
     method: named('晴山蓝'),
     string: named('铜绿'),
     number: named('杏黄'),

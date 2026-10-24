@@ -10,6 +10,10 @@
 import { named } from './data.ts';
 import type { Flavor } from './types.ts';
 
+// 鷃蓝 is the dimmed interaction blue: functions, links, focus, buttons,
+// badges and progress share one hue.
+const interaction = named('鷃蓝');
+
 export const xuanzhiDimmed: Flavor = {
   meta: {
     id: 'xuanzhi-dimmed',
@@ -43,7 +47,7 @@ export const xuanzhiDimmed: Flavor = {
     subtle: '#ded4c2',
     normal: '#cbc0ab',
     strong: '#ada18a',
-    focus: named('鲸鱼灰'),
+    focus: interaction,
   },
 
   text: {
@@ -56,6 +60,9 @@ export const xuanzhiDimmed: Flavor = {
     cursor: named('玉鈫蓝'),
   },
 
+  // 鷃蓝 carries actions; 烟红 stays a faded pigment mark.
+  action: interaction,
+
   syntax: {
     // 鼠背灰 — the dimmest note that still clears 4.5:1 on aged paper.
     comment: named('鼠背灰'),
@@ -63,7 +70,7 @@ export const xuanzhiDimmed: Flavor = {
     // stay recognisable through the dimmed light.
     keyword: named('烟红'),
     storage: named('烟红'),
-    function: named('鷃蓝'),
+    function: interaction,
     method: named('海涛蓝'),
     string: named('荷叶绿'),
     number: named('驼色'),

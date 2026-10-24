@@ -101,6 +101,12 @@ export interface Flavor {
   surface: SurfaceTokens;
   border: BorderTokens;
   text: TextTokens;
+  /**
+   * Interaction color for primary actions: buttons, badges, progress, focus
+   * and selected chrome. Reserved for the cool blue so the annotation red
+   * stays a mark rather than a command.
+   */
+  action: string;
   syntax: SyntaxTokens;
   status: StatusTokens;
   /** ANSI 0–15, in terminal order. */

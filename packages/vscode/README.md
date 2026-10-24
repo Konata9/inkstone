@@ -45,8 +45,9 @@ Works in VS Code 1.85+, Cursor, Windsurf, VSCodium and other VS Code-compatible 
 
 ## Design notes
 
-- **Contrast is a band, not a floor** — body text 10.5–12.5:1, syntax 4.5–9:1. All six variants pass the same 846 checks, including OKLCH chroma budgets.
+- **Contrast is a band, not a floor** — body text 10.5–12.5:1, syntax 4.5–9:1. All six variants pass the same 872 checks, including OKLCH chroma budgets.
 - **Cinnabar without the glare** — print-ink reds keep their hue and lightness but drop to C≈0.165, so they read as pigment rather than neon. The caret uses the cool interaction color instead.
+- **Red marks, blue acts** — keywords, errors and deletions keep cinnabar; buttons, badges, progress, focus and selected chrome use the variant's interaction blue, so confirmation and destruction never share a hue.
 - **No visual noise** — comments stay upright, there are no gradients, no glass effects and no italic comments.
 - **Traditional colors are traceable** — accents keep their original zhongguose hex where possible; softened pigments and derived neutrals are documented in the [palette reference](https://github.com/Konata9/inkstone/blob/main/docs/palette.md).
 - **One skeleton, six lights** — hue order stays the same across variants (cinnabar → blue → green → orange → purple → cyan → crimson).
