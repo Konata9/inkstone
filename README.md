@@ -54,7 +54,7 @@ A traditional Chinese color theme for editors and terminals, built from the 526-
 
 ### VS Code / Cursor / Windsurf / VSCodium
 
-从 [Releases](https://github.com/Konata9/inkstone/releases) 下载最新 VSIX，或本地构建（暂未上架 Marketplace）。
+从 [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Konata9.inkstone) 安装，或从 [Releases](https://github.com/Konata9/inkstone/releases) 下载最新 VSIX / 本地构建。
 
 ```bash
 pnpm install
@@ -210,7 +210,8 @@ site/                     官网静态页（生成物，GitHub Pages）
 docs/palette.md           色板对照表（生成物）
 docs/preview.png          六个编辑器窗口截图（`pnpm capture:preview`）
 docs/site-design.md       官网设计冻结说明
-.github/workflows/        构建 + 打包 CI
+docs/publishing.md        Marketplace / Open VSX 发布与 Trusted Publishing 配置
+.github/workflows/        构建、打包与发布 CI
 ```
 
 ## 开发
@@ -239,6 +240,10 @@ pnpm site         # 构建并打开官网（site/index.html）
 6. **不做花活**：无渐变、无斜体注释、无玻璃拟态；只做耐看的纸墨与海色。
 7. **红做记号，青做动作**：朱砂只留在语法、印章与危险态；按钮、徽标、进度、焦点与选中态用交互蓝，主操作和危险操作各占一个色相。
 
+## 发布
+
+稳定 tag（`v*`）会由 GitHub Actions 自动发布到 VS Code Marketplace 与 Open VSX；预发布 tag 只生成 GitHub prerelease。维护者配置、Open VSX Trusted Publishing 的首次 bootstrap 与重试方式见 [发布文档](docs/publishing.md)。
+
 ## 许可与致谢
 
 - 代码以 [MIT](LICENSE) 发布。
@@ -259,7 +264,7 @@ pnpm site         # 构建并打开官网（site/index.html）
 - **Canghai (沧海)** — deep-sea twilight, blue-green minerals and a cinnabar seal.
 - **Qingci (青瓷)** — cool light, moon-white celadon glaze and grey ink.
 
-Install the VSIX from `dist/`, or install the Ghostty / Kaku / OpenCode themes with the scripts above. The same Lua scheme also works in WezTerm.
+Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Konata9.inkstone), or use the VSIX from `dist/`; the Ghostty / Kaku / OpenCode themes install with the scripts above. The same Lua scheme also works in WezTerm.
 
 Built with a generator: one semantic palette produces the VS Code themes, the Ghostty themes and the terminal ANSI schemes, and the build fails if any token leaves its contrast band or OKLCH chroma budget.
 

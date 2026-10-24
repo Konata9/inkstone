@@ -9,6 +9,7 @@
 - **Flavor chip state**: each chip keeps its own palette surface and 24px 2×2 icon; the selected chip gets a 3px action top rule, a 500-weight label, and a 12px check pin, while hover only previews unselected chips.
 - **Compact footer**: license, version, build facts and links share one row on desktop and wrap cleanly on narrow screens.
 - **Slower flavor wipe**: the site's diagonal flavor transition now runs at 1.05s instead of 850ms, giving the palette change a little more room to breathe.
+- **Marketplace publishing**: stable `v*` tag releases now publish the packaged VSIX to VS Code Marketplace (`VSCE_PAT`) and Open VSX (GitHub OIDC trusted publishing), with `--skip-duplicate` for safe retries. Setup and the one-time Open VSX bootstrap are documented in `docs/publishing.md`.
 - **Clean dist on build**: `pnpm build` now clears `dist/` before writing, so renamed or retired flavors never leave stale files behind for install scripts or release packaging.
 - **Kaku TOML target**: every flavor also ships a WezTerm-compatible `.toml` scheme, so Kaku's Settings → Theme lists it without a `dofile` block; `pnpm install:kaku` now installs both formats.
 - **Shorter README preview**: `docs/preview.png` is an editor-only 3×2 gallery captured from `preview/gallery.html`, instead of the full compare page.
