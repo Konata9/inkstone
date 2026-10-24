@@ -1,7 +1,6 @@
 # Changelog
 
-## Unreleased
-
+## 0.3.4
 - **Red marks, blue acts**: buttons, badges, progress, focus rings and selected chrome now use each flavor's interaction blue (羽扇豆蓝 / 涧石蓝 / 飞燕草蓝 / 鷃蓝 / 霁青 / 玉鈫蓝); cinnabar stays reserved for keywords, errors, deletions, the seal and syntax marks. Adds a first-class `action` token plus a hover step, and points OpenCode `accent` at the blue hue.
 - **Safer action hover**: the site CTA and links use the generated `--action` / `--action-hover` pair instead of `brightness(1.08)`, so hover no longer drops 宣纸 to 4.39:1.
 - **Site readability pass**: the hero copy column widens, the compatibility strip becomes an auto-fit grid (no more overlap with the editor), the Chinese tagline wraps, and a 12/14/16/28 type scale replaces the 9–13px labels. Small labels move from `--fg-3` / `--fg-4` to `--fg-2`, the editor mock reads at 14px, mobile gets a compact 13px preview, and the GitHub entries carry the monochrome mark.

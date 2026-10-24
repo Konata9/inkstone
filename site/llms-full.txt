@@ -1,6 +1,6 @@
 # Inkstone (墨观) — full summary for assistants
 
-Version 0.3.3. MIT. Publisher Konata9. Extension ID `Konata9.inkstone`.
+Version 0.3.4. MIT. Publisher Konata9. Extension ID `Konata9.inkstone`.
 
 ## Overview
 
