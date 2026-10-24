@@ -6,7 +6,9 @@
 - **Safer action hover**: the site CTA and links use the generated `--action` / `--action-hover` pair instead of `brightness(1.08)`, so hover no longer drops 宣纸 to 4.39:1.
 - **Site readability pass**: the hero copy column widens, the compatibility strip becomes an auto-fit grid (no more overlap with the editor), the Chinese tagline wraps, and a 12/14/16/28 type scale replaces the 9–13px labels. Small labels move from `--fg-3` / `--fg-4` to `--fg-2`, the editor mock reads at 14px, mobile gets a compact 13px preview, and the GitHub entries carry the monochrome mark.
 - **Site copy pass**: the hero lead now starts with the 526-color source; the specimen section uses the active palette name as its heading with a “配色思路” note, and all six flavor descriptions are rewritten as inspiration + use case instead of color lists.
-- **Flavor chip icons**: each chip keeps its own palette surface; the icon is now a 24px 2×2 preview (canvas / keyword / string / type), and the selected chip keeps the inset action top rule.
+- **Source credit**: the 526-colour phrase in the hero tagline is bold and links to zhongguose.com.
+- **Flavor chip state**: each chip keeps its own palette surface and 24px 2×2 icon; the selected chip gets a 3px action top rule, a 500-weight label, and a 12px check pin, while hover only previews unselected chips.
+- **Compact footer**: license, version, build facts and links share one row on desktop and wrap cleanly on narrow screens.
 - **Slower flavor wipe**: the site's diagonal flavor transition now runs at 1.05s instead of 850ms, giving the palette change a little more room to breathe.
 - **Clean dist on build**: `pnpm build` now clears `dist/` before writing, so renamed or retired flavors never leave stale files behind for install scripts or release packaging.
 - **Kaku TOML target**: every flavor also ships a WezTerm-compatible `.toml` scheme, so Kaku's Settings → Theme lists it without a `dofile` block; `pnpm install:kaku` now installs both formats.

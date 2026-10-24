@@ -262,12 +262,26 @@ button:focus-visible {
   transition: background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease), transform .1s var(--ease), box-shadow .15s var(--ease);
 }
 .flavor-icon {
+  position: relative;
   width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0;
   /* A miniature of the palette: canvas / keyword / string / type. */
   background:
     linear-gradient(90deg, var(--chip-bg) 0 50%, var(--chip-accent) 50% 100%) top / 100% 50% no-repeat,
     linear-gradient(90deg, var(--chip-string) 0 50%, var(--chip-type) 50% 100%) bottom / 100% 50% no-repeat;
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--chip-fg) 18%, transparent);
+}
+/* State pin: sits on the icon's right edge, inside the 10px icon/text gap. */
+.flavor-btn[aria-pressed="true"] .flavor-icon::after {
+  content: "✓";
+  position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
+  display: grid; place-items: center;
+  width: 12px; height: 12px; box-sizing: border-box;
+  border-radius: 50%;
+  border: 1.5px solid var(--chip-active);
+  background: var(--chip-action);
+  color: var(--chip-bg);
+  font-family: var(--sans);
+  font-size: 8px; font-weight: 700; line-height: 1;
 }
 .flavor-text {
   display: block; min-width: 0; line-height: 1.25;
@@ -281,11 +295,14 @@ button:focus-visible {
   background: var(--chip-active);
   color: var(--chip-fg);
   border-color: var(--chip-border-strong);
-  box-shadow: inset 0 2px 0 var(--chip-action);
+  box-shadow: inset 0 3px 0 var(--chip-action);
 }
+.flavor-btn[aria-pressed="true"] .flavor-text { font-weight: 500; }
+.flavor-btn[aria-pressed="true"] .sub { font-weight: 400; }
 .flavor-btn:active { transform: translateY(1px); }
 @media (hover: hover) {
-  .flavor-btn:hover {
+  /* Hover is a preview for unselected chips; the current chip stays put. */
+  .flavor-btn:not([aria-pressed="true"]):hover {
     background: var(--chip-alt);
     color: var(--chip-fg);
     border-color: var(--chip-border-strong);
@@ -372,15 +389,18 @@ button:focus-visible {
 
 .foot {
   border-top: 1px solid var(--border-subtle);
-  padding: 28px 0 48px;
-  display: flex; flex-wrap: wrap; gap: 14px 28px;
-  justify-content: space-between; align-items: flex-start;
+  padding: 28px 0 40px;
+  display: flex; flex-wrap: wrap; gap: 12px 28px;
+  justify-content: space-between; align-items: center;
   color: var(--fg-2); font-size: var(--text-label);
 }
-.foot-meta { display: flex; flex-direction: column; gap: 4px; max-width: 36rem; }
+.foot-meta {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 8px 18px; max-width: none;
+}
 .foot-chips {
-  list-style: none; margin: 8px 0 0; padding: 0;
-  display: flex; flex-wrap: wrap; gap: 8px 16px;
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-wrap: wrap; gap: 8px 14px;
   font-size: var(--text-meta); color: var(--fg-3);
 }
 .foot nav { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }

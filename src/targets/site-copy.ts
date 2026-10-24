@@ -11,7 +11,7 @@ export interface SiteCopy {
   description: string;
   brandZh: string;
   brandEn: string;
-  tagline: string;
+  taglineHtml: string;
   inspirationBody: string;
   editorsTitle: string;
   terminalsTitle: string;
@@ -37,8 +37,8 @@ export const siteCopy: Record<SiteLocale, SiteCopy> = {
       'A code palette grown from 526 traditional Chinese colors, with six variants for VS Code, Cursor, Ghostty, WezTerm and OpenCode.',
     brandZh: '墨观',
     brandEn: 'Inkstone',
-    tagline:
-      'A code palette grown from 526 traditional Chinese colors. Six variants share one hue skeleton, so switching feels like the same painting under a different light.',
+    taglineHtml:
+      'A code palette grown from <strong><a href="https://zhongguose.com/" target="_blank" rel="noopener noreferrer">526 traditional Chinese colors</a></strong>. Six variants share one hue skeleton, so switching feels like the same painting under a different light.',
     inspirationBody:
       'All six palettes draw from the same traditional Chinese chart. Ink & paper sit on paper and soot; sea & celadon sit on deep water and glaze. Dimmed turns the lights down — it never puts a gray filter over the ink.',
     editorsTitle: 'Editors',
@@ -63,8 +63,8 @@ export const siteCopy: Record<SiteLocale, SiteCopy> = {
       '一套从 526 个中国传统颜色里长出来的代码配色，为 VS Code、Cursor、Ghostty、WezTerm 与 OpenCode 提供六个变体。',
     brandZh: '墨观',
     brandEn: 'Inkstone',
-    tagline:
-      '一套从 526 个中国传统颜色里长出来的代码配色。六个变体共用同一套色相骨架，切换时像同一幅画换了光线。',
+    taglineHtml:
+      '一套从 <strong><a href="https://zhongguose.com/" target="_blank" rel="noopener noreferrer">526 个中国传统颜色</a></strong>里长出来的代码配色。六个变体共用同一套色相骨架，切换时像同一幅画换了光线。',
     inspirationBody:
       '六套色板都从同一张中国传统色谱里取色。墨纸组以纸墨为底，海瓷组以深海与青瓷釉为底；Dimmed 不是蒙一层灰，而是把房间的灯调暗。',
     editorsTitle: '编辑器',

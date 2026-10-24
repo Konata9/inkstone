@@ -58,7 +58,7 @@
           <img class="hero-seal" src="{{ home }}favicon.png" width="64" height="64" alt="" decoding="async">
           <span class="hero-title-text">{{ copy.brandZh }} <span class="brand-en">{{ copy.brandEn }}</span></span>
         </h1>
-        <p class="tagline">{{ copy.tagline }}</p>
+        <p class="tagline">{{ copy.taglineHtml | raw }}</p>
         <div class="cta-row">
           <a class="cta cta-primary" href="{{ releasesUrl }}">{{ copy.ctaInstall }}</a>
           <a class="cta cta-ghost" href="{{ repoUrl }}">{% render 'icon', id: 'github' %}<span>{{ copy.ctaSource }}</span></a>

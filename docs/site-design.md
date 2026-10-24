@@ -58,7 +58,8 @@ Waiver: paper/ink surfaces are product tokens (玄墨 / 宣纸), not generic AI 
    locked to its own palette), and the live editor mock. Below 1100px the copy
    comes first and the mock follows as a compact preview; below 480px the
    flavor chips drop the secondary language and wrap the primary name. Header wordmark also
-   shows the seal. Logo asset is `favicon.png` (from
+   shows the seal. The 526-colour phrase in the tagline is bold and links to
+   zhongguose.com. Logo asset is `favicon.png` (from
    `packages/vscode/icon.png`). PC-first measure ≈1640px.
 2. **Specimen** — shared chart/family lede, then the active flavor's name as
    the heading, a `配色思路` / `Color idea` label, the flavor's idea/source line
@@ -66,6 +67,7 @@ Waiver: paper/ink surfaces are product tokens (玄墨 / 宣纸), not generic AI 
    visible flavor panel carries its own h2. Platforms stay in the hero strip.
 3. **Footer** — license, version, quiet build facts, GitHub / Releases / palette.
    The GitHub entry carries the monochrome mark; the other links stay text-only.
+   On desktop the meta facts and links share one row; below 1100px they wrap.
 
 Dividers: negative space + hairline (`--border-subtle`). No section numbers.
 No tracked-capital labels.
@@ -75,13 +77,15 @@ No tracked-capital labels.
 | State | Treatment |
 | --- | --- |
 | default | each chip keeps its own `--chip-bg` / `--chip-fg` / `--chip-border`; 24px 2×2 palette icon |
-| hover | `--chip-alt` fill, `--chip-border-strong` |
+| hover (unselected only) | `--chip-alt` fill, `--chip-border-strong` |
 | `:focus-visible` | 2px outline `--chip-action` |
 | `:active` | slightly pressed (`translateY(1px)`) |
-| selected (current) | `--chip-active` fill, `--chip-fg` label, inset top rule `--chip-action` |
+| selected (current) | `--chip-active` fill, `--chip-fg` 500 label, 3px inset top rule `--chip-action`, 12px check pin on the icon |
 
 The icon is a 24px 2×2 miniature: canvas (`--chip-bg`), keyword
-(`--chip-accent`), string (`--chip-string`) and type (`--chip-type`).
+(`--chip-accent`), string (`--chip-string`) and type (`--chip-type`). The
+selected chip adds a 12px check pin on the icon's right edge; the chip itself
+keeps a single border.
 
 ## Flavor switch motion
 
