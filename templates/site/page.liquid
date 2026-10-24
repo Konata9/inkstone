@@ -27,10 +27,24 @@
 <meta name="twitter:description" content="{{ copy.description }}">
 <meta name="twitter:image" content="{{ ogImage }}">
 <link rel="icon" type="image/png" href="{{ home }}favicon.png">
+<script type="application/json" id="inkstone-site-config">{{ siteConfigJson | raw }}</script>
+<script>
+{{ bootJs | raw }}
+</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JEHXD6F2BB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-JEHXD6F2BB');
+</script>
 <script type="application/ld+json">{{ jsonLdJson | raw }}</script>
 <style>
 {{ stylesCss | raw }}
 {{ flavorTokens | raw }}
+{{ flavorPanelCss | raw }}
 {{ editorStyles | raw }}
 </style>
 </head>
@@ -45,10 +59,13 @@
       <img class="brand-logo" src="{{ home }}favicon.png" width="32" height="32" alt="" decoding="async">
       <span class="brand-words">{{ copy.brandZh }}<span>{{ copy.brandEn }}</span></span>
     </a>
-    <nav class="lang" aria-label="Language">
-      <a href="{{ langHrefEn }}"{% if locale == 'en' %} aria-current="page"{% endif %}>{{ copy.langEn }}</a>
-      <a href="{{ langHrefZh }}"{% if locale == 'zh' %} aria-current="page"{% endif %}>{{ copy.langZh }}</a>
-    </nav>
+    <div class="top-actions">
+      <nav class="lang" aria-label="Language">
+        <a href="{{ langHrefEn }}"{% if locale == 'en' %} aria-current="page"{% endif %}>{{ copy.langEn }}</a>
+        <a href="{{ langHrefZh }}"{% if locale == 'zh' %} aria-current="page"{% endif %}>{{ copy.langZh }}</a>
+      </nav>
+      <a class="top-github" href="{{ repoUrl }}" aria-label="GitHub">{% render 'icon', id: 'github' %}</a>
+    </div>
   </header>
 
   <main id="main">
@@ -60,8 +77,8 @@
         </h1>
         <p class="tagline">{{ copy.taglineHtml | raw }}</p>
         <div class="cta-row">
-          <a class="cta cta-primary" href="{{ releasesUrl }}">{{ copy.ctaInstall }}</a>
-          <a class="cta cta-ghost" href="{{ repoUrl }}">{% render 'icon', id: 'github' %}<span>{{ copy.ctaSource }}</span></a>
+          <a class="cta cta-primary" href="{{ marketplaceUrl }}">{% render 'icon', id: 'vscode' %}<span>{{ copy.ctaInstall }}</span></a>
+          <a class="cta cta-secondary" href="{{ openVsxUrl }}"><span>{{ copy.ctaOpenVsx }}</span></a>
         </div>
         <ul class="support-strip" aria-label="{{ copy.editorsTitle }}, {{ copy.terminalsTitle }}">
           {% for item in editors %}
@@ -135,7 +152,6 @@
   </footer>
 </div>
 
-<script type="application/json" id="inkstone-site-config">{{ siteConfigJson | raw }}</script>
 <script>
 {{ appJs | raw }}
 </script>

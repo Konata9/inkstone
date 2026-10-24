@@ -54,7 +54,7 @@ A traditional Chinese color theme for editors and terminals, built from the 526-
 
 ### VS Code / Cursor / Windsurf / VSCodium
 
-从 [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Konata9.inkstone) 安装，或从 [Releases](https://github.com/Konata9/inkstone/releases) 下载最新 VSIX / 本地构建。
+从 [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Konata9.inkstone) 安装；VSCodium / Open VSX 用户使用 [Open VSX](https://open-vsx.org/extension/Konata9/inkstone)。也可以从 [Releases](https://github.com/Konata9/inkstone/releases) 下载最新 VSIX / 本地构建。
 
 ```bash
 pnpm install
@@ -209,7 +209,6 @@ preview/gallery.html      README / Marketplace 用的编辑器总览（生成物
 site/                     官网静态页（生成物，GitHub Pages）
 docs/palette.md           色板对照表（生成物）
 docs/preview.png          六个编辑器窗口截图（`pnpm capture:preview`）
-docs/site-design.md       官网设计冻结说明
 docs/publishing.md        Marketplace / Open VSX 发布与 Trusted Publishing 配置
 .github/workflows/        构建、打包与发布 CI
 ```
@@ -228,7 +227,7 @@ pnpm capture:preview  # 从 gallery.html 截取 docs/preview.png（需 Playwrigh
 pnpm site         # 构建并打开官网（site/index.html）
 ```
 
-生成器保证各端一致：改一处色板，VS Code、Ghostty、Kaku、OpenCode 与官网同时更新。构建会拒绝落在对比度区间或彩度预算之外的配色。官网页面结构与样式在 `templates/site/`，构建只注入文案、版本与色板数据；默认英文（`site/`），中文在 `site/zh/`；页面 chrome 跟随系统明暗选用玄墨 / 宣纸，可切换六个变体。设计说明见 [docs/site-design.md](docs/site-design.md)。
+生成器保证各端一致：改一处色板，VS Code、Ghostty、Kaku、OpenCode 与官网同时更新。构建会拒绝落在对比度区间或彩度预算之外的配色。官网页面结构与样式在 `templates/site/`，构建只注入文案、版本与色板数据；默认英文（`site/`），中文在 `site/zh/`；页面 chrome 跟随系统明暗选用玄墨 / 宣纸，可切换六个变体。
 
 ### 设计约束
 
@@ -264,7 +263,7 @@ pnpm site         # 构建并打开官网（site/index.html）
 - **Canghai (沧海)** — deep-sea twilight, blue-green minerals and a cinnabar seal.
 - **Qingci (青瓷)** — cool light, moon-white celadon glaze and grey ink.
 
-Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Konata9.inkstone), or use the VSIX from `dist/`; the Ghostty / Kaku / OpenCode themes install with the scripts above. The same Lua scheme also works in WezTerm.
+Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Konata9.inkstone) or [Open VSX](https://open-vsx.org/extension/Konata9/inkstone), or use the VSIX from `dist/`; the Ghostty / Kaku / OpenCode themes install with the scripts above. The same Lua scheme also works in WezTerm.
 
 Built with a generator: one semantic palette produces the VS Code themes, the Ghostty themes and the terminal ANSI schemes, and the build fails if any token leaves its contrast band or OKLCH chroma budget.
 

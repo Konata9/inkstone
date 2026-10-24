@@ -119,6 +119,13 @@ button:focus-visible {
 .lang a {
   color: var(--fg-2); padding: 6px 12px; border-radius: 6px; border: 1px solid transparent;
 }
+.top-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.top-github {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 6px; color: var(--fg-3);
+}
+.top-github:hover { color: var(--fg); background: var(--bg-alt); }
+.top-github .app-icon { width: 16px; height: 16px; }
 .lang a[aria-current="page"] {
   color: var(--fg); border-color: var(--border); background: var(--bg-alt);
 }
@@ -185,25 +192,38 @@ button:focus-visible {
   margin-top: 14px;
   background: var(--border-strong);
 }
-.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 20px; }
+/* Two registries, one row: same cell, same height, same weight. The filled
+   variant marks the common path; both carry the action colour. */
+.cta-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 420px;
+  margin: 0 0 28px;
+}
 .cta {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 12px 20px; border-radius: 8px; font-size: var(--text-label);
-  border: 1px solid var(--border-strong);
+  min-height: 44px; padding: 0 16px; border-radius: 8px;
+  border: 1px solid var(--action);
+  font-size: var(--text-label); font-weight: 500;
   white-space: nowrap;
   transition: background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease);
 }
-.cta .app-icon { width: 16px; height: 16px; color: currentColor; }
-.cta-primary { background: var(--action); color: var(--bg); border-color: var(--action); }
-.cta-ghost { background: transparent; color: var(--fg); }
+.cta .app-icon { width: 16px; height: 16px; color: currentColor; flex: none; }
+.cta-primary { background: var(--action); color: var(--bg); }
+.cta-secondary { background: transparent; color: var(--action); }
 @media (hover: hover) {
   .cta-primary:hover {
     background: var(--action-hover);
     border-color: var(--action-hover);
     color: var(--bg);
   }
-  .cta-ghost:hover { background: var(--bg-alt); color: var(--fg); }
+  .cta-secondary:hover { background: var(--action); color: var(--bg); }
 }
+/* The action blue doubles as the cursor colour, so the default ring vanishes
+   against a filled primary. Switch that one to ink. */
+.cta:focus-visible { outline: 2px solid var(--cursor); outline-offset: 2px; }
+.cta-primary:focus-visible { outline-color: var(--fg); outline-offset: 3px; }
 
 /* Compatibility strip — auto-fit grid that stays inside the copy column */
 .support-strip {
@@ -435,4 +455,5 @@ button:focus-visible {
 @media (max-width: 480px) {
   .flavor-btn .sub { display: none; }
   .flavor-text { white-space: normal; line-height: 1.2; }
+  .cta-row { grid-template-columns: 1fr; max-width: none; }
 }

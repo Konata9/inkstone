@@ -53,6 +53,7 @@
     const root = document.documentElement;
     root.dataset.flavor = flavorId;
     root.dataset.appearance = config.appearance[flavorId] || 'dark';
+    root.style.colorScheme = root.dataset.appearance;
 
     document.querySelectorAll('.flavor-btn').forEach((btn) => {
       btn.setAttribute('aria-pressed', btn.dataset.flavor === flavorId ? 'true' : 'false');

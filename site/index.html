@@ -24,6 +24,42 @@
 <meta name="twitter:description" content="A code palette grown from 526 traditional Chinese colors, with six variants for VS Code, Cursor, Ghostty, WezTerm and OpenCode.">
 <meta name="twitter:image" content="https://konata9.github.io/inkstone/og.jpg">
 <link rel="icon" type="image/png" href="./favicon.png">
+<script type="application/json" id="inkstone-site-config">{"storageKey":"inkstone.site.flavor","flavorIds":["xuanmo","xuanmo-dimmed","xuanzhi","xuanzhi-dimmed","canghai","qingci"],"appearance":{"xuanmo":"dark","xuanmo-dimmed":"dark","xuanzhi":"light","xuanzhi-dimmed":"light","canghai":"dark","qingci":"light"},"defaultDark":"xuanmo","defaultLight":"xuanzhi","softRedirectZh":"./zh/"}</script>
+<script>
+(function () {
+  var el = document.getElementById('inkstone-site-config');
+  if (!el) return;
+  var c = JSON.parse(el.textContent || '{}');
+  try {
+    if (c.softRedirectZh) {
+      var langs = navigator.languages || [navigator.language];
+      var zh = langs.some(function (l) { return /^zh\b/i.test(l || ''); });
+      if (zh && !sessionStorage.getItem('inkstone.site.langPrompted')) {
+        sessionStorage.setItem('inkstone.site.langPrompted', '1');
+        location.replace(c.softRedirectZh);
+        return;
+      }
+    }
+  } catch (e) {}
+  var stored = null;
+  try { stored = localStorage.getItem(c.storageKey); } catch (e) {}
+  var light = window.matchMedia('(prefers-color-scheme: light)').matches;
+  var id = c.flavorIds.indexOf(stored) >= 0 ? stored : (light ? c.defaultLight : c.defaultDark);
+  var root = document.documentElement;
+  root.dataset.flavor = id;
+  root.dataset.appearance = c.appearance[id] || 'dark';
+  root.style.colorScheme = root.dataset.appearance;
+})();
+</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JEHXD6F2BB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-JEHXD6F2BB');
+</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Inkstone","alternateName":"墨观","applicationCategory":"DeveloperApplication","operatingSystem":"VS Code 1.85+, Cursor, Windsurf, VSCodium, Ghostty, WezTerm, OpenCode","description":"A code palette grown from 526 traditional Chinese colors, with six variants for VS Code, Cursor, Ghostty, WezTerm and OpenCode.","url":"https://konata9.github.io/inkstone/","downloadUrl":"https://github.com/Konata9/inkstone/releases","softwareVersion":"0.3.4","license":"https://opensource.org/licenses/MIT","author":{"@type":"Person","name":"Konata9","url":"https://github.com/Konata9"},"offers":{"@type":"Offer","price":"0","priceCurrency":"USD","availability":"https://schema.org/InStock"}}</script>
 <style>
 /* Hallmark · v2.0.0 · custom · redesign: full · genre editorial
@@ -147,6 +183,13 @@ button:focus-visible {
 .lang a {
   color: var(--fg-2); padding: 6px 12px; border-radius: 6px; border: 1px solid transparent;
 }
+.top-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.top-github {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 6px; color: var(--fg-3);
+}
+.top-github:hover { color: var(--fg); background: var(--bg-alt); }
+.top-github .app-icon { width: 16px; height: 16px; }
 .lang a[aria-current="page"] {
   color: var(--fg); border-color: var(--border); background: var(--bg-alt);
 }
@@ -213,25 +256,38 @@ button:focus-visible {
   margin-top: 14px;
   background: var(--border-strong);
 }
-.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 20px; }
+/* Two registries, one row: same cell, same height, same weight. The filled
+   variant marks the common path; both carry the action colour. */
+.cta-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 420px;
+  margin: 0 0 28px;
+}
 .cta {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 12px 20px; border-radius: 8px; font-size: var(--text-label);
-  border: 1px solid var(--border-strong);
+  min-height: 44px; padding: 0 16px; border-radius: 8px;
+  border: 1px solid var(--action);
+  font-size: var(--text-label); font-weight: 500;
   white-space: nowrap;
   transition: background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease);
 }
-.cta .app-icon { width: 16px; height: 16px; color: currentColor; }
-.cta-primary { background: var(--action); color: var(--bg); border-color: var(--action); }
-.cta-ghost { background: transparent; color: var(--fg); }
+.cta .app-icon { width: 16px; height: 16px; color: currentColor; flex: none; }
+.cta-primary { background: var(--action); color: var(--bg); }
+.cta-secondary { background: transparent; color: var(--action); }
 @media (hover: hover) {
   .cta-primary:hover {
     background: var(--action-hover);
     border-color: var(--action-hover);
     color: var(--bg);
   }
-  .cta-ghost:hover { background: var(--bg-alt); color: var(--fg); }
+  .cta-secondary:hover { background: var(--action); color: var(--bg); }
 }
+/* The action blue doubles as the cursor colour, so the default ring vanishes
+   against a filled primary. Switch that one to ink. */
+.cta:focus-visible { outline: 2px solid var(--cursor); outline-offset: 2px; }
+.cta-primary:focus-visible { outline-color: var(--fg); outline-offset: 3px; }
 
 /* Compatibility strip — auto-fit grid that stays inside the copy column */
 .support-strip {
@@ -463,6 +519,7 @@ button:focus-visible {
 @media (max-width: 480px) {
   .flavor-btn .sub { display: none; }
   .flavor-text { white-space: normal; line-height: 1.2; }
+  .cta-row { grid-template-columns: 1fr; max-width: none; }
 }
 
 html[data-flavor="xuanmo"]{--bg:#14131a;--bg-alt:#1a1922;--activity:#0f0e14;--bg-sunken:#0f0e14;--sel:#332f46;--active:#302e3c;--border:#343240;--border-subtle:#262430;--border-strong:#4a4557;--fg:#d4cec4;--fg-2:#ada599;--fg-3:#8b8597;--fg-4:#6f6979;--cursor:#619ac3;--action:#619ac3;--action-hover:#74a6ca;--kw:#da5761;--fn:#619ac3;--str:#2bae85;--num:#f28e16;--type:#d6a01d;--cm:#85809e;--dec:#c08eaf;--var:#d4cec4;--param:#c08eaf;--prop:#c9c3b9;--ansi-1:#e1505d;--ansi-2:#2bae85;--ansi-3:#e2c027;--ansi-4:#619ac3;--ansi-5:#c08eaf;--ansi-6:#57c3c2;--diff-add:#2bae8526;--diff-del:#e2573726;--lens:rgba(255,255,255,0.06)}
@@ -471,6 +528,12 @@ html[data-flavor="xuanzhi"]{--bg:#f7f4ed;--bg-alt:#f1ece2;--activity:#eae3d5;--b
 html[data-flavor="xuanzhi-dimmed"]{--bg:#e9e2d4;--bg-alt:#e3dbcb;--activity:#dcd3c1;--bg-sunken:#f1ebdf;--sel:#d3c7ae;--active:#d8cebb;--border:#cbc0ab;--border-subtle:#ded4c2;--border-strong:#ada18a;--fg:#2f2b25;--fg-2:#4f4a40;--fg-3:#665f53;--fg-4:#847c6e;--cursor:#126e82;--action:#144a74;--action-hover:#124166;--kw:#894e54;--fn:#144a74;--str:#1a6840;--num:#66462a;--type:#525288;--cm:#73575c;--dec:#894276;--var:#2f2b25;--param:#5d3f51;--prop:#4f4a41;--ansi-1:#894e54;--ansi-2:#1a6840;--ansi-3:#66462a;--ansi-4:#144a74;--ansi-5:#894276;--ansi-6:#134857;--diff-add:#1a684021;--diff-del:#82111f1f;--lens:rgba(43,39,35,0.05)}
 html[data-flavor="canghai"]{--bg:#0d1822;--bg-alt:#12202b;--activity:#0a131b;--bg-sunken:#0a131b;--sel:#1d3644;--active:#20323f;--border:#29404f;--border-subtle:#1b2b36;--border-strong:#3d5a6d;--fg:#c8d4dd;--fg-2:#9aadbb;--fg-3:#788d9f;--fg-4:#5e7385;--cursor:#66a9c9;--action:#63bbd0;--action-hover:#76c3d6;--kw:#dc5e41;--fn:#63bbd0;--str:#1ba784;--num:#d6a01d;--type:#c08eaf;--cm:#648e93;--dec:#c08eaf;--var:#c8d4dd;--param:#c08eaf;--prop:#b3c2ce;--ansi-1:#e25737;--ansi-2:#1ba784;--ansi-3:#e2c027;--ansi-4:#22a2c3;--ansi-5:#c08eaf;--ansi-6:#57c3c2;--diff-add:#1ba78426;--diff-del:#e2573726;--lens:rgba(255,255,255,0.06)}
 html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg-sunken:#f2f8f4;--sel:#c7d9cf;--active:#d7e2da;--border:#c7d5cc;--border-subtle:#dbe6df;--border-strong:#a8bab0;--fg:#2b333e;--fg-2:#4f5b5a;--fg-3:#5f6b67;--fg-4:#7d8983;--cursor:#126e82;--action:#126e82;--action-hover:#106172;--kw:#bc3a46;--fn:#126e82;--str:#1a6840;--num:#66462a;--type:#813c85;--cm:#495c69;--dec:#5d3f51;--var:#2b333e;--param:#5d3f51;--prop:#3f4a46;--ansi-1:#c23142;--ansi-2:#1a6840;--ansi-3:#66462a;--ansi-4:#126e82;--ansi-5:#813c85;--ansi-6:#495c69;--diff-add:#1a684021;--diff-del:#82111f1f;--lens:rgba(43,39,35,0.05)}
+html[data-flavor="xuanmo"] .flavor-panel[data-flavor="xuanmo"]{display:block}
+html[data-flavor="xuanmo-dimmed"] .flavor-panel[data-flavor="xuanmo-dimmed"]{display:block}
+html[data-flavor="xuanzhi"] .flavor-panel[data-flavor="xuanzhi"]{display:block}
+html[data-flavor="xuanzhi-dimmed"] .flavor-panel[data-flavor="xuanzhi-dimmed"]{display:block}
+html[data-flavor="canghai"] .flavor-panel[data-flavor="canghai"]{display:block}
+html[data-flavor="qingci"] .flavor-panel[data-flavor="qingci"]{display:block}
 
   .editor { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--bg); }
   .titlebar { height: 32px; background: var(--bg-alt); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px; padding: 0 12px; }
@@ -531,10 +594,17 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
       <img class="brand-logo" src="./favicon.png" width="32" height="32" alt="" decoding="async">
       <span class="brand-words">墨观<span>Inkstone</span></span>
     </a>
-    <nav class="lang" aria-label="Language">
-      <a href="./" aria-current="page">EN</a>
-      <a href="./zh/">中文</a>
-    </nav>
+    <div class="top-actions">
+      <nav class="lang" aria-label="Language">
+        <a href="./" aria-current="page">EN</a>
+        <a href="./zh/">中文</a>
+      </nav>
+      <a class="top-github" href="https://github.com/Konata9/inkstone" aria-label="GitHub">
+
+<svg class="app-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+
+</a>
+    </div>
   </header>
 
   <main id="main">
@@ -546,12 +616,12 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
         </h1>
         <p class="tagline">A code palette grown from <strong><a href="https://zhongguose.com/" target="_blank" rel="noopener noreferrer">526 traditional Chinese colors</a></strong>. Six variants share one hue skeleton, so switching feels like the same painting under a different light.</p>
         <div class="cta-row">
-          <a class="cta cta-primary" href="https://github.com/Konata9/inkstone/releases">Install from Releases</a>
-          <a class="cta cta-ghost" href="https://github.com/Konata9/inkstone">
+          <a class="cta cta-primary" href="https://marketplace.visualstudio.com/items?itemName=Konata9.inkstone">
 
-<svg class="app-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+<svg class="app-icon" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><path fill="currentColor" d="M70.9119 99.3171C72.4869 99.9307 74.2828 99.8914 75.8725 99.1264L96.4608 89.2197C98.6242 88.1787 100 85.9892 100 83.5872V16.4133C100 14.0113 98.6243 11.8218 96.4609 10.7808L75.8725 0.873756C73.7862 -0.130129 71.3446 0.11576 69.5135 1.44695C69.252 1.63711 69.0028 1.84943 68.769 2.08341L29.3551 38.0415L12.1872 25.0096C10.589 23.7965 8.35363 23.8959 6.86933 25.2461L1.36303 30.2549C-0.452552 31.9064 -0.454633 34.7627 1.35853 36.417L16.2471 50.0001L1.35853 63.5832C-0.454633 65.2374 -0.452552 68.0938 1.36303 69.7453L6.86933 74.7541C8.35363 76.1043 10.589 76.2037 12.1872 74.9905L29.3551 61.9587L68.769 97.9167C69.3925 98.5406 70.1246 99.0104 70.9119 99.3171ZM75.0152 27.2989L45.1091 50.0001L75.0152 72.7012V27.2989Z"/></svg>
 
-<span>Source on GitHub</span></a>
+<span>Install in VS Code</span></a>
+          <a class="cta cta-secondary" href="https://open-vsx.org/extension/Konata9/inkstone"><span>Open VSX</span></a>
         </div>
         <ul class="support-strip" aria-label="Editors, Terminals">
           
@@ -1222,7 +1292,6 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
   </footer>
 </div>
 
-<script type="application/json" id="inkstone-site-config">{"storageKey":"inkstone.site.flavor","flavorIds":["xuanmo","xuanmo-dimmed","xuanzhi","xuanzhi-dimmed","canghai","qingci"],"appearance":{"xuanmo":"dark","xuanmo-dimmed":"dark","xuanzhi":"light","xuanzhi-dimmed":"light","canghai":"dark","qingci":"light"},"defaultDark":"xuanmo","defaultLight":"xuanzhi","softRedirectZh":"./zh/"}</script>
 <script>
 /**
  * Flavor switcher for the product site.
@@ -1279,6 +1348,7 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
     const root = document.documentElement;
     root.dataset.flavor = flavorId;
     root.dataset.appearance = config.appearance[flavorId] || 'dark';
+    root.style.colorScheme = root.dataset.appearance;
 
     document.querySelectorAll('.flavor-btn').forEach((btn) => {
       btn.setAttribute('aria-pressed', btn.dataset.flavor === flavorId ? 'true' : 'false');

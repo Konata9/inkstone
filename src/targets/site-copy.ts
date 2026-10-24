@@ -17,7 +17,7 @@ export interface SiteCopy {
   terminalsTitle: string;
   flavorsLabel: string;
   ctaInstall: string;
-  ctaSource: string;
+  ctaOpenVsx: string;
   specimenLabel: string;
   colorIdeaLabel: string;
   previewLabel: string;
@@ -44,8 +44,8 @@ export const siteCopy: Record<SiteLocale, SiteCopy> = {
     editorsTitle: 'Editors',
     terminalsTitle: 'Terminals',
     flavorsLabel: 'Variants',
-    ctaInstall: 'Install from Releases',
-    ctaSource: 'Source on GitHub',
+    ctaInstall: 'Install in VS Code',
+    ctaOpenVsx: 'Open VSX',
     specimenLabel: 'Palettes',
     colorIdeaLabel: 'Color idea',
     previewLabel: 'Editor',
@@ -70,8 +70,8 @@ export const siteCopy: Record<SiteLocale, SiteCopy> = {
     editorsTitle: '编辑器',
     terminalsTitle: '终端',
     flavorsLabel: '变体',
-    ctaInstall: '从 Releases 安装',
-    ctaSource: 'GitHub 源码',
+    ctaInstall: '安装到 VS Code',
+    ctaOpenVsx: 'Open VSX',
     specimenLabel: '色板',
     colorIdeaLabel: '配色思路',
     previewLabel: '编辑器',

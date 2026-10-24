@@ -36,6 +36,8 @@ export const SITE_FAVICON_SOURCE = join(root, 'packages', 'vscode', 'icon.png');
 
 const RELEASES_URL = 'https://github.com/Konata9/inkstone/releases';
 const REPO_URL = 'https://github.com/Konata9/inkstone';
+const MARKETPLACE_URL = 'https://marketplace.visualstudio.com/items?itemName=Konata9.inkstone';
+const OPEN_VSX_URL = 'https://open-vsx.org/extension/Konata9/inkstone';
 const STORAGE_KEY = 'inkstone.site.flavor';
 
 const EDITORS = [
@@ -67,6 +69,47 @@ const stylesCss = readFileSync(join(templateRoot, 'styles.css'), 'utf8');
 const appJs = readFileSync(join(templateRoot, 'app.js'), 'utf8');
 const sharedEditorStyles = editorStyles();
 const flavorTokens = flavors.map((f) => `html[data-flavor="${f.meta.id}"]{${cssVars(f)}}`).join('\n');
+
+/**
+ * Reveal the matching specimen panel from the root attribute, so the section is
+ * painted correctly on first paint instead of waiting for the body script.
+ */
+const flavorPanelCss = flavors
+  .map(
+    (f) =>
+      `html[data-flavor="${f.meta.id}"] .flavor-panel[data-flavor="${f.meta.id}"]{display:block}`,
+  )
+  .join('\n');
+
+/**
+ * Runs in <head> before the stylesheet paints. Sets the stored / system flavor
+ * and performs the one-time zh redirect synchronously, so the first frame is
+ * already the right one. app.js reuses the same config and stays idempotent.
+ */
+const bootJs = `(function () {
+  var el = document.getElementById('inkstone-site-config');
+  if (!el) return;
+  var c = JSON.parse(el.textContent || '{}');
+  try {
+    if (c.softRedirectZh) {
+      var langs = navigator.languages || [navigator.language];
+      var zh = langs.some(function (l) { return /^zh\\b/i.test(l || ''); });
+      if (zh && !sessionStorage.getItem('inkstone.site.langPrompted')) {
+        sessionStorage.setItem('inkstone.site.langPrompted', '1');
+        location.replace(c.softRedirectZh);
+        return;
+      }
+    }
+  } catch (e) {}
+  var stored = null;
+  try { stored = localStorage.getItem(c.storageKey); } catch (e) {}
+  var light = window.matchMedia('(prefers-color-scheme: light)').matches;
+  var id = c.flavorIds.indexOf(stored) >= 0 ? stored : (light ? c.defaultLight : c.defaultDark);
+  var root = document.documentElement;
+  root.dataset.flavor = id;
+  root.dataset.appearance = c.appearance[id] || 'dark';
+  root.style.colorScheme = root.dataset.appearance;
+})();`;
 
 export interface GeneratedSiteFile {
   path: string;
@@ -163,12 +206,16 @@ function pageContext(locale: SiteLocale, version: string) {
     langHrefZh: isEn ? './zh/' : './',
     releasesUrl: RELEASES_URL,
     repoUrl: REPO_URL,
+    marketplaceUrl: MARKETPLACE_URL,
+    openVsxUrl: OPEN_VSX_URL,
     paletteUrl: `${REPO_URL}/blob/main/docs/palette.md`,
     editors: [...EDITORS],
     terminals: [...TERMINALS],
     chips: CHIPS,
     flavors: pageFlavors,
     flavorTokens,
+    flavorPanelCss,
+    bootJs,
     stylesCss,
     editorStyles: sharedEditorStyles,
     appJs,
