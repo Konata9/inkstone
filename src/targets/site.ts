@@ -100,6 +100,8 @@ function buildFlavors(locale: SiteLocale) {
       chipBorder: f.border.normal,
       chipBorderStrong: f.border.strong,
       chipAccent: f.syntax.keyword,
+      chipString: f.syntax.string,
+      chipType: f.syntax.type,
       chipAction: f.action,
       surfacesHtml: surfaces(f),
       accentsHtml: accents(f),

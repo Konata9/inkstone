@@ -280,29 +280,29 @@ export function editorStyles(): string {
   .titlebar { height: 32px; background: var(--bg-alt); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px; padding: 0 12px; }
   .dots { display: flex; gap: 5px; }
   .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--border-strong); display: block; }
-  .title { font-size: 10.5px; color: var(--fg-3); letter-spacing: .02em; }
+  .title { font-size: 12px; color: var(--fg-2); letter-spacing: .02em; }
   .editor-body { display: grid; grid-template-columns: 42px 132px 1fr; min-height: 0; }
   .activity { background: var(--activity); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 12px 0; }
   .glyph { color: var(--fg-3); font-size: 14px; opacity: .8; }
-  .sidebar { background: var(--bg-alt); border-right: 1px solid var(--border-subtle); padding: 10px 8px; font-size: 10.5px; color: var(--fg-2); }
-  .side-title { font-size: 10px; letter-spacing: 0; color: var(--fg-3); padding: 4px 8px 8px; }
+  .sidebar { background: var(--bg-alt); border-right: 1px solid var(--border-subtle); padding: 10px 8px; font-size: 12px; color: var(--fg-2); }
+  .side-title { font-size: 12px; letter-spacing: 0; color: var(--fg-2); padding: 4px 8px 8px; }
   .side-row { padding: 3px 6px; border-radius: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .side-row.file { padding-left: 20px; color: var(--fg-2); }
   .side-active { background: var(--active); color: var(--fg); }
   .side-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--kw); margin-left: 6px; vertical-align: middle; }
-  .side-muted { color: var(--fg-4); padding-left: 20px; }
+  .side-muted { color: var(--fg-3); padding-left: 20px; }
 
   .editor-main { min-width: 0; display: flex; flex-direction: column; }
   .tabs { display: flex; background: var(--bg-alt); border-bottom: 1px solid var(--border-subtle); }
-  .tab { font-size: 10.5px; color: var(--fg-3); padding: 7px 14px; border-right: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 8px; }
+  .tab { font-size: 12px; color: var(--fg-2); padding: 7px 14px; border-right: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 8px; }
   .tab.active { background: var(--bg); color: var(--fg); box-shadow: inset 0 1px 0 var(--action); }
   .close { opacity: .5; font-size: 12px; }
-  .breadcrumb { display: flex; gap: 6px; align-items: center; padding: 6px 14px; font-size: 10px; color: var(--fg-3); border-bottom: 1px solid var(--border-subtle); }
+  .breadcrumb { display: flex; gap: 6px; align-items: center; padding: 6px 14px; font-size: 12px; color: var(--fg-2); border-bottom: 1px solid var(--border-subtle); }
   .breadcrumb i { font-style: normal; opacity: .5; }
 
-  .code { font-family: var(--mono); font-size: 11px; line-height: 1.72; padding: 10px 0; overflow-x: auto; }
+  .code { font-family: var(--mono); font-size: 14px; line-height: 1.62; padding: 10px 0; overflow-x: auto; }
   .line { display: flex; white-space: pre; min-width: max-content; }
-  .ln { width: 38px; text-align: right; padding-right: 12px; color: var(--fg-4); flex: 0 0 auto; user-select: none; }
+  .ln { width: 40px; text-align: right; padding-right: 12px; color: var(--fg-3); flex: 0 0 auto; user-select: none; }
   .lc { padding-right: 16px; }
   .line-active { background: var(--lens); }
   .line-selected { background: var(--sel); }
@@ -313,13 +313,13 @@ export function editorStyles(): string {
   .str { color: var(--str); }
   .num { color: var(--num); }
   .type { color: var(--type); }
-  .cm { color: var(--cm); font-style: italic; }
+  .cm { color: var(--cm); }
   .dec { color: var(--dec); }
   .var { color: var(--var); }
   .param { color: var(--param); font-style: italic; }
   .prop { color: var(--prop); }
 
-  .statusbar { display: flex; justify-content: space-between; gap: 8px; background: var(--active); color: var(--fg); font-size: 9.5px; padding: 4px 12px; border-top: 1px solid var(--border-subtle); }
+  .statusbar { display: flex; justify-content: space-between; gap: 8px; background: var(--active); color: var(--fg); font-size: 12px; padding: 5px 12px; border-top: 1px solid var(--border-subtle); }
   .sb-left b { color: var(--kw); font-weight: 500; }
   .sb-sep { opacity: .35; margin: 0 6px; }`;
 }

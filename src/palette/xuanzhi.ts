@@ -22,8 +22,8 @@ export const xuanzhi: Flavor = {
     appearance: 'light',
     family: 'ink',
     description: {
-      zh: '生宣的暖白底色，松烟写字，青绿设色。',
-      en: 'Raw xuan paper, pine-soot ink, blue-green mineral washes.',
+      zh: '生宣的暖白底色，松烟写字，青绿设色。纸是暖的、墨是冷的，矿物色在中间过渡；关键字用降彩的鹤顶红，像朱批而不是警告。',
+      en: 'Raw xuan paper, pine-soot ink, mineral washes. Warm paper, cool ink, and mineral colors in between; keywords use a softened cinnabar that reads as a brush annotation, not an alarm.',
     },
   },
 

@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Inkstone · Traditional Chinese color themes</title>
-<meta name="description" content="Inkstone (墨观) is a traditional Chinese color theme for VS Code, Cursor, Ghostty, WezTerm and OpenCode: six variants from the 526-color zhongguose palette.">
+<meta name="description" content="A code palette grown from 526 traditional Chinese colors, with six variants for VS Code, Cursor, Ghostty, WezTerm and OpenCode.">
 <link rel="canonical" href="https://konata9.github.io/inkstone/">
 <link rel="alternate" hreflang="en" href="https://konata9.github.io/inkstone/">
 <link rel="alternate" hreflang="zh-CN" href="https://konata9.github.io/inkstone/zh/">
@@ -14,17 +14,17 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Inkstone">
 <meta property="og:title" content="Inkstone · Traditional Chinese color themes">
-<meta property="og:description" content="Inkstone (墨观) is a traditional Chinese color theme for VS Code, Cursor, Ghostty, WezTerm and OpenCode: six variants from the 526-color zhongguose palette.">
+<meta property="og:description" content="A code palette grown from 526 traditional Chinese colors, with six variants for VS Code, Cursor, Ghostty, WezTerm and OpenCode.">
 <meta property="og:url" content="https://konata9.github.io/inkstone/">
 <meta property="og:image" content="https://konata9.github.io/inkstone/og.jpg">
 <meta property="og:locale" content="en_US">
 <meta property="og:locale:alternate" content="zh_CN">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Inkstone · Traditional Chinese color themes">
-<meta name="twitter:description" content="Inkstone (墨观) is a traditional Chinese color theme for VS Code, Cursor, Ghostty, WezTerm and OpenCode: six variants from the 526-color zhongguose palette.">
+<meta name="twitter:description" content="A code palette grown from 526 traditional Chinese colors, with six variants for VS Code, Cursor, Ghostty, WezTerm and OpenCode.">
 <meta name="twitter:image" content="https://konata9.github.io/inkstone/og.jpg">
 <link rel="icon" type="image/png" href="./favicon.png">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Inkstone","alternateName":"墨观","applicationCategory":"DeveloperApplication","operatingSystem":"VS Code 1.85+, Cursor, Windsurf, VSCodium, Ghostty, WezTerm, OpenCode","description":"Inkstone (墨观) is a traditional Chinese color theme for VS Code, Cursor, Ghostty, WezTerm and OpenCode: six variants from the 526-color zhongguose palette.","url":"https://konata9.github.io/inkstone/","downloadUrl":"https://github.com/Konata9/inkstone/releases","softwareVersion":"0.3.3","license":"https://opensource.org/licenses/MIT","author":{"@type":"Person","name":"Konata9","url":"https://github.com/Konata9"},"offers":{"@type":"Offer","price":"0","priceCurrency":"USD","availability":"https://schema.org/InStock"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Inkstone","alternateName":"墨观","applicationCategory":"DeveloperApplication","operatingSystem":"VS Code 1.85+, Cursor, Windsurf, VSCodium, Ghostty, WezTerm, OpenCode","description":"A code palette grown from 526 traditional Chinese colors, with six variants for VS Code, Cursor, Ghostty, WezTerm and OpenCode.","url":"https://konata9.github.io/inkstone/","downloadUrl":"https://github.com/Konata9/inkstone/releases","softwareVersion":"0.3.3","license":"https://opensource.org/licenses/MIT","author":{"@type":"Person","name":"Konata9","url":"https://github.com/Konata9"},"offers":{"@type":"Offer","price":"0","priceCurrency":"USD","availability":"https://schema.org/InStock"}}</script>
 <style>
 /* Hallmark · v2.0.0 · custom · redesign: full · genre editorial
    P4 H4 E4 S4 R4 V4 · brand: 墨观 Inkstone · Songti + flavor tokens
@@ -40,6 +40,11 @@
   --measure: min(1640px, 100%);
   --gutter: clamp(28px, 3vw, 64px);
   --ease: cubic-bezier(.4, 0, .2, 1);
+  /* One scale for the whole page: metadata → labels → body → section title. */
+  --text-meta: 0.75rem;    /* 12px */
+  --text-label: 0.875rem;  /* 14px */
+  --text-body: 1rem;       /* 16px */
+  --text-title: 1.75rem;   /* 28px */
   --wash: color-mix(in srgb, var(--kw) 7%, transparent);
   --wash-2: color-mix(in srgb, var(--cursor) 6%, transparent);
 }
@@ -47,7 +52,7 @@
 * { box-sizing: border-box; }
 
 html, body { overflow-x: clip; }
-html { -webkit-font-smoothing: antialiased; }
+html { -webkit-font-smoothing: auto; }
 
 body {
   margin: 0;
@@ -90,7 +95,7 @@ body {
 ::view-transition-old(root) { z-index: 1; }
 ::view-transition-new(root) {
   z-index: 2;
-  animation: flavor-wipe .85s var(--ease) both;
+  animation: flavor-wipe 1.05s var(--ease) both;
 }
 @keyframes flavor-wipe {
   from { clip-path: polygon(0 100%, 0 100%, 0 100%); }
@@ -133,14 +138,14 @@ button:focus-visible {
   display: block;
 }
 .brand-words span {
-  font-family: var(--sans); font-size: 12px; color: var(--fg-3);
+  font-family: var(--sans); font-size: var(--text-label); color: var(--fg-3);
   margin-left: 10px; font-weight: 400;
 }
 .brand-mark:hover { color: var(--fg); }
 
-.lang { display: flex; gap: 2px; font-size: 13px; }
+.lang { display: flex; gap: 2px; font-size: var(--text-label); }
 .lang a {
-  color: var(--fg-3); padding: 6px 12px; border-radius: 6px; border: 1px solid transparent;
+  color: var(--fg-2); padding: 6px 12px; border-radius: 6px; border: 1px solid transparent;
 }
 .lang a[aria-current="page"] {
   color: var(--fg); border-color: var(--border); background: var(--bg-alt);
@@ -149,7 +154,7 @@ button:focus-visible {
 /* —— Hero: brand + CTA + flavor rail | product stage —— */
 .hero {
   display: grid;
-  grid-template-columns: minmax(300px, 0.55fr) minmax(0, 1.7fr);
+  grid-template-columns: clamp(360px, 30vw, 420px) minmax(0, 1fr);
   gap: clamp(32px, 4vw, 64px);
   align-items: start;
   padding: clamp(32px, 5vh, 56px) 0 clamp(48px, 8vh, 88px);
@@ -195,9 +200,10 @@ button:focus-visible {
 .tagline {
   margin: 0 0 28px;
   max-width: 28rem;
-  font-size: clamp(15px, 2vw, 17px);
+  font-size: var(--text-body);
+  line-height: 1.6;
   color: var(--fg-2);
-  text-wrap: pretty;
+  text-wrap: balance;
 }
 .tagline::after {
   content: "";
@@ -207,18 +213,15 @@ button:focus-visible {
   margin-top: 14px;
   background: var(--border-strong);
 }
-html[lang="zh-CN"] .tagline {
-  white-space: nowrap;
-  max-width: none;
-}
-
 .cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 20px; }
 .cta {
-  display: inline-flex; align-items: center; justify-content: center;
-  padding: 12px 20px; border-radius: 8px; font-size: 14px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 20px; border-radius: 8px; font-size: var(--text-label);
   border: 1px solid var(--border-strong);
+  white-space: nowrap;
   transition: background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease);
 }
+.cta .app-icon { width: 16px; height: 16px; color: currentColor; }
 .cta-primary { background: var(--action); color: var(--bg); border-color: var(--action); }
 .cta-ghost { background: transparent; color: var(--fg); }
 @media (hover: hover) {
@@ -230,17 +233,17 @@ html[lang="zh-CN"] .tagline {
   .cta-ghost:hover { background: var(--bg-alt); color: var(--fg); }
 }
 
-/* Compatibility strip — may run wider than the copy column into the stage gap */
+/* Compatibility strip — auto-fit grid that stays inside the copy column */
 .support-strip {
   list-style: none;
-  margin: 0 0 28px;
+  margin: 0 0 24px;
   padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 8px 16px;
   align-items: center;
-  width: max(100%, min(42rem, 140%));
-  max-width: calc(100% + 8rem);
+  width: 100%;
+  max-width: 100%;
 }
 .support-strip li {
   display: inline-flex;
@@ -249,6 +252,15 @@ html[lang="zh-CN"] .tagline {
   font-size: 14px;
   color: var(--fg-2);
   line-height: 1.2;
+}
+/* In the two-column desktop copy, keep editors in the left column and
+   terminals in the right instead of filling row by row. */
+@media (min-width: 1101px) {
+  .support-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(4, auto);
+    grid-auto-flow: column;
+  }
 }
 .support-strip .app-icon {
   width: 18px;
@@ -268,28 +280,29 @@ html[lang="zh-CN"] .tagline {
   width: 100%;
   height: 56px;
   box-sizing: border-box;
-  /* Each chip keeps its own palette (inline --chip-*), not the page chrome. */
+  /* Each chip keeps its own palette; the 2×2 icon adds the accent preview. */
   background: var(--chip-bg);
   color: var(--chip-fg);
   border: 1px solid var(--chip-border);
   border-radius: 8px;
   padding: 0 12px;
-  font-size: 12px; text-align: left;
-  transition: background .15s var(--ease), border-color .15s var(--ease), transform .1s var(--ease), box-shadow .15s var(--ease);
+  font-size: var(--text-label); text-align: left;
+  transition: background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease), transform .1s var(--ease), box-shadow .15s var(--ease);
 }
 .flavor-icon {
-  width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0;
+  width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0;
+  /* A miniature of the palette: canvas / keyword / string / type. */
   background:
-    linear-gradient(135deg, var(--chip-accent) 0 36%, transparent 36%),
-    var(--chip-bg);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--chip-fg) 16%, transparent);
+    linear-gradient(90deg, var(--chip-bg) 0 50%, var(--chip-accent) 50% 100%) top / 100% 50% no-repeat,
+    linear-gradient(90deg, var(--chip-string) 0 50%, var(--chip-type) 50% 100%) bottom / 100% 50% no-repeat;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--chip-fg) 18%, transparent);
 }
 .flavor-text {
   display: block; min-width: 0; line-height: 1.25;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .flavor-btn .sub {
-  display: block; font-size: 10px; color: var(--chip-muted); margin-top: 2px;
+  display: block; font-size: var(--text-meta); color: var(--chip-muted); margin-top: 2px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .flavor-btn[aria-pressed="true"] {
@@ -323,8 +336,12 @@ html[lang="zh-CN"] .tagline {
 }
 .hero-stage .editor { border: 0; border-radius: 0; }
 .hero-stage .editor-body { grid-template-columns: 40px 128px 1fr; min-height: 420px; }
-.hero-stage .code { font-size: 12px; line-height: 1.7; }
-.hero-stage .sidebar { font-size: 11.5px; }
+.hero-stage .code {
+  font-size: var(--text-label); line-height: 1.62;
+  scrollbar-width: none;
+}
+.hero-stage .code::-webkit-scrollbar { display: none; }
+.hero-stage .sidebar { font-size: var(--text-meta); }
 
 .flavor-panel { display: none; }
 .flavor-panel.is-active { display: block; }
@@ -334,7 +351,8 @@ html[lang="zh-CN"] .tagline {
   font-family: var(--serif);
   font-style: normal;
   font-weight: 500;
-  font-size: clamp(22px, 3vw, 28px);
+  font-size: var(--text-title);
+  line-height: 1.2;
   color: var(--fg);
   letter-spacing: .02em;
 }
@@ -351,56 +369,80 @@ html[lang="zh-CN"] .tagline {
 .specimen-head p {
   margin: 0;
   color: var(--fg-2);
-  font-size: 15px;
+  font-size: var(--text-body);
+  line-height: 1.6;
   text-wrap: pretty;
 }
 .panel-label {
-  font-size: 13px;
-  color: var(--fg-3);
+  font-size: var(--text-label);
+  color: var(--fg-2);
   margin: 0 0 6px;
 }
 .panel-idea {
   margin: 0 0 16px;
   max-width: 36rem;
-  font-size: 15px;
-  color: var(--fg-2);
+  font-size: var(--text-body);
+  line-height: 1.6;
+  color: var(--fg);
   text-wrap: pretty;
 }
 .panel-body { min-width: 0; }
 .swatch-gap { height: 14px; }
-.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 8px; }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(136px, 1fr)); gap: 10px; }
 .chip { border: 1px solid var(--border-subtle); border-radius: 6px; overflow: hidden; background: var(--bg-alt); }
-.chip-color { height: 44px; display: flex; align-items: flex-end; justify-content: flex-end; padding: 4px 6px; }
-.chip-sample { font-family: var(--serif); font-size: 11px; opacity: .5; }
-.chip-body { padding: 7px 8px 8px; }
-.chip-name { font-size: 11px; color: var(--fg); display: flex; justify-content: space-between; gap: 4px; }
-.chip-cn { color: var(--fg-3); font-size: 10px; white-space: nowrap; }
-.chip-meta { display: flex; justify-content: space-between; gap: 4px; margin-top: 2px; font-size: 9.5px; color: var(--fg-3); }
-.chip-meta code { font-family: var(--mono); font-size: 9px; color: var(--fg-2); }
+.chip-color { height: 48px; display: flex; align-items: flex-end; justify-content: flex-end; padding: 4px 7px; }
+.chip-sample { font-family: var(--serif); font-size: var(--text-meta); opacity: .72; }
+.chip-body { padding: 9px 10px 10px; }
+.chip-name { font-size: var(--text-label); color: var(--fg); display: flex; justify-content: space-between; gap: 4px; line-height: 1.3; }
+.chip-cn { color: var(--fg-2); font-size: var(--text-meta); white-space: nowrap; }
+.chip-meta { display: flex; justify-content: space-between; gap: 4px; margin-top: 3px; font-size: var(--text-meta); color: var(--fg-2); }
+.chip-meta code { font-family: var(--mono); font-size: var(--text-meta); color: var(--fg-2); font-variant-numeric: tabular-nums; }
 
 .foot {
   border-top: 1px solid var(--border-subtle);
   padding: 28px 0 48px;
   display: flex; flex-wrap: wrap; gap: 14px 28px;
   justify-content: space-between; align-items: flex-start;
-  color: var(--fg-3); font-size: 13px;
+  color: var(--fg-2); font-size: var(--text-label);
 }
 .foot-meta { display: flex; flex-direction: column; gap: 4px; max-width: 36rem; }
 .foot-chips {
   list-style: none; margin: 8px 0 0; padding: 0;
   display: flex; flex-wrap: wrap; gap: 8px 16px;
-  font-size: 12px; color: var(--fg-4);
+  font-size: var(--text-meta); color: var(--fg-3);
 }
-.foot nav { display: flex; flex-wrap: wrap; gap: 16px; }
+.foot nav { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+.foot nav a { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.foot nav a .app-icon { color: currentColor; }
 
-/* Site is PC-first (editor / terminal themes). Narrow viewports stack as a fallback. */
+/* Site is PC-first (editor / terminal themes). Narrow viewports stack as a fallback:
+   brand + CTA first, then a compact editor preview. */
 @media (max-width: 1100px) {
   .hero {
     grid-template-columns: 1fr;
     min-height: 0;
     align-items: start;
   }
-  .hero-stage { order: -1; }
+  .hero-copy { order: -1; max-width: 42rem; }
+  .hero-stage { order: 1; }
+}
+
+/* The site shell's desktop grid outranks the mock's own collapse rule, so the
+   mobile override has to live here at the same specificity. */
+@media (max-width: 768px) {
+  .hero-stage .editor-body { grid-template-columns: 1fr; min-height: 0; }
+  .hero-stage .activity,
+  .hero-stage .sidebar { display: none; }
+  .hero-stage .code { font-size: 13px; line-height: 1.6; }
+  .hero-stage .line:nth-child(n + 11) { display: none; }
+  .hero-stage .sb-right { display: none; }
+}
+
+/* Two chips per row get narrow on phones: drop the secondary language and let
+   the primary name wrap instead of truncating it. */
+@media (max-width: 480px) {
+  .flavor-btn .sub { display: none; }
+  .flavor-text { white-space: normal; line-height: 1.2; }
 }
 
 html[data-flavor="xuanmo"]{--bg:#14131a;--bg-alt:#1a1922;--activity:#0f0e14;--bg-sunken:#0f0e14;--sel:#332f46;--active:#302e3c;--border:#343240;--border-subtle:#262430;--border-strong:#4a4557;--fg:#d4cec4;--fg-2:#ada599;--fg-3:#8b8597;--fg-4:#6f6979;--cursor:#619ac3;--action:#619ac3;--action-hover:#74a6ca;--kw:#da5761;--fn:#619ac3;--str:#2bae85;--num:#f28e16;--type:#d6a01d;--cm:#85809e;--dec:#c08eaf;--var:#d4cec4;--param:#c08eaf;--prop:#c9c3b9;--ansi-1:#e1505d;--ansi-2:#2bae85;--ansi-3:#e2c027;--ansi-4:#619ac3;--ansi-5:#c08eaf;--ansi-6:#57c3c2;--diff-add:#2bae8526;--diff-del:#e2573726;--lens:rgba(255,255,255,0.06)}
@@ -414,29 +456,29 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
   .titlebar { height: 32px; background: var(--bg-alt); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px; padding: 0 12px; }
   .dots { display: flex; gap: 5px; }
   .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--border-strong); display: block; }
-  .title { font-size: 10.5px; color: var(--fg-3); letter-spacing: .02em; }
+  .title { font-size: 12px; color: var(--fg-2); letter-spacing: .02em; }
   .editor-body { display: grid; grid-template-columns: 42px 132px 1fr; min-height: 0; }
   .activity { background: var(--activity); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 12px 0; }
   .glyph { color: var(--fg-3); font-size: 14px; opacity: .8; }
-  .sidebar { background: var(--bg-alt); border-right: 1px solid var(--border-subtle); padding: 10px 8px; font-size: 10.5px; color: var(--fg-2); }
-  .side-title { font-size: 10px; letter-spacing: 0; color: var(--fg-3); padding: 4px 8px 8px; }
+  .sidebar { background: var(--bg-alt); border-right: 1px solid var(--border-subtle); padding: 10px 8px; font-size: 12px; color: var(--fg-2); }
+  .side-title { font-size: 12px; letter-spacing: 0; color: var(--fg-2); padding: 4px 8px 8px; }
   .side-row { padding: 3px 6px; border-radius: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .side-row.file { padding-left: 20px; color: var(--fg-2); }
   .side-active { background: var(--active); color: var(--fg); }
   .side-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--kw); margin-left: 6px; vertical-align: middle; }
-  .side-muted { color: var(--fg-4); padding-left: 20px; }
+  .side-muted { color: var(--fg-3); padding-left: 20px; }
 
   .editor-main { min-width: 0; display: flex; flex-direction: column; }
   .tabs { display: flex; background: var(--bg-alt); border-bottom: 1px solid var(--border-subtle); }
-  .tab { font-size: 10.5px; color: var(--fg-3); padding: 7px 14px; border-right: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 8px; }
+  .tab { font-size: 12px; color: var(--fg-2); padding: 7px 14px; border-right: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 8px; }
   .tab.active { background: var(--bg); color: var(--fg); box-shadow: inset 0 1px 0 var(--action); }
   .close { opacity: .5; font-size: 12px; }
-  .breadcrumb { display: flex; gap: 6px; align-items: center; padding: 6px 14px; font-size: 10px; color: var(--fg-3); border-bottom: 1px solid var(--border-subtle); }
+  .breadcrumb { display: flex; gap: 6px; align-items: center; padding: 6px 14px; font-size: 12px; color: var(--fg-2); border-bottom: 1px solid var(--border-subtle); }
   .breadcrumb i { font-style: normal; opacity: .5; }
 
-  .code { font-family: var(--mono); font-size: 11px; line-height: 1.72; padding: 10px 0; overflow-x: auto; }
+  .code { font-family: var(--mono); font-size: 14px; line-height: 1.62; padding: 10px 0; overflow-x: auto; }
   .line { display: flex; white-space: pre; min-width: max-content; }
-  .ln { width: 38px; text-align: right; padding-right: 12px; color: var(--fg-4); flex: 0 0 auto; user-select: none; }
+  .ln { width: 40px; text-align: right; padding-right: 12px; color: var(--fg-3); flex: 0 0 auto; user-select: none; }
   .lc { padding-right: 16px; }
   .line-active { background: var(--lens); }
   .line-selected { background: var(--sel); }
@@ -447,13 +489,13 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
   .str { color: var(--str); }
   .num { color: var(--num); }
   .type { color: var(--type); }
-  .cm { color: var(--cm); font-style: italic; }
+  .cm { color: var(--cm); }
   .dec { color: var(--dec); }
   .var { color: var(--var); }
   .param { color: var(--param); font-style: italic; }
   .prop { color: var(--prop); }
 
-  .statusbar { display: flex; justify-content: space-between; gap: 8px; background: var(--active); color: var(--fg); font-size: 9.5px; padding: 4px 12px; border-top: 1px solid var(--border-subtle); }
+  .statusbar { display: flex; justify-content: space-between; gap: 8px; background: var(--active); color: var(--fg); font-size: 12px; padding: 5px 12px; border-top: 1px solid var(--border-subtle); }
   .sb-left b { color: var(--kw); font-weight: 500; }
   .sb-sep { opacity: .35; margin: 0 6px; }
 </style>
@@ -482,10 +524,14 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
           <img class="hero-seal" src="./favicon.png" width="64" height="64" alt="" decoding="async">
           <span class="hero-title-text">墨观 <span class="brand-en">Inkstone</span></span>
         </h1>
-        <p class="tagline">Six variants share one hue skeleton, so switching feels like the same painting under a different light.</p>
+        <p class="tagline">A code palette grown from 526 traditional Chinese colors. Six variants share one hue skeleton, so switching feels like the same painting under a different light.</p>
         <div class="cta-row">
           <a class="cta cta-primary" href="https://github.com/Konata9/inkstone/releases">Install from Releases</a>
-          <a class="cta cta-ghost" href="https://github.com/Konata9/inkstone">Source on GitHub</a>
+          <a class="cta cta-ghost" href="https://github.com/Konata9/inkstone">
+
+<svg class="app-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+
+<span>Source on GitHub</span></a>
         </div>
         <ul class="support-strip" aria-label="Editors, Terminals">
           
@@ -541,7 +587,7 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
             data-flavor="xuanmo"
             aria-pressed="false"
             title="Xuanmo"
-            style="--chip-bg:#14131a;--chip-alt:#1a1922;--chip-active:#302e3c;--chip-fg:#d4cec4;--chip-muted:#ada599;--chip-border:#343240;--chip-border-strong:#4a4557;--chip-accent:#da5761;--chip-action:#619ac3"
+            style="--chip-bg:#14131a;--chip-alt:#1a1922;--chip-active:#302e3c;--chip-fg:#d4cec4;--chip-muted:#ada599;--chip-border:#343240;--chip-border-strong:#4a4557;--chip-accent:#da5761;--chip-string:#2bae85;--chip-type:#d6a01d;--chip-action:#619ac3"
           >
             <span class="flavor-icon" aria-hidden="true"></span>
             <span class="flavor-text">Xuanmo<span class="sub">玄墨</span></span>
@@ -553,7 +599,7 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
             data-flavor="xuanmo-dimmed"
             aria-pressed="false"
             title="Xuanmo Dimmed"
-            style="--chip-bg:#19181e;--chip-alt:#1e1d24;--chip-active:#2e2c36;--chip-fg:#d8d2c6;--chip-muted:#b0a99f;--chip-border:#393643;--chip-border-strong:#4f4a5b;--chip-accent:#c27c88;--chip-action:#66a9c9"
+            style="--chip-bg:#19181e;--chip-alt:#1e1d24;--chip-active:#2e2c36;--chip-fg:#d8d2c6;--chip-muted:#b0a99f;--chip-border:#393643;--chip-border-strong:#4f4a5b;--chip-accent:#c27c88;--chip-string:#69a794;--chip-type:#d6a01d;--chip-action:#66a9c9"
           >
             <span class="flavor-icon" aria-hidden="true"></span>
             <span class="flavor-text">Xuanmo Dimmed<span class="sub">玄墨 Dimmed</span></span>
@@ -565,7 +611,7 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
             data-flavor="xuanzhi"
             aria-pressed="false"
             title="Xuanzhi"
-            style="--chip-bg:#f7f4ed;--chip-alt:#f1ece2;--chip-active:#e4dbcc;--chip-fg:#35322d;--chip-muted:#5b564c;--chip-border:#d6ccb9;--chip-border-strong:#b9ad97;--chip-accent:#c34435;--chip-action:#0f59a4"
+            style="--chip-bg:#f7f4ed;--chip-alt:#f1ece2;--chip-active:#e4dbcc;--chip-fg:#35322d;--chip-muted:#5b564c;--chip-border:#d6ccb9;--chip-border-strong:#b9ad97;--chip-accent:#c34435;--chip-string:#1a6840;--chip-type:#813c85;--chip-action:#0f59a4"
           >
             <span class="flavor-icon" aria-hidden="true"></span>
             <span class="flavor-text">Xuanzhi<span class="sub">宣纸</span></span>
@@ -577,7 +623,7 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
             data-flavor="xuanzhi-dimmed"
             aria-pressed="false"
             title="Xuanzhi Dimmed"
-            style="--chip-bg:#e9e2d4;--chip-alt:#e3dbcb;--chip-active:#d8cebb;--chip-fg:#2f2b25;--chip-muted:#4f4a40;--chip-border:#cbc0ab;--chip-border-strong:#ada18a;--chip-accent:#894e54;--chip-action:#144a74"
+            style="--chip-bg:#e9e2d4;--chip-alt:#e3dbcb;--chip-active:#d8cebb;--chip-fg:#2f2b25;--chip-muted:#4f4a40;--chip-border:#cbc0ab;--chip-border-strong:#ada18a;--chip-accent:#894e54;--chip-string:#1a6840;--chip-type:#525288;--chip-action:#144a74"
           >
             <span class="flavor-icon" aria-hidden="true"></span>
             <span class="flavor-text">Xuanzhi Dimmed<span class="sub">宣纸 Dimmed</span></span>
@@ -589,7 +635,7 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
             data-flavor="canghai"
             aria-pressed="false"
             title="Canghai"
-            style="--chip-bg:#0d1822;--chip-alt:#12202b;--chip-active:#20323f;--chip-fg:#c8d4dd;--chip-muted:#9aadbb;--chip-border:#29404f;--chip-border-strong:#3d5a6d;--chip-accent:#dc5e41;--chip-action:#63bbd0"
+            style="--chip-bg:#0d1822;--chip-alt:#12202b;--chip-active:#20323f;--chip-fg:#c8d4dd;--chip-muted:#9aadbb;--chip-border:#29404f;--chip-border-strong:#3d5a6d;--chip-accent:#dc5e41;--chip-string:#1ba784;--chip-type:#c08eaf;--chip-action:#63bbd0"
           >
             <span class="flavor-icon" aria-hidden="true"></span>
             <span class="flavor-text">Canghai<span class="sub">沧海</span></span>
@@ -601,7 +647,7 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
             data-flavor="qingci"
             aria-pressed="false"
             title="Qingci"
-            style="--chip-bg:#e8f0ec;--chip-alt:#e1eae4;--chip-active:#d7e2da;--chip-fg:#2b333e;--chip-muted:#4f5b5a;--chip-border:#c7d5cc;--chip-border-strong:#a8bab0;--chip-accent:#bc3a46;--chip-action:#126e82"
+            style="--chip-bg:#e8f0ec;--chip-alt:#e1eae4;--chip-active:#d7e2da;--chip-fg:#2b333e;--chip-muted:#4f5b5a;--chip-border:#c7d5cc;--chip-border-strong:#a8bab0;--chip-accent:#bc3a46;--chip-string:#1a6840;--chip-type:#813c85;--chip-action:#126e82"
           >
             <span class="flavor-icon" aria-hidden="true"></span>
             <span class="flavor-text">Qingci<span class="sub">青瓷</span></span>
@@ -969,15 +1015,15 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
       </div>
     </section>
 
-    <section class="specimen" aria-labelledby="specimen-title">
+    <section class="specimen" aria-label="Palettes">
       <div class="specimen-head">
-        <h2 id="specimen-title" class="section-title">Active palette</h2>
-        <p>Colours come from the 526-entry zhongguose chart. Ink & paper (玄墨 / 宣纸) and sea & celadon (沧海 / 青瓷) keep the same hue order; Dimmed lowers the room light, not the ink.</p>
+        <p>All six palettes draw from the same traditional Chinese chart. Ink & paper sit on paper and soot; sea & celadon sit on deep water and glaze. Dimmed turns the lights down — it never puts a gray filter over the ink.</p>
       </div>
       
       <div class="flavor-panel" data-flavor="xuanmo">
-        <div class="panel-label">Xuanmo</div>
-        <p class="panel-idea">Pine-soot ink ground, cinnabar annotations, mineral pigments layered on top.</p>
+        <h2 class="section-title">Xuanmo</h2>
+        <div class="panel-label">Color idea</div>
+        <p class="panel-idea">Pine-soot ink underfoot, cinnabar for annotations. The dark canvas gives the brightness back to your code, and red is kept for what needs to be seen — built for long nights.</p>
         <div class="panel-body">
           
     <div class="swatches">
@@ -1000,8 +1046,9 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
       </div>
       
       <div class="flavor-panel" data-flavor="xuanmo-dimmed">
-        <div class="panel-label">Xuanmo Dimmed</div>
-        <p class="panel-idea">A deeper ink room with pigments softened one step — the same painting, lights turned down.</p>
+        <h2 class="section-title">Xuanmo Dimmed</h2>
+        <div class="panel-label">Color idea</div>
+        <p class="panel-idea">The same ink with the lights turned down. A deeper canvas, ink that never turns gray, and pigments that give up half a step of saturation — for softer rooms.</p>
         <div class="panel-body">
           
     <div class="swatches">
@@ -1024,8 +1071,9 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
       </div>
       
       <div class="flavor-panel" data-flavor="xuanzhi">
-        <div class="panel-label">Xuanzhi</div>
-        <p class="panel-idea">Raw xuan paper, pine-soot ink, blue-green mineral washes.</p>
+        <h2 class="section-title">Xuanzhi</h2>
+        <div class="panel-label">Color idea</div>
+        <p class="panel-idea">Raw xuan paper, pine-soot ink, mineral washes. Warm paper, cool ink, and mineral colors in between; keywords use a softened cinnabar that reads as a brush annotation, not an alarm.</p>
         <div class="panel-body">
           
     <div class="swatches">
@@ -1048,8 +1096,9 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
       </div>
       
       <div class="flavor-panel" data-flavor="xuanzhi-dimmed">
-        <div class="panel-label">Xuanzhi Dimmed</div>
-        <p class="panel-idea">Aged xuan paper and deeper ink, one stop softer than raw paper.</p>
+        <h2 class="section-title">Xuanzhi Dimmed</h2>
+        <div class="panel-label">Color idea</div>
+        <p class="panel-idea">Aged paper in warm gray, with ink a shade deeper. Like an old book page in afternoon light: the paper stops glaring, the pigments fade half a step, but every hue is still recognizable.</p>
         <div class="panel-body">
           
     <div class="swatches">
@@ -1072,8 +1121,9 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
       </div>
       
       <div class="flavor-panel" data-flavor="canghai">
-        <div class="panel-label">Canghai</div>
-        <p class="panel-idea">Deep-sea twilight, blue-green minerals, a touch of cinnabar.</p>
+        <h2 class="section-title">Canghai</h2>
+        <div class="panel-label">Color idea</div>
+        <p class="panel-idea">Deep-sea twilight, blue-green minerals, a single touch of vermilion. A cool canvas that stays quiet without going flat.</p>
         <div class="panel-body">
           
     <div class="swatches">
@@ -1096,8 +1146,9 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
       </div>
       
       <div class="flavor-panel" data-flavor="qingci">
-        <div class="panel-label">Qingci</div>
-        <p class="panel-idea">Moon-white celadon glaze, cool grey ink, sky after rain.</p>
+        <h2 class="section-title">Qingci</h2>
+        <div class="panel-label">Color idea</div>
+        <p class="panel-idea">Moon-white glaze, blue-gray ink, sky-after-rain. Like a Ru ware bowl: the color sits under the glaze and never competes with the text — for daylight and light desks.</p>
         <div class="panel-body">
           
     <div class="swatches">
@@ -1141,7 +1192,11 @@ html[data-flavor="qingci"]{--bg:#e8f0ec;--bg-alt:#e1eae4;--activity:#d9e3dc;--bg
     </div>
     <nav>
       <a href="https://github.com/Konata9/inkstone/blob/main/docs/palette.md">Palette reference</a>
-      <a href="https://github.com/Konata9/inkstone">GitHub</a>
+      <a href="https://github.com/Konata9/inkstone">
+
+<svg class="app-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+
+<span>GitHub</span></a>
       <a href="https://github.com/Konata9/inkstone/releases">Releases</a>
     </nav>
   </footer>

@@ -24,8 +24,8 @@ export const xuanmoDimmed: Flavor = {
     dimmed: true,
     family: 'ink',
     description: {
-      zh: '深墨夜色，矿物颜料各降一分饱和度。',
-      en: 'A deeper ink room with pigments softened one step — the same painting, lights turned down.',
+      zh: '同一方墨，把灯调暗一档。画布更沉、墨色不灰，矿物颜料只退半步饱和度——适合光线柔和的房间。',
+      en: 'The same ink with the lights turned down. A deeper canvas, ink that never turns gray, and pigments that give up half a step of saturation — for softer rooms.',
     },
   },
 

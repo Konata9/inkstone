@@ -61,7 +61,7 @@
         <p class="tagline">{{ copy.tagline }}</p>
         <div class="cta-row">
           <a class="cta cta-primary" href="{{ releasesUrl }}">{{ copy.ctaInstall }}</a>
-          <a class="cta cta-ghost" href="{{ repoUrl }}">{{ copy.ctaSource }}</a>
+          <a class="cta cta-ghost" href="{{ repoUrl }}">{% render 'icon', id: 'github' %}<span>{{ copy.ctaSource }}</span></a>
         </div>
         <ul class="support-strip" aria-label="{{ copy.editorsTitle }}, {{ copy.terminalsTitle }}">
           {% for item in editors %}
@@ -79,7 +79,7 @@
             data-flavor="{{ f.id }}"
             aria-pressed="false"
             title="{{ f.label }}"
-            style="--chip-bg:{{ f.chipBg }};--chip-alt:{{ f.chipAlt }};--chip-active:{{ f.chipActive }};--chip-fg:{{ f.chipFg }};--chip-muted:{{ f.chipMuted }};--chip-border:{{ f.chipBorder }};--chip-border-strong:{{ f.chipBorderStrong }};--chip-accent:{{ f.chipAccent }};--chip-action:{{ f.chipAction }}"
+            style="--chip-bg:{{ f.chipBg }};--chip-alt:{{ f.chipAlt }};--chip-active:{{ f.chipActive }};--chip-fg:{{ f.chipFg }};--chip-muted:{{ f.chipMuted }};--chip-border:{{ f.chipBorder }};--chip-border-strong:{{ f.chipBorderStrong }};--chip-accent:{{ f.chipAccent }};--chip-string:{{ f.chipString }};--chip-type:{{ f.chipType }};--chip-action:{{ f.chipAction }}"
           >
             <span class="flavor-icon" aria-hidden="true"></span>
             <span class="flavor-text">{{ f.label }}<span class="sub">{{ f.sub }}</span></span>
@@ -97,14 +97,14 @@
       </div>
     </section>
 
-    <section class="specimen" aria-labelledby="specimen-title">
+    <section class="specimen" aria-label="{{ copy.specimenLabel }}">
       <div class="specimen-head">
-        <h2 id="specimen-title" class="section-title">{{ copy.specimenTitle }}</h2>
         <p>{{ copy.inspirationBody }}</p>
       </div>
       {% for f in flavors %}
       <div class="flavor-panel" data-flavor="{{ f.id }}">
-        <div class="panel-label">{{ f.name }}</div>
+        <h2 class="section-title">{{ f.name }}</h2>
+        <div class="panel-label">{{ copy.colorIdeaLabel }}</div>
         <p class="panel-idea">{{ f.description }}</p>
         <div class="panel-body">
           {{ f.surfacesHtml | raw }}
@@ -129,7 +129,7 @@
     </div>
     <nav>
       <a href="{{ paletteUrl }}">{{ copy.footerPalette }}</a>
-      <a href="{{ repoUrl }}">GitHub</a>
+      <a href="{{ repoUrl }}">{% render 'icon', id: 'github' %}<span>GitHub</span></a>
       <a href="{{ releasesUrl }}">Releases</a>
     </nav>
   </footer>

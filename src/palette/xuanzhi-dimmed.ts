@@ -23,8 +23,8 @@ export const xuanzhiDimmed: Flavor = {
     dimmed: true,
     family: 'ink',
     description: {
-      zh: '陈纸暖灰，墨色更深；比生宣低一档亮度。',
-      en: 'Aged xuan paper and deeper ink, one stop softer than raw paper.',
+      zh: '陈纸的暖灰，墨色再深一分。像旧书页在下午的光线里：纸不刺眼，颜料褪了半度，但仍认得出每一种颜色。',
+      en: 'Aged paper in warm gray, with ink a shade deeper. Like an old book page in afternoon light: the paper stops glaring, the pigments fade half a step, but every hue is still recognizable.',
     },
   },
 

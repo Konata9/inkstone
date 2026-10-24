@@ -18,7 +18,8 @@ export interface SiteCopy {
   flavorsLabel: string;
   ctaInstall: string;
   ctaSource: string;
-  specimenTitle: string;
+  specimenLabel: string;
+  colorIdeaLabel: string;
   previewLabel: string;
   footerLicense: string;
   footerPalette: string;
@@ -33,19 +34,20 @@ export const siteCopy: Record<SiteLocale, SiteCopy> = {
     ogLocale: 'en_US',
     title: 'Inkstone · Traditional Chinese color themes',
     description:
-      'Inkstone (墨观) is a traditional Chinese color theme for VS Code, Cursor, Ghostty, WezTerm and OpenCode: six variants from the 526-color zhongguose palette.',
+      'A code palette grown from 526 traditional Chinese colors, with six variants for VS Code, Cursor, Ghostty, WezTerm and OpenCode.',
     brandZh: '墨观',
     brandEn: 'Inkstone',
     tagline:
-      'Six variants share one hue skeleton, so switching feels like the same painting under a different light.',
+      'A code palette grown from 526 traditional Chinese colors. Six variants share one hue skeleton, so switching feels like the same painting under a different light.',
     inspirationBody:
-      'Colours come from the 526-entry zhongguose chart. Ink & paper (玄墨 / 宣纸) and sea & celadon (沧海 / 青瓷) keep the same hue order; Dimmed lowers the room light, not the ink.',
+      'All six palettes draw from the same traditional Chinese chart. Ink & paper sit on paper and soot; sea & celadon sit on deep water and glaze. Dimmed turns the lights down — it never puts a gray filter over the ink.',
     editorsTitle: 'Editors',
     terminalsTitle: 'Terminals',
     flavorsLabel: 'Variants',
     ctaInstall: 'Install from Releases',
     ctaSource: 'Source on GitHub',
-    specimenTitle: 'Active palette',
+    specimenLabel: 'Palettes',
+    colorIdeaLabel: 'Color idea',
     previewLabel: 'Editor',
     footerLicense: 'MIT License',
     footerPalette: 'Palette reference',
@@ -58,18 +60,20 @@ export const siteCopy: Record<SiteLocale, SiteCopy> = {
     ogLocale: 'zh_CN',
     title: '墨观 Inkstone · 中国传统色彩主题',
     description:
-      '墨观从 526 个中国传统颜色中取色，为 VS Code、Cursor、Ghostty、WezTerm 与 OpenCode 提供六个变体：玄墨、宣纸、沧海、青瓷及 Dimmed。',
+      '一套从 526 个中国传统颜色里长出来的代码配色，为 VS Code、Cursor、Ghostty、WezTerm 与 OpenCode 提供六个变体。',
     brandZh: '墨观',
     brandEn: 'Inkstone',
-    tagline: '六个变体共用同一套色相骨架，切换时像同一幅画换了光线。',
+    tagline:
+      '一套从 526 个中国传统颜色里长出来的代码配色。六个变体共用同一套色相骨架，切换时像同一幅画换了光线。',
     inspirationBody:
-      '色值来自 zhongguose 526 色色谱。墨纸组（玄墨 / 宣纸）与海瓷组（沧海 / 青瓷）色相顺序一致；Dimmed 只降环境光，不降墨色。',
+      '六套色板都从同一张中国传统色谱里取色。墨纸组以纸墨为底，海瓷组以深海与青瓷釉为底；Dimmed 不是蒙一层灰，而是把房间的灯调暗。',
     editorsTitle: '编辑器',
     terminalsTitle: '终端',
     flavorsLabel: '变体',
     ctaInstall: '从 Releases 安装',
     ctaSource: 'GitHub 源码',
-    specimenTitle: '当前色板',
+    specimenLabel: '色板',
+    colorIdeaLabel: '配色思路',
     previewLabel: '编辑器',
     footerLicense: 'MIT 许可',
     footerPalette: '色板对照',

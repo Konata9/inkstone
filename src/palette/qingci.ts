@@ -22,8 +22,8 @@ export const qingci: Flavor = {
     appearance: 'light',
     family: 'sea',
     description: {
-      zh: '月白釉底，青灰题字，雨过天青。',
-      en: 'Moon-white celadon glaze, cool grey ink, sky after rain.',
+      zh: '月白釉底，青灰题字，雨过天青。像一件汝窑器：颜色都在釉下，不抢字；适合白天和浅色桌面。',
+      en: 'Moon-white glaze, blue-gray ink, sky-after-rain. Like a Ru ware bowl: the color sits under the glaze and never competes with the text — for daylight and light desks.',
     },
   },
 

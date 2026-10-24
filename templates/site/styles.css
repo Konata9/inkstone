@@ -12,6 +12,11 @@
   --measure: min(1640px, 100%);
   --gutter: clamp(28px, 3vw, 64px);
   --ease: cubic-bezier(.4, 0, .2, 1);
+  /* One scale for the whole page: metadata → labels → body → section title. */
+  --text-meta: 0.75rem;    /* 12px */
+  --text-label: 0.875rem;  /* 14px */
+  --text-body: 1rem;       /* 16px */
+  --text-title: 1.75rem;   /* 28px */
   --wash: color-mix(in srgb, var(--kw) 7%, transparent);
   --wash-2: color-mix(in srgb, var(--cursor) 6%, transparent);
 }
@@ -19,7 +24,7 @@
 * { box-sizing: border-box; }
 
 html, body { overflow-x: clip; }
-html { -webkit-font-smoothing: antialiased; }
+html { -webkit-font-smoothing: auto; }
 
 body {
   margin: 0;
@@ -62,7 +67,7 @@ body {
 ::view-transition-old(root) { z-index: 1; }
 ::view-transition-new(root) {
   z-index: 2;
-  animation: flavor-wipe .85s var(--ease) both;
+  animation: flavor-wipe 1.05s var(--ease) both;
 }
 @keyframes flavor-wipe {
   from { clip-path: polygon(0 100%, 0 100%, 0 100%); }
@@ -105,14 +110,14 @@ button:focus-visible {
   display: block;
 }
 .brand-words span {
-  font-family: var(--sans); font-size: 12px; color: var(--fg-3);
+  font-family: var(--sans); font-size: var(--text-label); color: var(--fg-3);
   margin-left: 10px; font-weight: 400;
 }
 .brand-mark:hover { color: var(--fg); }
 
-.lang { display: flex; gap: 2px; font-size: 13px; }
+.lang { display: flex; gap: 2px; font-size: var(--text-label); }
 .lang a {
-  color: var(--fg-3); padding: 6px 12px; border-radius: 6px; border: 1px solid transparent;
+  color: var(--fg-2); padding: 6px 12px; border-radius: 6px; border: 1px solid transparent;
 }
 .lang a[aria-current="page"] {
   color: var(--fg); border-color: var(--border); background: var(--bg-alt);
@@ -121,7 +126,7 @@ button:focus-visible {
 /* —— Hero: brand + CTA + flavor rail | product stage —— */
 .hero {
   display: grid;
-  grid-template-columns: minmax(300px, 0.55fr) minmax(0, 1.7fr);
+  grid-template-columns: clamp(360px, 30vw, 420px) minmax(0, 1fr);
   gap: clamp(32px, 4vw, 64px);
   align-items: start;
   padding: clamp(32px, 5vh, 56px) 0 clamp(48px, 8vh, 88px);
@@ -167,9 +172,10 @@ button:focus-visible {
 .tagline {
   margin: 0 0 28px;
   max-width: 28rem;
-  font-size: clamp(15px, 2vw, 17px);
+  font-size: var(--text-body);
+  line-height: 1.6;
   color: var(--fg-2);
-  text-wrap: pretty;
+  text-wrap: balance;
 }
 .tagline::after {
   content: "";
@@ -179,18 +185,15 @@ button:focus-visible {
   margin-top: 14px;
   background: var(--border-strong);
 }
-html[lang="zh-CN"] .tagline {
-  white-space: nowrap;
-  max-width: none;
-}
-
 .cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 20px; }
 .cta {
-  display: inline-flex; align-items: center; justify-content: center;
-  padding: 12px 20px; border-radius: 8px; font-size: 14px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 20px; border-radius: 8px; font-size: var(--text-label);
   border: 1px solid var(--border-strong);
+  white-space: nowrap;
   transition: background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease);
 }
+.cta .app-icon { width: 16px; height: 16px; color: currentColor; }
 .cta-primary { background: var(--action); color: var(--bg); border-color: var(--action); }
 .cta-ghost { background: transparent; color: var(--fg); }
 @media (hover: hover) {
@@ -202,17 +205,17 @@ html[lang="zh-CN"] .tagline {
   .cta-ghost:hover { background: var(--bg-alt); color: var(--fg); }
 }
 
-/* Compatibility strip — may run wider than the copy column into the stage gap */
+/* Compatibility strip — auto-fit grid that stays inside the copy column */
 .support-strip {
   list-style: none;
-  margin: 0 0 28px;
+  margin: 0 0 24px;
   padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 8px 16px;
   align-items: center;
-  width: max(100%, min(42rem, 140%));
-  max-width: calc(100% + 8rem);
+  width: 100%;
+  max-width: 100%;
 }
 .support-strip li {
   display: inline-flex;
@@ -221,6 +224,15 @@ html[lang="zh-CN"] .tagline {
   font-size: 14px;
   color: var(--fg-2);
   line-height: 1.2;
+}
+/* In the two-column desktop copy, keep editors in the left column and
+   terminals in the right instead of filling row by row. */
+@media (min-width: 1101px) {
+  .support-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(4, auto);
+    grid-auto-flow: column;
+  }
 }
 .support-strip .app-icon {
   width: 18px;
@@ -240,28 +252,29 @@ html[lang="zh-CN"] .tagline {
   width: 100%;
   height: 56px;
   box-sizing: border-box;
-  /* Each chip keeps its own palette (inline --chip-*), not the page chrome. */
+  /* Each chip keeps its own palette; the 2×2 icon adds the accent preview. */
   background: var(--chip-bg);
   color: var(--chip-fg);
   border: 1px solid var(--chip-border);
   border-radius: 8px;
   padding: 0 12px;
-  font-size: 12px; text-align: left;
-  transition: background .15s var(--ease), border-color .15s var(--ease), transform .1s var(--ease), box-shadow .15s var(--ease);
+  font-size: var(--text-label); text-align: left;
+  transition: background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease), transform .1s var(--ease), box-shadow .15s var(--ease);
 }
 .flavor-icon {
-  width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0;
+  width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0;
+  /* A miniature of the palette: canvas / keyword / string / type. */
   background:
-    linear-gradient(135deg, var(--chip-accent) 0 36%, transparent 36%),
-    var(--chip-bg);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--chip-fg) 16%, transparent);
+    linear-gradient(90deg, var(--chip-bg) 0 50%, var(--chip-accent) 50% 100%) top / 100% 50% no-repeat,
+    linear-gradient(90deg, var(--chip-string) 0 50%, var(--chip-type) 50% 100%) bottom / 100% 50% no-repeat;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--chip-fg) 18%, transparent);
 }
 .flavor-text {
   display: block; min-width: 0; line-height: 1.25;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .flavor-btn .sub {
-  display: block; font-size: 10px; color: var(--chip-muted); margin-top: 2px;
+  display: block; font-size: var(--text-meta); color: var(--chip-muted); margin-top: 2px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .flavor-btn[aria-pressed="true"] {
@@ -295,8 +308,12 @@ html[lang="zh-CN"] .tagline {
 }
 .hero-stage .editor { border: 0; border-radius: 0; }
 .hero-stage .editor-body { grid-template-columns: 40px 128px 1fr; min-height: 420px; }
-.hero-stage .code { font-size: 12px; line-height: 1.7; }
-.hero-stage .sidebar { font-size: 11.5px; }
+.hero-stage .code {
+  font-size: var(--text-label); line-height: 1.62;
+  scrollbar-width: none;
+}
+.hero-stage .code::-webkit-scrollbar { display: none; }
+.hero-stage .sidebar { font-size: var(--text-meta); }
 
 .flavor-panel { display: none; }
 .flavor-panel.is-active { display: block; }
@@ -306,7 +323,8 @@ html[lang="zh-CN"] .tagline {
   font-family: var(--serif);
   font-style: normal;
   font-weight: 500;
-  font-size: clamp(22px, 3vw, 28px);
+  font-size: var(--text-title);
+  line-height: 1.2;
   color: var(--fg);
   letter-spacing: .02em;
 }
@@ -323,54 +341,78 @@ html[lang="zh-CN"] .tagline {
 .specimen-head p {
   margin: 0;
   color: var(--fg-2);
-  font-size: 15px;
+  font-size: var(--text-body);
+  line-height: 1.6;
   text-wrap: pretty;
 }
 .panel-label {
-  font-size: 13px;
-  color: var(--fg-3);
+  font-size: var(--text-label);
+  color: var(--fg-2);
   margin: 0 0 6px;
 }
 .panel-idea {
   margin: 0 0 16px;
   max-width: 36rem;
-  font-size: 15px;
-  color: var(--fg-2);
+  font-size: var(--text-body);
+  line-height: 1.6;
+  color: var(--fg);
   text-wrap: pretty;
 }
 .panel-body { min-width: 0; }
 .swatch-gap { height: 14px; }
-.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 8px; }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(136px, 1fr)); gap: 10px; }
 .chip { border: 1px solid var(--border-subtle); border-radius: 6px; overflow: hidden; background: var(--bg-alt); }
-.chip-color { height: 44px; display: flex; align-items: flex-end; justify-content: flex-end; padding: 4px 6px; }
-.chip-sample { font-family: var(--serif); font-size: 11px; opacity: .5; }
-.chip-body { padding: 7px 8px 8px; }
-.chip-name { font-size: 11px; color: var(--fg); display: flex; justify-content: space-between; gap: 4px; }
-.chip-cn { color: var(--fg-3); font-size: 10px; white-space: nowrap; }
-.chip-meta { display: flex; justify-content: space-between; gap: 4px; margin-top: 2px; font-size: 9.5px; color: var(--fg-3); }
-.chip-meta code { font-family: var(--mono); font-size: 9px; color: var(--fg-2); }
+.chip-color { height: 48px; display: flex; align-items: flex-end; justify-content: flex-end; padding: 4px 7px; }
+.chip-sample { font-family: var(--serif); font-size: var(--text-meta); opacity: .72; }
+.chip-body { padding: 9px 10px 10px; }
+.chip-name { font-size: var(--text-label); color: var(--fg); display: flex; justify-content: space-between; gap: 4px; line-height: 1.3; }
+.chip-cn { color: var(--fg-2); font-size: var(--text-meta); white-space: nowrap; }
+.chip-meta { display: flex; justify-content: space-between; gap: 4px; margin-top: 3px; font-size: var(--text-meta); color: var(--fg-2); }
+.chip-meta code { font-family: var(--mono); font-size: var(--text-meta); color: var(--fg-2); font-variant-numeric: tabular-nums; }
 
 .foot {
   border-top: 1px solid var(--border-subtle);
   padding: 28px 0 48px;
   display: flex; flex-wrap: wrap; gap: 14px 28px;
   justify-content: space-between; align-items: flex-start;
-  color: var(--fg-3); font-size: 13px;
+  color: var(--fg-2); font-size: var(--text-label);
 }
 .foot-meta { display: flex; flex-direction: column; gap: 4px; max-width: 36rem; }
 .foot-chips {
   list-style: none; margin: 8px 0 0; padding: 0;
   display: flex; flex-wrap: wrap; gap: 8px 16px;
-  font-size: 12px; color: var(--fg-4);
+  font-size: var(--text-meta); color: var(--fg-3);
 }
-.foot nav { display: flex; flex-wrap: wrap; gap: 16px; }
+.foot nav { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+.foot nav a { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.foot nav a .app-icon { color: currentColor; }
 
-/* Site is PC-first (editor / terminal themes). Narrow viewports stack as a fallback. */
+/* Site is PC-first (editor / terminal themes). Narrow viewports stack as a fallback:
+   brand + CTA first, then a compact editor preview. */
 @media (max-width: 1100px) {
   .hero {
     grid-template-columns: 1fr;
     min-height: 0;
     align-items: start;
   }
-  .hero-stage { order: -1; }
+  .hero-copy { order: -1; max-width: 42rem; }
+  .hero-stage { order: 1; }
+}
+
+/* The site shell's desktop grid outranks the mock's own collapse rule, so the
+   mobile override has to live here at the same specificity. */
+@media (max-width: 768px) {
+  .hero-stage .editor-body { grid-template-columns: 1fr; min-height: 0; }
+  .hero-stage .activity,
+  .hero-stage .sidebar { display: none; }
+  .hero-stage .code { font-size: 13px; line-height: 1.6; }
+  .hero-stage .line:nth-child(n + 11) { display: none; }
+  .hero-stage .sb-right { display: none; }
+}
+
+/* Two chips per row get narrow on phones: drop the secondary language and let
+   the primary name wrap instead of truncating it. */
+@media (max-width: 480px) {
+  .flavor-btn .sub { display: none; }
+  .flavor-text { white-space: normal; line-height: 1.2; }
 }

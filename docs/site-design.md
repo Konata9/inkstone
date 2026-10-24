@@ -26,6 +26,7 @@ Injected per flavor (same names as preview):
 - Surfaces: `--bg`, `--bg-alt`, `--activity`, `--bg-sunken`, `--sel`, `--active`
 - Borders: `--border`, `--border-subtle`, `--border-strong`
 - Text: `--fg`, `--fg-2`, `--fg-3`, `--fg-4`, `--cursor`
+- Type: `--text-meta` 12px, `--text-label` 14px, `--text-body` 16px, `--text-title` 28px
 - Action: `--action`, `--action-hover` (the flavor's interaction blue)
 - Syntax: `--kw`, `--fn`, `--str`, `--num`, `--type`, `--cm`, `--dec`, `--var`, `--param`, `--prop`
 - Lens: `--lens`
@@ -42,18 +43,29 @@ No italic headings. Links, CTAs, focus and selected chrome use `--action`;
 `--kw` stays a code/annotation mark, never a command.
 Atmosphere wash uses `color-mix` from `--kw` / `--cursor` over the canvas.
 
+Text floor: 12px for metadata, 14px for UI labels, 16px for body copy.
+Small labels use `--fg-2`; `--fg-3` is reserved for metadata at 12px or larger,
+and `--fg-4` is not used for text. The editor code is 14px (13px in the compact
+mobile preview), with 12px chrome.
+
 Waiver: paper/ink surfaces are product tokens (玄墨 / 宣纸), not generic AI cream.
 
 ## Macrostructure
 
 1. **Hero (first viewport)** — top-aligned Stage: seal logo inline before the
-   brand name, tagline, CTAs, a larger support strip (may overhang toward the
-   editor column), equal-size flavor chips (each locked to its own palette),
-   and the live editor mock. Header wordmark also shows the seal. Logo asset is
-   `favicon.png` (from `packages/vscode/icon.png`). PC-first measure ≈1640px.
-2. **Specimen** — shared zhongguose / family lede, then the active flavor's
-   idea/source line (`meta.description`) and swatches. Platforms stay in the hero strip.
+   brand name, tagline, CTAs, a compatibility strip laid out as an auto-fit
+   grid inside the copy column (no overhang), equal-size flavor chips (each
+   locked to its own palette), and the live editor mock. Below 1100px the copy
+   comes first and the mock follows as a compact preview; below 480px the
+   flavor chips drop the secondary language and wrap the primary name. Header wordmark also
+   shows the seal. Logo asset is `favicon.png` (from
+   `packages/vscode/icon.png`). PC-first measure ≈1640px.
+2. **Specimen** — shared chart/family lede, then the active flavor's name as
+   the heading, a `配色思路` / `Color idea` label, the flavor's idea/source line
+   (`meta.description`), and swatches. No generic “Active palette” title; the
+   visible flavor panel carries its own h2. Platforms stay in the hero strip.
 3. **Footer** — license, version, quiet build facts, GitHub / Releases / palette.
+   The GitHub entry carries the monochrome mark; the other links stay text-only.
 
 Dividers: negative space + hairline (`--border-subtle`). No section numbers.
 No tracked-capital labels.
@@ -62,17 +74,20 @@ No tracked-capital labels.
 
 | State | Treatment |
 | --- | --- |
-| default | hairline border, `--fg-2` label |
-| hover | `--bg-alt` fill (only under `@media (hover: hover)`) |
+| default | each chip keeps its own `--chip-bg` / `--chip-fg` / `--chip-border`; 24px 2×2 palette icon |
+| hover | `--chip-alt` fill, `--chip-border-strong` |
 | `:focus-visible` | 2px outline `--chip-action` |
 | `:active` | slightly pressed (`translateY(1px)`) |
-| selected (current) | inset top rule `--chip-action`, `--fg` label, `--active` fill |
+| selected (current) | `--chip-active` fill, `--chip-fg` label, inset top rule `--chip-action` |
+
+The icon is a 24px 2×2 miniature: canvas (`--chip-bg`), keyword
+(`--chip-accent`), string (`--chip-string`) and type (`--chip-type`).
 
 ## Flavor switch motion
 
 User clicks wrap `document.startViewTransition` so the new flavor
 reveals with a hard diagonal wipe **bottom-left → top-right**
-(`clip-path` on `::view-transition-new(root)`, ~850ms). Initial load and
+(`clip-path` on `::view-transition-new(root)`, ~1.05s). Initial load and
 system `prefers-color-scheme` sync stay instant. Skip the wipe when
 `prefers-reduced-motion: reduce` or the View Transitions API is missing
 (body color transition remains as a soft fallback).

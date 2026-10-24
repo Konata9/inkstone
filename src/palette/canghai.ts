@@ -22,8 +22,8 @@ export const canghai: Flavor = {
     appearance: 'dark',
     family: 'sea',
     description: {
-      zh: '深海暮色，青绿矿物，银朱点染。',
-      en: 'Deep-sea twilight, blue-green minerals, a touch of cinnabar.',
+      zh: '深海暮色作底，青绿矿物铺开，银朱只做海面上的一点反光。冷色画布安静，但不至于单调。',
+      en: 'Deep-sea twilight, blue-green minerals, a single touch of vermilion. A cool canvas that stays quiet without going flat.',
     },
   },
 

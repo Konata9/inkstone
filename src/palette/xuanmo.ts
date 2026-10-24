@@ -23,8 +23,8 @@ export const xuanmo: Flavor = {
     appearance: 'dark',
     family: 'ink',
     description: {
-      zh: '以松烟墨为底，朱砂为批，矿物颜料层层罩染。',
-      en: 'Pine-soot ink ground, cinnabar annotations, mineral pigments layered on top.',
+      zh: '松烟墨打底，朱砂作批注。深色画布把亮度让给代码，红色只留给需要被看见的地方——适合夜里长时间写代码。',
+      en: 'Pine-soot ink underfoot, cinnabar for annotations. The dark canvas gives the brightness back to your code, and red is kept for what needs to be seen — built for long nights.',
     },
   },
 
