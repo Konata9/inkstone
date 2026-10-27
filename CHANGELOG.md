@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3.5
 - **玄墨关键字离开粉红侧**: `keyword` / `storage` / `deleted` move from 海棠红 · 降彩 (`#da5761`, H≈18.6) to 鱼鳃红 · 降彩 (`#d8574a`, H≈28.5), keeping the same lightness and chroma. 玄墨 Dimmed moves from 山黎豆红 (`#c27c88`) to 桂红 · 降彩 (`#c57f73`), a muted brick instead of dusty rose.
 - **Red leaves the interaction layer**: selection highlight, range highlight, bracket match, overview ruler and chat slash commands now use each flavor's action blue instead of the keyword red; the bracket color cycle ends on red instead of starting with it. Annotation red is left to keywords, errors and deletions.
 - **One warm family in 玄墨**: numbers / booleans / constants move from 杏黄 to 土黄, and types move to 萝兰紫, so the syntax layer no longer runs 杏黄 and 土黄 at the same time. 杏黄 stays reserved for warnings, and search highlights inherit the calmer 土黄.
