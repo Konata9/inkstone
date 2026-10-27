@@ -70,17 +70,20 @@ export const xuanmo: Flavor = {
     // 螺甸紫 — the muted violet of inlaid shell, used for prose annotations.
     // Lightened from #74759b to keep comments above 4.5:1 on the ink canvas.
     comment: '#85809e',
-    // 海棠红 is a print-ink red; keep its hue and lightness, compress the
-    // chroma so it reads as pigment instead of neon on a dark canvas.
-    keyword: soften('海棠红', 0.165),
-    storage: soften('海棠红', 0.165),
+    // 鱼鳃红 sits at H≈28.5, clear of the pink side where 海棠红 (H≈18.6)
+    // used to pull the dark canvas. Keep its lightness and chroma so the
+    // keyword stays a brick/vermilion mark rather than getting brighter.
+    keyword: soften('鱼鳃红', 0.165),
+    storage: soften('鱼鳃红', 0.165),
     function: interaction,
     method: named('晴山蓝'),
     string: named('铜绿'),
-    number: named('杏黄'),
-    boolean: named('杏黄'),
-    type: named('土黄'),
-    constant: named('杏黄'),
+    // One warm family only: numbers and types used to add 杏黄 + 土黄 at
+    // once. Numbers join 土黄; types move to 萝兰紫, as in 宣纸 and 沧海.
+    number: named('土黄'),
+    boolean: named('土黄'),
+    type: named('萝兰紫'),
+    constant: named('土黄'),
     variable: '#d4cec4', // 宣纸 white, softened
     parameter: named('萝兰紫'),
     property: '#c9c3b9', // 宣纸 white, dimmed
@@ -98,12 +101,14 @@ export const xuanmo: Flavor = {
 
   status: {
     error: soften('银朱', 0.18),
+    // With numbers on 土黄, 杏黄 is left to warning alone: orange now
+    // means "pay attention", not "this is a literal".
     warning: named('杏黄'),
     info: named('羽扇豆蓝'),
     success: named('铜绿'),
     modified: named('土黄'),
     added: named('铜绿'),
-    deleted: soften('海棠红', 0.165),
+    deleted: soften('鱼鳃红', 0.165),
     renamed: named('羽扇豆蓝'),
   },
 

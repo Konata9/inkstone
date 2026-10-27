@@ -69,8 +69,10 @@ export const xuanmoDimmed: Flavor = {
   syntax: {
     // 螺甸紫, dimmed by the deeper canvas rather than a new hue.
     comment: '#85809e',
-    keyword: named('山黎豆红'),
-    storage: named('山黎豆红'),
+    // 桂红 compressed to the Dimmed chroma floor: same brick hue as 玄墨,
+    // no longer the dusty rose of 山黎豆红 (H≈8.6).
+    keyword: soften('桂红', 0.09),
+    storage: soften('桂红', 0.09),
     // Pigments keep their hue identity: only ~25% of the chroma is given up.
     function: interaction,
     method: named('羽扇豆蓝'),
@@ -100,7 +102,7 @@ export const xuanmoDimmed: Flavor = {
     success: named('梧枝绿'),
     modified: named('土黄'),
     added: named('梧枝绿'),
-    deleted: named('山黎豆红'),
+    deleted: soften('桂红', 0.09),
     renamed: named('涧石蓝'),
   },
 

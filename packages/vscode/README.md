@@ -12,8 +12,8 @@ Six variants share one hue skeleton, so switching feels like the same painting u
 
 | Variant | Mode | Canvas | Keywords | Strings | Types |
 | --- | --- | --- | --- | --- | --- |
-| **玄墨 Xuanmo** | Dark | `#14131a` | 海棠红 · softened `#da5761` | 铜绿 `#2bae85` | 土黄 `#d6a01d` |
-| **玄墨 Dimmed** | Dark | `#19181e` | 山黎豆红 `#c27c88` | 梧枝绿 `#69a794` | 土黄 `#d6a01d` |
+| **玄墨 Xuanmo** | Dark | `#14131a` | 鱼鳃红 · softened `#d8574a` | 铜绿 `#2bae85` | 萝兰紫 `#c08eaf` |
+| **玄墨 Dimmed** | Dark | `#19181e` | 桂红 · softened `#c57f73` | 梧枝绿 `#69a794` | 土黄 `#d6a01d` |
 | **宣纸 Xuanzhi** | Light | `#f7f4ed` | 鹤顶红 · softened `#c34435` | 荷叶绿 `#1a6840` | 桔梗紫 `#813c85` |
 | **宣纸 Dimmed** | Light | `#e9e2d4` | 烟红 `#894e54` | 荷叶绿 `#1a6840` | 野菊紫 `#525288` |
 | **沧海 Canghai** | Dark | `#0d1822` | 银朱 · softened `#dc5e41` | 竹绿 `#1ba784` | 萝兰紫 `#c08eaf` |
@@ -46,8 +46,8 @@ Works in VS Code 1.85+, Cursor, Windsurf, VSCodium and other VS Code-compatible 
 ## Design notes
 
 - **Contrast is a band, not a floor** — body text 10.5–12.5:1, syntax 4.5–9:1. All six variants pass the same 872 checks, including OKLCH chroma budgets.
-- **Cinnabar without the glare** — print-ink reds keep their hue and lightness but drop to C≈0.165, so they read as pigment rather than neon. The caret uses the cool interaction color instead.
-- **Red marks, blue acts** — keywords, errors and deletions keep cinnabar; buttons, badges, progress, focus and selected chrome use the variant's interaction blue, so confirmation and destruction never share a hue.
+- **Cinnabar without the glare** — print-ink reds keep their hue and lightness but drop to C≈0.165, so they read as pigment rather than neon. 玄墨's keyword sits on the brick side (鱼鳃红, H≈28.5) rather than the pink side, and the Dimmed keyword is a muted 桂红. The caret uses the cool interaction color instead.
+- **Red marks, blue acts** — keywords, tags, errors and deletions keep cinnabar; buttons, badges, progress, focus, selected chrome, selection/range highlights, bracket matching and slash commands use the variant's interaction blue, so confirmation and destruction never share a hue.
 - **No visual noise** — comments stay upright, there are no gradients, no glass effects and no italic comments.
 - **Traditional colors are traceable** — accents keep their original zhongguose hex where possible; softened pigments and derived neutrals are documented in the [palette reference](https://github.com/Konata9/inkstone/blob/main/docs/palette.md).
 - **One skeleton, six lights** — hue order stays the same across variants (cinnabar → blue → green → orange → purple → cyan → crimson).

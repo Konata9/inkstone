@@ -346,6 +346,7 @@ Terminal themes: use the Ghostty / Kaku zip assets from the same release, or
 - Not a generic dark/light pair: six curated rooms on one skeleton
 - Keywords use annotation reds (朱批) on ink/paper; sea/celadon uses seal-like reds on glaze
 - Cursor color is a cool interaction blue, not the keyword red
+- Selection, range highlights, bracket matching and slash commands also use the interaction blue; red is reserved for semantic marks (keywords, tags, errors, deletions)
 
 ## Links
 

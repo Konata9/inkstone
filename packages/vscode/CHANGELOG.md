@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+- **玄墨关键字离开粉红侧**: `keyword` / `storage` / `deleted` move from 海棠红 · 降彩 (`#da5761`, H≈18.6) to 鱼鳃红 · 降彩 (`#d8574a`, H≈28.5), keeping the same lightness and chroma. 玄墨 Dimmed moves from 山黎豆红 (`#c27c88`) to 桂红 · 降彩 (`#c57f73`), a muted brick instead of dusty rose.
+- **Red leaves the interaction layer**: selection highlight, range highlight, bracket match, overview ruler and chat slash commands now use each flavor's action blue instead of the keyword red; the bracket color cycle ends on red instead of starting with it. Annotation red is left to keywords, errors and deletions.
+- **One warm family in 玄墨**: numbers / booleans / constants move from 杏黄 to 土黄, and types move to 萝兰紫, so the syntax layer no longer runs 杏黄 and 土黄 at the same time. 杏黄 stays reserved for warnings, and search highlights inherit the calmer 土黄.
+
 ## 0.3.4
 - **Red marks, blue acts**: buttons, badges, progress, focus rings and selected chrome now use each flavor's interaction blue (羽扇豆蓝 / 涧石蓝 / 飞燕草蓝 / 鷃蓝 / 霁青 / 玉鈫蓝); cinnabar stays reserved for keywords, errors, deletions, the seal and syntax marks. Adds a first-class `action` token plus a hover step, and points OpenCode `accent` at the blue hue.
 - **Safer action hover**: the site CTA and links use the generated `--action` / `--action-hover` pair instead of `brightness(1.08)`, so hover no longer drops 宣纸 to 4.39:1.
