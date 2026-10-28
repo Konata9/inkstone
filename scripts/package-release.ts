@@ -221,15 +221,21 @@ theme = light:Inkstone Qingci,dark:Inkstone Canghai
 
 ## Kaku
 
+Kaku 0.27.1 and newer list custom themes from \`~/.config/kaku/colors/\`:
+
 \`\`\`bash
 mkdir -p ~/.config/kaku/colors
-cp kaku/*.lua ~/.config/kaku/
 cp kaku/*.toml ~/.config/kaku/colors/
 \`\`\`
 
 Open Settings (Cmd+,) and pick \`Inkstone Xuanmo\` from Theme; Kaku writes
-\`config.color_scheme\` for you. A Kaku that does not list these files yet, and
-WezTerm, can reference the Lua table instead:
+\`config.color_scheme\` for you.
+
+On an older Kaku, or in WezTerm, use the Lua table instead:
+
+\`\`\`bash
+cp kaku/*.lua ~/.config/kaku/
+\`\`\`
 
 \`\`\`lua
 config.color_schemes = config.color_schemes or {}

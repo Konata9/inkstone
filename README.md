@@ -119,11 +119,16 @@ theme = light:Inkstone Qingci,dark:Inkstone Canghai
 
 ### Kaku / WezTerm
 
+Kaku 从 **0.27.1** 起会把 `~/.config/kaku/colors/` 里的 TOML 配色列进 Settings → Theme，所以安装脚本按版本分流：
+
 ```bash
 pnpm install:kaku
 ```
 
-脚本会把六个 `.lua` 装到 `~/.config/kaku/`，把六个 `.toml` 装到 `~/.config/kaku/colors/`。打开 Settings（`Cmd + ,`），Theme 列表里会直接出现六个变体，选中即可，Kaku 会自己写入 `config.color_scheme`。
+脚本先读 `kaku --version`，没有 CLI 时读 `/Applications/Kaku.app` 里的版本号：
+
+- **0.27.1 及以上**：只把六个 `.toml` 复制到 `~/.config/kaku/colors/`，并删掉旧版脚本留下的 `~/.config/kaku/inkstone-*.lua`。打开 Settings（`Cmd + ,`），Theme 列表里直接出现下表的六个名字，选中即可，Kaku 会自己写入 `config.color_scheme`。
+- **低于 0.27.1 或没装 Kaku**：不写入任何文件，只提示版本过低；按下面的「旧版 Kaku / WezTerm」手动装 Lua 表。
 
 | 变体 | Settings 里的名称 |
 | --- | --- |
@@ -134,7 +139,18 @@ pnpm install:kaku
 | 沧海（deep-sea dark） | `Inkstone Canghai` |
 | 青瓷（celadon light） | `Inkstone Qingci` |
 
-旧版 Kaku（Settings 里还是只有 Auto / Kaku Dark / Kaku Light）和 WezTerm 继续用 Lua 表，把下面三行追加到 `~/.config/kaku/kaku.lua`（Kaku 会自动重载）：
+从旧脚本升级时注意：`kaku.lua` 里如果还留着 `dofile(wezterm.config_dir .. '/inkstone-xuanmo.lua')` 这类行，Lua 文件一被删掉就会报错，需要把这些行删掉或注释掉。已经选好的 `config.color_scheme = 'Inkstone Xuanmo'` 不用动，TOML 里的方案同名。
+
+#### 旧版 Kaku / WezTerm（Lua）
+
+0.27.1 之前的 Kaku（Settings 里只有 Auto / Kaku Dark / Kaku Light）和 WezTerm 继续用 Lua 表。手动把六个 `.lua` 复制到 Kaku 的配置目录：
+
+```bash
+mkdir -p ~/.config/kaku
+cp dist/kaku/inkstone-*.lua ~/.config/kaku/
+```
+
+再把下面三行追加到 `~/.config/kaku/kaku.lua`（Kaku 会自动重载）：
 
 ```lua
 config.color_schemes = config.color_schemes or {}
@@ -264,7 +280,7 @@ pnpm site         # 构建并打开官网（site/index.html）
 - **Canghai (沧海)** — deep-sea twilight, blue-green minerals and a cinnabar seal.
 - **Qingci (青瓷)** — cool light, moon-white celadon glaze and grey ink.
 
-Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Konata9.inkstone) or [Open VSX](https://open-vsx.org/extension/Konata9/inkstone), or use the VSIX from `dist/`; the Ghostty / Kaku / OpenCode themes install with the scripts above. The same Lua scheme also works in WezTerm.
+Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Konata9.inkstone) or [Open VSX](https://open-vsx.org/extension/Konata9/inkstone), or use the VSIX from `dist/`; the Ghostty / Kaku / OpenCode themes install with the scripts above. In Kaku 0.27.1 and newer the installer drops only the TOML schemes into `~/.config/kaku/colors/`; the same-named Lua scheme stays available for WezTerm and older Kaku builds.
 
 Built with a generator: one semantic palette produces the VS Code themes, the Ghostty themes and the terminal ANSI schemes, and the build fails if any token leaves its contrast band or OKLCH chroma budget.
 
