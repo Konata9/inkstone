@@ -23,8 +23,9 @@ import {
   OPENCODE_SYNTAX_KEYS,
 } from './targets/opencode.ts';
 import { buildTheme } from './targets/vscode.ts';
+import { generateWarp, WARP_COLOR_NAMES } from './targets/warp.ts';
 import { generateZed } from './targets/zed.ts';
-import { ZED_FAMILY_NAME } from './targets/naming.ts';
+import { warpFileName, warpThemeName, ZED_FAMILY_NAME } from './targets/naming.ts';
 
 /** Workbench key for an ANSI slot, e.g. `terminal.ansiBrightBlack`. */
 function terminalAnsiKey(slot: number): string {
@@ -153,6 +154,55 @@ export function checkThemes(): string[] {
     if (palette.length !== 16) issues.push(`ghostty ${file.path}: expected 16 palette slots, found ${palette.length}`);
     const indices = new Set(palette.map((match) => match[1]));
     if (indices.size !== 16) issues.push(`ghostty ${file.path}: duplicate palette indices`);
+  }
+
+  // --- Warp ------------------------------------------------------------
+  // The generator writes a fixed two-level layout, so a line parser is enough
+  // to catch a lost key, an unquoted `#` (which YAML reads as a comment) or a
+  // drifted ANSI slot without pulling in a YAML dependency.
+  for (const file of generateWarp()) {
+    const top = new Map<string, string>();
+    const groups: Record<string, Map<string, string>> = { normal: new Map(), bright: new Map() };
+    let group: Map<string, string> | undefined;
+    for (const line of file.content.split('\n')) {
+      if (!line.trim() || line.trim().startsWith('#')) continue;
+      const topMatch = /^([a-z_]+):\s*(.*)$/.exec(line);
+      const groupMatch = /^  (normal|bright):$/.exec(line);
+      const colorMatch = /^    ([a-z]+):\s*'(#[0-9a-f]{6})'$/i.exec(line);
+      if (topMatch) {
+        top.set(topMatch[1]!, topMatch[2]!);
+        group = undefined;
+      } else if (groupMatch) {
+        group = groups[groupMatch[1]!];
+      } else if (colorMatch && group) {
+        group.set(colorMatch[1]!, colorMatch[2]!);
+      } else {
+        issues.push(`warp ${file.path}: unparseable line "${line}"`);
+      }
+    }
+    for (const required of ['name', 'accent', 'cursor', 'background', 'foreground', 'details', 'terminal_colors']) {
+      if (!top.has(required)) issues.push(`warp ${file.path}: missing ${required}`);
+    }
+    const flavor = flavors.find((candidate) => file.path.endsWith(warpFileName(candidate)));
+    if (!flavor) {
+      issues.push(`warp ${file.path}: no flavor matches this file name`);
+    } else if (top.get('name') !== `'${warpThemeName(flavor)}'`) {
+      issues.push(`warp ${file.path}: name must be the quoted '${warpThemeName(flavor)}'`);
+    }
+    for (const key of ['accent', 'cursor', 'background', 'foreground']) {
+      const value = /^'(.*)'$/.exec(top.get(key) ?? '')?.[1];
+      if (!value || !isValidHex(value)) issues.push(`warp ${file.path}: invalid or unquoted color for ${key}`);
+    }
+    if (!['darker', 'lighter'].includes(top.get('details') ?? '')) {
+      issues.push(`warp ${file.path}: details must be darker or lighter`);
+    }
+    const slots = [...groups.normal!.values(), ...groups.bright!.values()];
+    const names = [...groups.normal!.keys(), ...groups.bright!.keys()];
+    if (names.join() !== [...WARP_COLOR_NAMES, ...WARP_COLOR_NAMES].join()) {
+      issues.push(`warp ${file.path}: expected 8 normal and 8 bright colors in ANSI order`);
+    } else if (flavor && slots.some((value, index) => value !== flavor.ansi[index])) {
+      issues.push(`warp ${file.path}: ANSI palette drifted from the flavor`);
+    }
   }
 
   // --- Kaku / WezTerm --------------------------------------------------

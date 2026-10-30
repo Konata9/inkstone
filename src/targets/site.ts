@@ -51,6 +51,7 @@ const EDITORS = [
 const TERMINALS = [
   { id: 'ghostty', label: 'Ghostty' },
   { id: 'wezterm', label: 'Kaku / WezTerm' },
+  { id: 'warp', label: 'Warp' },
   { id: 'opencode', label: 'OpenCode' },
 ] as const;
 
@@ -166,7 +167,7 @@ function pageContext(locale: SiteLocale, version: string) {
     name: 'Inkstone',
     alternateName: '墨观',
     applicationCategory: 'DeveloperApplication',
-    operatingSystem: 'VS Code 1.85+, Cursor, Windsurf, VSCodium, Ghostty, WezTerm, OpenCode',
+    operatingSystem: 'VS Code 1.85+, Cursor, Windsurf, VSCodium, Ghostty, WezTerm, Warp, OpenCode',
     description: copy.description,
     url: canonical,
     downloadUrl: RELEASES_URL,
@@ -295,7 +296,7 @@ ${flavors
 ## Platforms
 
 - Editors: VS Code, Cursor, Windsurf, VSCodium
-- Terminals: Ghostty, Kaku / WezTerm
+- Terminals: Ghostty, Kaku / WezTerm, Warp
 - Also: OpenCode V2 themes
 
 ## Install
@@ -328,7 +329,7 @@ pigments recognisable. The build runs 872 contrast and chroma checks.
 ## Features
 
 - Full VS Code / Cursor workbench colors, TextMate scopes, semantic tokens
-- Matching terminal ANSI palettes (Ghostty, Kaku / WezTerm)
+- Matching terminal ANSI palettes (Ghostty, Kaku / WezTerm, Warp)
 - OpenCode V2 theme JSON for all six flavors
 - Cursor-specific: \`contrastActiveBorder\` is transparent so editor tabs are not outlined
 
@@ -339,8 +340,8 @@ pigments recognisable. The build runs 872 contrast and chroma checks.
 3. \`code --install-extension Konata9.inkstone-<version>.vsix\` (or Cursor / VSCodium equivalent)
 4. Preferences: Color Theme → pick a 墨观 / Inkstone variant
 
-Terminal themes: use the Ghostty / Kaku zip assets from the same release, or
-\`pnpm install:ghostty\` / \`pnpm install:kaku\` / \`pnpm install:opencode\` / \`pnpm install:zed\` from source.
+Terminal themes: use the Ghostty / Kaku / Warp zip assets from the same release, or
+\`pnpm install:ghostty\` / \`pnpm install:kaku\` / \`pnpm install:opencode\` / \`pnpm install:warp\` / \`pnpm install:zed\` from source.
 
 ## Comparison notes
 

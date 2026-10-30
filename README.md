@@ -48,6 +48,7 @@ A traditional Chinese color theme for editors and terminals, built from the 526-
 | `inkstone-ghostty-<version>.zip` | Ghostty 主题文件 |
 | `inkstone-kaku-<version>.zip` | Kaku / WezTerm 色表（Lua + TOML） |
 | `inkstone-opencode-<version>.zip` | OpenCode V2 主题 |
+| `inkstone-warp-<version>.zip` | Warp 主题（YAML） |
 | `inkstone-zed-<version>.zip` | Zed 主题包 |
 | `inkstone-<version>.zip` | 全部产物 + `manifest.json` + 安装说明 |
 | `manifest.json` / `SHA256SUMS` | 机器可读索引与校验和 |
@@ -190,6 +191,16 @@ pnpm install:opencode
 | `inkstone-qingci` | 青瓷 | 亮 |
 
 OpenCode 的语义 token 全部从同一份色板映射：正文、背景层、语法、diff、Markdown、反馈色与九级 hue scale 都由生成器输出；`accent` 与 `interactive` 都指向各变体的交互蓝，`destructive` 独占错误红。新增主题文件后需要重启 OpenCode。
+
+### Warp
+
+```bash
+pnpm install:warp
+```
+
+六个 `.yaml` 会复制到 `~/.warp/themes/`（Linux 为 `${XDG_DATA_HOME:-~/.local/share}/warp-terminal/themes/`）。打开 Settings → Appearance → Themes，列表里会出现 `Inkstone Xuanmo` 等六个名字；打开 **Sync with OS** 可以分别指定亮色与暗色变体，例如宣纸 / 玄墨。
+
+Warp 主题只有画布、光标、强调色与 16 色 ANSI 四类字段，没有选区色。`accent` 用于标签页、选中块与焦点，按「红做记号，青做动作」指向各变体的交互蓝；光标沿用 `text.cursor`。
 
 ### Zed
 
