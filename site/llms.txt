@@ -25,7 +25,7 @@
 ## Platforms
 
 - Editors: VS Code, Cursor, Windsurf, VSCodium
-- Terminals: Ghostty, Kaku / WezTerm
+- Terminals: Ghostty, Kaku / WezTerm, Warp
 - Also: OpenCode V2 themes
 
 ## Install

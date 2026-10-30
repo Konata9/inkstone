@@ -11,6 +11,7 @@
  *   dist/kaku/*.lua                (WezTerm-compatible Lua tables)
  *   dist/kaku/*.toml               (Kaku `colors/` directory schemes)
  *   dist/opencode/*.json
+ *   dist/warp/*.yaml
  *   dist/zed/inkstone.json
  *   dist/zed/extension.toml
  *   preview/index.html
@@ -32,6 +33,7 @@ import { generateOpencode } from './targets/opencode.ts';
 import { renderGallery, renderPreview } from './targets/preview.ts';
 import { generateSite, SITE_FAVICON_SOURCE } from './targets/site.ts';
 import { generateVscode } from './targets/vscode.ts';
+import { generateWarp } from './targets/warp.ts';
 import { generateZed } from './targets/zed.ts';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -73,6 +75,7 @@ const files = [
   ...generateKaku(),
   ...generateKakuToml(),
   ...generateOpencode(),
+  ...generateWarp(),
   ...generateZed(rootPkg.version),
   { path: 'preview/index.html', content: renderPreview() },
   { path: 'preview/gallery.html', content: renderGallery() },
@@ -97,5 +100,5 @@ console.log(
   `\nBuilt ${files.length} files for ${flavors.length} flavors ` +
     `(${checks.audit.checks} palette checks, ${flavors.length} VS Code themes, ` +
     `${flavors.length} Ghostty themes, ${flavors.length} Kaku schemes (Lua + TOML), ` +
-    `${flavors.length} OpenCode themes, Zed themes, site pages).\n`,
+    `${flavors.length} OpenCode themes, ${flavors.length} Warp themes, Zed themes, site pages).\n`,
 );

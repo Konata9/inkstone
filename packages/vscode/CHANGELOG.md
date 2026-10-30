@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- **Warp target**: every flavor ships a Warp custom-theme YAML in `dist/warp/`, with the action blue as `accent` and the interaction cursor; `pnpm install:warp` copies them to `~/.warp/themes/` (or the XDG path on Linux), and releases gain `inkstone-warp-<version>.zip`. Post-build checks parse the YAML and guard against ANSI drift.
+
 ## 0.3.5
 - **玄墨关键字离开粉红侧**: `keyword` / `storage` / `deleted` move from 海棠红 · 降彩 (`#da5761`, H≈18.6) to 鱼鳃红 · 降彩 (`#d8574a`, H≈28.5), keeping the same lightness and chroma. 玄墨 Dimmed moves from 山黎豆红 (`#c27c88`) to 桂红 · 降彩 (`#c57f73`), a muted brick instead of dusty rose.
 - **Red leaves the interaction layer**: selection highlight, range highlight, bracket match, overview ruler and chat slash commands now use each flavor's action blue instead of the keyword red; the bracket color cycle ends on red instead of starting with it. Annotation red is left to keywords, errors and deletions.

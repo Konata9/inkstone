@@ -34,7 +34,7 @@ export const siteCopy: Record<SiteLocale, SiteCopy> = {
     ogLocale: 'en_US',
     title: 'Inkstone · Traditional Chinese color themes',
     description:
-      'A code palette grown from 526 traditional Chinese colors, with six variants for VS Code, Cursor, Ghostty, WezTerm and OpenCode.',
+      'A code palette grown from 526 traditional Chinese colors, with six variants for VS Code, Cursor, Ghostty, WezTerm, Warp and OpenCode.',
     brandZh: '墨观',
     brandEn: 'Inkstone',
     taglineHtml:
@@ -60,7 +60,7 @@ export const siteCopy: Record<SiteLocale, SiteCopy> = {
     ogLocale: 'zh_CN',
     title: '墨观 Inkstone · 中国传统色彩主题',
     description:
-      '一套从 526 个中国传统颜色里长出来的代码配色，为 VS Code、Cursor、Ghostty、WezTerm 与 OpenCode 提供六个变体。',
+      '一套从 526 个中国传统颜色里长出来的代码配色，为 VS Code、Cursor、Ghostty、WezTerm、Warp 与 OpenCode 提供六个变体。',
     brandZh: '墨观',
     brandEn: 'Inkstone',
     taglineHtml:

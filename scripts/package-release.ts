@@ -11,6 +11,7 @@
  *   inkstone-ghostty-<version>.zip
  *   inkstone-kaku-<version>.zip
  *   inkstone-opencode-<version>.zip
+ *   inkstone-warp-<version>.zip
  *   inkstone-<version>.zip          (all targets + manifest)
  *   Konata9.inkstone-<version>.vsix
  *   manifest.json
@@ -42,6 +43,7 @@ import {
   opencodeFileName,
   themeDisplayName,
   vscodeFileName,
+  warpFileName,
   ZED_FILE_NAME,
 } from '../src/targets/naming.ts';
 import { argValue } from './args.ts';
@@ -66,6 +68,7 @@ interface ThemeManifest {
     kakuToml: string;
     opencode: string;
     vscode: string;
+    warp: string;
     zed: string;
   };
 }
@@ -117,16 +120,19 @@ const ghosttyFiles = flavors.map(ghosttyThemeName);
 const kakuFiles = flavors.map(kakuFileName);
 const kakuTomlFiles = flavors.map(kakuTomlFileName);
 const opencodeFiles = flavors.map(opencodeFileName);
+const warpFiles = flavors.map(warpFileName);
 
 for (const file of ghosttyFiles) assertFile(join(root, 'dist', 'ghostty', file));
 for (const file of kakuFiles) assertFile(join(root, 'dist', 'kaku', file));
 for (const file of kakuTomlFiles) assertFile(join(root, 'dist', 'kaku', file));
 for (const file of opencodeFiles) assertFile(join(root, 'dist', 'opencode', file));
+for (const file of warpFiles) assertFile(join(root, 'dist', 'warp', file));
 assertFile(join(root, 'dist', 'zed', ZED_FILE_NAME));
 
 const ghosttyArchive = `inkstone-ghostty-${version}.zip`;
 const kakuArchive = `inkstone-kaku-${version}.zip`;
 const opencodeArchive = `inkstone-opencode-${version}.zip`;
+const warpArchive = `inkstone-warp-${version}.zip`;
 const zedArchive = `inkstone-zed-${version}.zip`;
 const bundleArchive = `inkstone-${version}.zip`;
 const vsixName = vsixFileName({ ...vscodePkg, version });
@@ -144,6 +150,7 @@ function zipFlat(archive: string, directory: string, files: string[]): void {
 zipFlat(ghosttyArchive, join(root, 'dist', 'ghostty'), ghosttyFiles);
 zipFlat(kakuArchive, join(root, 'dist', 'kaku'), [...kakuFiles, ...kakuTomlFiles]);
 zipFlat(opencodeArchive, join(root, 'dist', 'opencode'), opencodeFiles);
+zipFlat(warpArchive, join(root, 'dist', 'warp'), warpFiles);
 zipFlat(zedArchive, join(root, 'dist', 'zed'), [ZED_FILE_NAME]);
 copyFileSync(vsixPath, join(releaseDir, vsixName));
 
@@ -159,6 +166,7 @@ const themes: ThemeManifest[] = flavors.map((flavor) => ({
     kakuToml: kakuTomlFileName(flavor),
     opencode: opencodeFileName(flavor),
     vscode: vscodeFileName(flavor),
+    warp: warpFileName(flavor),
     zed: ZED_FILE_NAME,
   },
 }));
@@ -193,6 +201,12 @@ const manifest = {
       directory: '~/.config/opencode/themes',
       archive: opencodeArchive,
       format: 'json',
+    },
+    warp: {
+      directory: '~/.warp/themes',
+      linuxDirectory: '~/.local/share/warp-terminal/themes',
+      archive: warpArchive,
+      format: 'yaml',
     },
     zed: {
       directory: '~/.config/zed/themes',
@@ -276,6 +290,16 @@ Restart OpenCode and pick a theme with \`/themes\`, or pin it in
 }
 \`\`\`
 
+## Warp
+
+\`\`\`bash
+mkdir -p ~/.warp/themes        # Linux: ~/.local/share/warp-terminal/themes
+cp warp/*.yaml ~/.warp/themes/
+\`\`\`
+
+Open Settings → Appearance → Themes and pick an Inkstone variant; turn on
+"Sync with OS" to pair a light and a dark one.
+
 ## Zed
 
 \`\`\`bash
@@ -308,6 +332,7 @@ Then run **Preferences: Color Theme** and pick an Inkstone variant.
 mkdirSync(join(stagingDir, 'ghostty'), { recursive: true });
 mkdirSync(join(stagingDir, 'kaku'), { recursive: true });
 mkdirSync(join(stagingDir, 'opencode'), { recursive: true });
+mkdirSync(join(stagingDir, 'warp'), { recursive: true });
 mkdirSync(join(stagingDir, 'zed'), { recursive: true });
 
 for (const file of ghosttyFiles) {
@@ -322,6 +347,9 @@ for (const file of kakuTomlFiles) {
 for (const file of opencodeFiles) {
   copyFileSync(join(root, 'dist', 'opencode', file), join(stagingDir, 'opencode', file));
 }
+for (const file of warpFiles) {
+  copyFileSync(join(root, 'dist', 'warp', file), join(stagingDir, 'warp', file));
+}
 copyFileSync(join(root, 'dist', 'zed', ZED_FILE_NAME), join(stagingDir, 'zed', ZED_FILE_NAME));
 
 writeFileSync(join(stagingDir, 'manifest.json'), manifestJson, 'utf8');
@@ -331,7 +359,7 @@ copyFileSync(join(root, 'CHANGELOG.md'), join(stagingDir, 'CHANGELOG.md'));
 
 execFileSync(
   'zip',
-  ['-r', '-X', '-q', join(releaseDir, bundleArchive), 'ghostty', 'kaku', 'opencode', 'zed', 'manifest.json', 'INSTALL.md', 'LICENSE', 'CHANGELOG.md'],
+  ['-r', '-X', '-q', join(releaseDir, bundleArchive), 'ghostty', 'kaku', 'opencode', 'warp', 'zed', 'manifest.json', 'INSTALL.md', 'LICENSE', 'CHANGELOG.md'],
   { cwd: stagingDir, stdio: 'inherit' },
 );
 
