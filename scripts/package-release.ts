@@ -42,6 +42,7 @@ import {
   opencodeFileName,
   themeDisplayName,
   vscodeFileName,
+  ZED_FILE_NAME,
 } from '../src/targets/naming.ts';
 import { argValue } from './args.ts';
 import { extractReleaseNotes, hasUnreleasedEntries } from './changelog.ts';
@@ -65,6 +66,7 @@ interface ThemeManifest {
     kakuToml: string;
     opencode: string;
     vscode: string;
+    zed: string;
   };
 }
 
@@ -120,10 +122,12 @@ for (const file of ghosttyFiles) assertFile(join(root, 'dist', 'ghostty', file))
 for (const file of kakuFiles) assertFile(join(root, 'dist', 'kaku', file));
 for (const file of kakuTomlFiles) assertFile(join(root, 'dist', 'kaku', file));
 for (const file of opencodeFiles) assertFile(join(root, 'dist', 'opencode', file));
+assertFile(join(root, 'dist', 'zed', ZED_FILE_NAME));
 
 const ghosttyArchive = `inkstone-ghostty-${version}.zip`;
 const kakuArchive = `inkstone-kaku-${version}.zip`;
 const opencodeArchive = `inkstone-opencode-${version}.zip`;
+const zedArchive = `inkstone-zed-${version}.zip`;
 const bundleArchive = `inkstone-${version}.zip`;
 const vsixName = vsixFileName({ ...vscodePkg, version });
 const vsixPath = join(root, 'dist', vsixName);
@@ -140,6 +144,7 @@ function zipFlat(archive: string, directory: string, files: string[]): void {
 zipFlat(ghosttyArchive, join(root, 'dist', 'ghostty'), ghosttyFiles);
 zipFlat(kakuArchive, join(root, 'dist', 'kaku'), [...kakuFiles, ...kakuTomlFiles]);
 zipFlat(opencodeArchive, join(root, 'dist', 'opencode'), opencodeFiles);
+zipFlat(zedArchive, join(root, 'dist', 'zed'), [ZED_FILE_NAME]);
 copyFileSync(vsixPath, join(releaseDir, vsixName));
 
 const themes: ThemeManifest[] = flavors.map((flavor) => ({
@@ -154,6 +159,7 @@ const themes: ThemeManifest[] = flavors.map((flavor) => ({
     kakuToml: kakuTomlFileName(flavor),
     opencode: opencodeFileName(flavor),
     vscode: vscodeFileName(flavor),
+    zed: ZED_FILE_NAME,
   },
 }));
 
@@ -186,6 +192,11 @@ const manifest = {
     opencode: {
       directory: '~/.config/opencode/themes',
       archive: opencodeArchive,
+      format: 'json',
+    },
+    zed: {
+      directory: '~/.config/zed/themes',
+      archive: zedArchive,
       format: 'json',
     },
   },
@@ -265,6 +276,24 @@ Restart OpenCode and pick a theme with \`/themes\`, or pin it in
 }
 \`\`\`
 
+## Zed
+
+\`\`\`bash
+mkdir -p ~/.config/zed/themes
+cp zed/inkstone.json ~/.config/zed/themes/
+\`\`\`
+
+Pick an Inkstone variant with the theme selector (\`cmd-k cmd-t\`), or configure in \`~/.config/zed/settings.json\`:
+
+\`\`\`json
+{
+  "theme": {
+    "mode": "system",
+    "light": "墨观 · 宣纸 (Inkstone Xuanzhi)",
+    "dark": "墨观 · 玄墨 (Inkstone Xuanmo)"
+  }
+}
+\`\`\`
 ## VS Code / Cursor / Windsurf / VSCodium
 
 Install \`${vsixName}\` from the release assets:
@@ -279,6 +308,7 @@ Then run **Preferences: Color Theme** and pick an Inkstone variant.
 mkdirSync(join(stagingDir, 'ghostty'), { recursive: true });
 mkdirSync(join(stagingDir, 'kaku'), { recursive: true });
 mkdirSync(join(stagingDir, 'opencode'), { recursive: true });
+mkdirSync(join(stagingDir, 'zed'), { recursive: true });
 
 for (const file of ghosttyFiles) {
   copyFileSync(join(root, 'dist', 'ghostty', file), join(stagingDir, 'ghostty', file));
@@ -292,6 +322,7 @@ for (const file of kakuTomlFiles) {
 for (const file of opencodeFiles) {
   copyFileSync(join(root, 'dist', 'opencode', file), join(stagingDir, 'opencode', file));
 }
+copyFileSync(join(root, 'dist', 'zed', ZED_FILE_NAME), join(stagingDir, 'zed', ZED_FILE_NAME));
 
 writeFileSync(join(stagingDir, 'manifest.json'), manifestJson, 'utf8');
 writeFileSync(join(stagingDir, 'INSTALL.md'), installDoc, 'utf8');
@@ -300,7 +331,7 @@ copyFileSync(join(root, 'CHANGELOG.md'), join(stagingDir, 'CHANGELOG.md'));
 
 execFileSync(
   'zip',
-  ['-r', '-X', '-q', join(releaseDir, bundleArchive), 'ghostty', 'kaku', 'opencode', 'manifest.json', 'INSTALL.md', 'LICENSE', 'CHANGELOG.md'],
+  ['-r', '-X', '-q', join(releaseDir, bundleArchive), 'ghostty', 'kaku', 'opencode', 'zed', 'manifest.json', 'INSTALL.md', 'LICENSE', 'CHANGELOG.md'],
   { cwd: stagingDir, stdio: 'inherit' },
 );
 

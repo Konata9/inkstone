@@ -48,3 +48,9 @@ export function opencodeFileName(flavor: Flavor): string {
 export function themeDisplayName(flavor: Flavor): string {
   return `墨观 · ${flavorName(flavor, 'zh')} (Inkstone ${flavorName(flavor, 'en')})`;
 }
+
+/** Zed theme family name. */
+export const ZED_FAMILY_NAME = 'Inkstone';
+
+/** Zed theme family file name. */
+export const ZED_FILE_NAME = 'inkstone.json';

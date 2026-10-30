@@ -48,6 +48,7 @@ A traditional Chinese color theme for editors and terminals, built from the 526-
 | `inkstone-ghostty-<version>.zip` | Ghostty 主题文件 |
 | `inkstone-kaku-<version>.zip` | Kaku / WezTerm 色表（Lua + TOML） |
 | `inkstone-opencode-<version>.zip` | OpenCode V2 主题 |
+| `inkstone-zed-<version>.zip` | Zed 主题包 |
 | `inkstone-<version>.zip` | 全部产物 + `manifest.json` + 安装说明 |
 | `manifest.json` / `SHA256SUMS` | 机器可读索引与校验和 |
 
@@ -190,6 +191,37 @@ pnpm install:opencode
 
 OpenCode 的语义 token 全部从同一份色板映射：正文、背景层、语法、diff、Markdown、反馈色与九级 hue scale 都由生成器输出；`accent` 与 `interactive` 都指向各变体的交互蓝，`destructive` 独占错误红。新增主题文件后需要重启 OpenCode。
 
+### Zed
+
+```bash
+pnpm install:zed
+```
+
+`inkstone.json` 会复制到 `~/.config/zed/themes/`。
+
+可以通过命令面板（`Cmd+K Cmd+T`）搜索选择主题，或在 `~/.config/zed/settings.json` 中配置：
+
+```json
+{
+  "theme": {
+    "mode": "system",
+    "light": "墨观 · 宣纸 (Inkstone Xuanzhi)",
+    "dark": "墨观 · 玄墨 (Inkstone Xuanmo)"
+  }
+}
+```
+
+可选主题名称：
+
+| 主题名称 | 变体 | 模式 |
+| --- | --- | --- |
+| `墨观 · 玄墨 (Inkstone Xuanmo)` | 玄墨 | 暗 |
+| `墨观 · 玄墨 Dimmed (Inkstone Xuanmo Dimmed)` | 玄墨 Dimmed | 暗 |
+| `墨观 · 宣纸 (Inkstone Xuanzhi)` | 宣纸 | 亮 |
+| `墨观 · 宣纸 Dimmed (Inkstone Xuanzhi Dimmed)` | 宣纸 Dimmed | 亮 |
+| `墨观 · 沧海 (Inkstone Canghai)` | 沧海 | 暗 |
+| `墨观 · 青瓷 (Inkstone Qingci)` | 青瓷 | 亮 |
+
 ## 仓库结构
 
 ```
@@ -214,13 +246,14 @@ src/
     ghostty.ts            Ghostty 主题
     kaku.ts               Kaku / WezTerm 色表（Lua + TOML）
     opencode.ts           OpenCode V2 主题（base + hue scale）
+    zed.ts                Zed 主题（ThemeFamily + extension.toml）
     preview.ts            预览页 / gallery
     site.ts · site-copy.ts 官网数据注入（文案 / 版本 / 色板）
     docs.ts               色板文档
 templates/site/           官网 Liquid 模板（结构 / CSS / JS）
 scripts/                  安装脚本、VSIX 与 Release 打包
 packages/vscode/          VS Code 扩展（VSIX）
-dist/                     生成物：Ghostty 主题、Kaku 色表、OpenCode 主题、VSIX
+dist/                     生成物：Ghostty 主题、Kaku 色表、OpenCode 主题、Zed 主题、VSIX
 preview/index.html        本地预览页（生成物）
 preview/gallery.html      README / Marketplace 用的编辑器总览（生成物）
 site/                     官网静态页（生成物，GitHub Pages）

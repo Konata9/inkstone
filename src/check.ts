@@ -23,6 +23,8 @@ import {
   OPENCODE_SYNTAX_KEYS,
 } from './targets/opencode.ts';
 import { buildTheme } from './targets/vscode.ts';
+import { generateZed } from './targets/zed.ts';
+import { ZED_FAMILY_NAME } from './targets/naming.ts';
 
 /** Workbench key for an ANSI slot, e.g. `terminal.ansiBrightBlack`. */
 function terminalAnsiKey(slot: number): string {
@@ -404,6 +406,159 @@ export function checkThemes(): string[] {
     );
 
     if (checkedColors === 0) issues.push(`opencode ${file.path}: no color tokens were checked`);
+  }
+
+  const requiredZedStyles = [
+    'background',
+    'surface.background',
+    'elevated_surface.background',
+    'border',
+    'border.focused',
+    'text',
+    'text.muted',
+    'icon',
+    'status_bar.background',
+    'title_bar.background',
+    'tab_bar.background',
+    'tab.active_background',
+    'editor.foreground',
+    'editor.background',
+    'editor.gutter.background',
+    'editor.active_line.background',
+    'editor.line_number',
+    'terminal.background',
+    'terminal.foreground',
+  ];
+
+  const requiredZedSyntax = [
+    'comment',
+    'keyword',
+    'function',
+    'string',
+    'number',
+    'type',
+    'operator',
+    'variable',
+    'property',
+    'punctuation',
+  ];
+
+  for (const file of generateZed()) {
+    if (file.path.endsWith('.toml')) {
+      let doc: Record<string, unknown>;
+      try {
+        doc = parseToml(file.content) as Record<string, unknown>;
+      } catch (error) {
+        issues.push(`zed ${file.path}: invalid TOML — ${(error as Error).message}`);
+        continue;
+      }
+      if (doc.id !== 'inkstone') issues.push(`zed ${file.path}: expected id = "inkstone"`);
+      if (doc.name !== ZED_FAMILY_NAME) issues.push(`zed ${file.path}: expected name = "${ZED_FAMILY_NAME}"`);
+      if (!doc.version) issues.push(`zed ${file.path}: missing version`);
+      continue;
+    }
+
+    let doc: Record<string, unknown>;
+    try {
+      doc = JSON.parse(file.content) as Record<string, unknown>;
+    } catch (error) {
+      issues.push(`zed ${file.path}: invalid JSON — ${(error as Error).message}`);
+      continue;
+    }
+
+    if (doc.$schema !== 'https://zed.dev/schema/themes/v0.2.0.json') {
+      issues.push(`zed ${file.path}: wrong $schema`);
+    }
+    if (doc.name !== ZED_FAMILY_NAME) {
+      issues.push(`zed ${file.path}: expected family name "${ZED_FAMILY_NAME}"`);
+    }
+    if (doc.author !== 'Konata9') {
+      issues.push(`zed ${file.path}: expected author "Konata9"`);
+    }
+
+    const themes = doc.themes as Array<Record<string, unknown>> | undefined;
+    if (!Array.isArray(themes)) {
+      issues.push(`zed ${file.path}: themes must be an array`);
+      continue;
+    }
+    if (themes.length !== flavors.length) {
+      issues.push(`zed ${file.path}: expected ${flavors.length} themes, found ${themes.length}`);
+    }
+
+    for (const theme of themes) {
+      const themeName = String(theme.name);
+      const flavor = flavors.find((item) => themeName.includes(item.meta.en));
+      if (!flavor) {
+        issues.push(`zed ${file.path}: theme "${themeName}" does not match any flavor`);
+        continue;
+      }
+      if (theme.appearance !== flavor.meta.appearance) {
+        issues.push(`zed ${file.path}: theme "${themeName}" has appearance ${theme.appearance}, expected ${flavor.meta.appearance}`);
+      }
+
+      const style = theme.style as Record<string, unknown> | undefined;
+      if (!style || typeof style !== 'object') {
+        issues.push(`zed ${file.path}: theme "${themeName}" missing style`);
+        continue;
+      }
+
+      for (const key of requiredZedStyles) {
+        if (!(key in style)) issues.push(`zed ${file.path}: theme "${themeName}" missing style.${key}`);
+      }
+
+      const zedAnsiKeys = [
+        'terminal.ansi.black',
+        'terminal.ansi.red',
+        'terminal.ansi.green',
+        'terminal.ansi.yellow',
+        'terminal.ansi.blue',
+        'terminal.ansi.magenta',
+        'terminal.ansi.cyan',
+        'terminal.ansi.white',
+        'terminal.ansi.bright_black',
+        'terminal.ansi.bright_red',
+        'terminal.ansi.bright_green',
+        'terminal.ansi.bright_yellow',
+        'terminal.ansi.bright_blue',
+        'terminal.ansi.bright_magenta',
+        'terminal.ansi.bright_cyan',
+        'terminal.ansi.bright_white',
+      ];
+      for (const ansiKey of zedAnsiKeys) {
+        if (!style[ansiKey] || !isValidHex(String(style[ansiKey]))) {
+          issues.push(`zed ${file.path}: theme "${themeName}" invalid or missing ${ansiKey}`);
+        }
+      }
+
+      const syntax = style.syntax as Record<string, Record<string, unknown>> | undefined;
+      if (!syntax || typeof syntax !== 'object') {
+        issues.push(`zed ${file.path}: theme "${themeName}" missing syntax`);
+      } else {
+        for (const token of requiredZedSyntax) {
+          const rule = syntax[token];
+          if (!rule || !rule.color || !isValidHex(String(rule.color))) {
+            issues.push(`zed ${file.path}: theme "${themeName}" syntax.${token} is missing or has invalid color`);
+          }
+        }
+      }
+
+      const bg = String(style['editor.background']);
+      const fg = String(style['editor.foreground']);
+      if (isValidHex(bg) && isValidHex(fg)) {
+        const ratio = contrast(fg, bg);
+        if (ratio < 7) {
+          issues.push(`zed ${file.path}: theme "${themeName}" editor text contrast is ${ratio.toFixed(2)}:1 (min 7:1)`);
+        }
+      }
+
+      const commentColor = syntax?.comment?.color ? String(syntax.comment.color) : undefined;
+      if (commentColor && isValidHex(bg) && isValidHex(commentColor)) {
+        const ratio = contrast(commentColor, bg);
+        if (ratio < 4.5) {
+          issues.push(`zed ${file.path}: theme "${themeName}" comment contrast is ${ratio.toFixed(2)}:1 (min 4.5:1)`);
+        }
+      }
+    }
   }
 
   return issues;
