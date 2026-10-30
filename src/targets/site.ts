@@ -45,6 +45,7 @@ const EDITORS = [
   { id: 'cursor', label: 'Cursor' },
   { id: 'windsurf', label: 'Windsurf' },
   { id: 'vscodium', label: 'VSCodium' },
+  { id: 'zed', label: 'Zed' },
 ] as const;
 
 const TERMINALS = [
@@ -339,7 +340,7 @@ pigments recognisable. The build runs 872 contrast and chroma checks.
 4. Preferences: Color Theme → pick a 墨观 / Inkstone variant
 
 Terminal themes: use the Ghostty / Kaku zip assets from the same release, or
-\`pnpm install:ghostty\` / \`pnpm install:kaku\` / \`pnpm install:opencode\` from source.
+\`pnpm install:ghostty\` / \`pnpm install:kaku\` / \`pnpm install:opencode\` / \`pnpm install:zed\` from source.
 
 ## Comparison notes
 

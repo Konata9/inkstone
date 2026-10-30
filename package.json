@@ -32,7 +32,8 @@
     "release:tag": "tsx scripts/release-tag.ts",
     "install:ghostty": "pnpm build && bash scripts/install-ghostty.sh",
     "install:kaku": "pnpm build && bash scripts/install-kaku.sh",
-    "install:opencode": "pnpm build && bash scripts/install-opencode.sh"
+    "install:opencode": "pnpm build && bash scripts/install-opencode.sh",
+    "install:zed": "pnpm build && bash scripts/install-zed.sh"
   },
   "devDependencies": {
     "@types/luaparse": "^0.2.13",
