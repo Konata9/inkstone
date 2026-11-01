@@ -49,6 +49,8 @@ A traditional Chinese color theme for editors and terminals, built from the 526-
 | `inkstone-kaku-<version>.zip` | Kaku / WezTerm 色表（Lua + TOML） |
 | `inkstone-opencode-<version>.zip` | OpenCode V2 主题 |
 | `inkstone-zed-<version>.zip` | Zed 主题包 |
+| `inkstone-dsh-<version>.tgz` | DeepSeek Harness (DSH) 主题插件（菜单版，六主题切换） |
+| `inkstone-dsh-<variant>-<version>.tgz` | DSH 主题插件（按明暗自动配对） |
 | `inkstone-<version>.zip` | 全部主题产物 + `manifest.json` + 安装说明 |
 | `manifest.json` / `SHA256SUMS` | 机器可读索引与校验和 |
 
@@ -222,6 +224,39 @@ pnpm install:zed
 | `墨观 · 沧海 (Inkstone Canghai)` | 沧海 | 暗 |
 | `墨观 · 青瓷 (Inkstone Qingci)` | 青瓷 | 亮 |
 
+### DeepSeek Harness (DSH)
+
+DSH 的 Web GUI 与 Desktop 共用同一套渲染层，主题以插件形式安装。**菜单版** `inkstone-dsh-<version>.tgz` 把宣纸 / 宣纸 Dimmed / 玄墨 / 玄墨 Dimmed / 沧海 / 青瓷六个主题装进一个插件，在 **Settings → General** 里直接切换：
+
+```bash
+dsh plugin --profile web add file:/absolute/path/to/inkstone-dsh-<version>.tgz
+```
+
+从源码构建后也可以直接安装目录，`pnpm install:dsh` 默认安装菜单版：
+
+```bash
+pnpm install && pnpm build
+dsh plugin --profile web add "$PWD/dist/dsh/inkstone-dsh"
+```
+
+重启 `dsh web`，打开 **Settings → General**，在「墨观 Inkstone」一行点选宣纸 / 宣纸 Dimmed / 玄墨 / 玄墨 Dimmed / 沧海 / 青瓷：选择立即生效并记住。「跟随 DSH」把控制权交回 **Appearance** 的 Light / Dark / System —— Light 用宣纸，Dark 用玄墨。卸载：
+
+```bash
+dsh plugin --profile web remove inkstone-dsh
+```
+
+如果不需要菜单，也可以安装按明暗自动配对的单包：
+
+| 包 | 明（Light） | 暗（Dark） |
+| --- | --- | --- |
+| `inkstone-dsh-ink` | 宣纸 | 玄墨 |
+| `inkstone-dsh-ink-dimmed` | 宣纸 Dimmed | 玄墨 Dimmed |
+| `inkstone-dsh-sea` | 青瓷 | 沧海 |
+
+菜单版与配对版都覆盖同一套 token，**一次只装一个**；它们也与其它 DSH 主题插件（如 Catppuccin）互斥，请只保留一个。
+
+插件声明 `engines.dsh: ">=0.2.1-rc.3 <0.3.0"`；DSH 仍在预发布期，版本超出区间时会拒绝安装。终端 16 色由终端程序自身决定，不在主题范围内。
+
 ## 仓库结构
 
 ```
@@ -247,13 +282,15 @@ src/
     kaku.ts               Kaku / WezTerm 色表（Lua + TOML）
     opencode.ts           OpenCode V2 主题（base + hue scale）
     zed.ts                Zed 主题（ThemeFamily + extension.toml）
+    dsh.ts                DSH 主题插件（三对明暗变体 + 浏览器 bundle）
+    dsh-tokens.ts         DSH 0.2.1 颜色 token 冻结清单
     preview.ts            预览页 / gallery
     site.ts · site-copy.ts 官网数据注入（文案 / 版本 / 色板）
     docs.ts               色板文档
 templates/site/           官网 Liquid 模板（结构 / CSS / JS）
 scripts/                  安装脚本、VSIX 与 Release 打包
 packages/vscode/          VS Code 扩展（VSIX）
-dist/                     生成物：Ghostty 主题、Kaku 色表、OpenCode 主题、Zed 主题、VSIX
+dist/                     生成物：Ghostty 主题、Kaku 色表、OpenCode 主题、Zed 主题、DSH 插件包、VSIX
 preview/index.html        本地预览页（生成物）
 preview/gallery.html      README / Marketplace 用的编辑器总览（生成物）
 site/                     官网静态页（生成物，GitHub Pages）
@@ -334,3 +371,30 @@ Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/item
 Built with a generator: one semantic palette produces the VS Code themes, the Ghostty themes and the terminal ANSI schemes, and the build fails if any token leaves its contrast band or OKLCH chroma budget.
 
 Red stays a mark (keywords, errors, deletions, the seal) while each flavor's interaction blue carries buttons, badges, progress, focus and selected chrome, so confirmation and destruction never share a hue.
+
+### DeepSeek Harness (DSH)
+
+DSH's Web GUI and Desktop share one renderer and take themes as plugins. The **menu edition** `inkstone-dsh-<version>.tgz` packs all six themes (宣纸 / 宣纸 Dimmed / 玄墨 / 玄墨 Dimmed / 沧海 / 青瓷) into one plugin with a switcher under **Settings → General**:
+
+```bash
+dsh plugin --profile web add file:/absolute/path/to/inkstone-dsh-<version>.tgz
+```
+
+Building from source installs the generated directory instead (`pnpm install:dsh` builds and installs the menu edition):
+
+```bash
+pnpm install && pnpm build
+dsh plugin --profile web add "$PWD/dist/dsh/inkstone-dsh"
+```
+
+Restart `dsh web`, open **Settings → General**, and pick one of the Inkstone buttons: the choice applies immediately and is remembered. "跟随 DSH" hands control back to **Appearance** (Light uses 宣纸, Dark uses 玄墨). Remove it with `dsh plugin --profile web remove inkstone-dsh`.
+
+Prefer no menu? Install one Appearance-driven pair package instead:
+
+| Package | Light | Dark |
+| --- | --- | --- |
+| `inkstone-dsh-ink` | 宣纸 | 玄墨 |
+| `inkstone-dsh-ink-dimmed` | 宣纸 Dimmed | 玄墨 Dimmed |
+| `inkstone-dsh-sea` | 青瓷 | 沧海 |
+
+All DSH theme packages override the same tokens, so install **one at a time**; they are also mutually exclusive with other DSH theme plugins such as Catppuccin. The packages declare `engines.dsh: ">=0.2.1-rc.3 <0.3.0"`, and a pre-release DSH outside that range refuses the install. Terminal ANSI colours are chosen by the terminal itself and stay out of scope.

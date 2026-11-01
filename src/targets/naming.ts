@@ -54,3 +54,38 @@ export const ZED_FAMILY_NAME = 'Inkstone';
 
 /** Zed theme family file name. */
 export const ZED_FILE_NAME = 'inkstone.json';
+
+/** DSH plugin package name for a light/dark pair: `inkstone-dsh-ink`. */
+export function dshPackageName(pairId: string): string {
+  return `inkstone-dsh-${pairId}`;
+}
+
+/** DSH Loader row id: `inkstone-theme-ink`. */
+export function dshRowId(pairId: string): string {
+  return `inkstone-theme-${pairId}`;
+}
+
+/** DSH package display name: `墨观 · 宣纸 + 玄墨`. */
+export function dshDisplayName(light: Flavor, dark: Flavor): string {
+  return `墨观 · ${flavorName(light, 'zh')} + ${flavorName(dark, 'zh')}`;
+}
+
+/** DSH release tarball name: `inkstone-dsh-ink-0.3.5.tgz`. */
+export function dshTarballFileName(packageName: string, version: string): string {
+  return `${packageName}-${version}.tgz`;
+}
+
+/** DSH menu-edition package name: `inkstone-dsh`. */
+export function dshMenuPackageName(): string {
+  return 'inkstone-dsh';
+}
+
+/** DSH menu-edition Loader row id: `inkstone-theme`. */
+export function dshMenuRowId(): string {
+  return 'inkstone-theme';
+}
+
+/** DSH registered theme id for a flavour: `inkstone-xuanzhi`. */
+export function dshThemeId(flavorId: string): string {
+  return `inkstone-${flavorId}`;
+}

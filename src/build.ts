@@ -11,6 +11,7 @@
  *   dist/opencode/*.json
  *   dist/zed/inkstone.json
  *   dist/zed/extension.toml
+ *   dist/dsh/<package>/**  (four installable DeepSeek Harness theme plugins)
  *   preview/index.html
  *   preview/gallery.html   (editor-only shot source for docs/preview.png)
  *   site/                  (product site for GitHub Pages)
@@ -24,6 +25,7 @@ import { fileURLToPath } from 'node:url';
 import { reportFailures, runChecks } from './checks.ts';
 import { flavors } from './palette/index.ts';
 import { renderPaletteDoc } from './targets/docs.ts';
+import { generateDsh } from './targets/dsh.ts';
 import { generateGhostty } from './targets/ghostty.ts';
 import { generateKaku, generateKakuToml } from './targets/kaku.ts';
 import { generateOpencode } from './targets/opencode.ts';
@@ -55,6 +57,7 @@ const files = [
   ...generateKakuToml(),
   ...generateOpencode(),
   ...generateZed(rootPkg.version),
+  ...generateDsh(rootPkg.version, readFileSync(join(root, 'LICENSE'), 'utf8')),
   { path: 'preview/index.html', content: renderPreview() },
   { path: 'preview/gallery.html', content: renderGallery() },
   ...generateSite(),
@@ -78,5 +81,5 @@ console.log(
   `\nBuilt ${files.length} files for ${flavors.length} flavors ` +
     `(${checks.audit.checks} palette checks, ${flavors.length} VS Code themes, ` +
     `${flavors.length} Ghostty themes, ${flavors.length} Kaku schemes (Lua + TOML), ` +
-    `${flavors.length} OpenCode themes, Zed themes, site pages).\n`,
+    `${flavors.length} OpenCode themes, Zed themes, DSH theme plugins, site pages).\n`,
 );
