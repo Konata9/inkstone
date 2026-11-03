@@ -100,7 +100,7 @@ if (drift.length > 0) {
 
 console.log(`  ✓ working tree clean, on ${branch}`);
 console.log(`  ✓ ${changelogLabel} has a ${version} section with no Unreleased entries`);
-console.log('  ✓ packages/vscode/themes are in sync with the palette');
+console.log('  ✓ generated files are in sync with the palette');
 console.log(`  ✓ tag ${tag} is unused`);
 
 if (dryRun) {

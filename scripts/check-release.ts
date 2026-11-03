@@ -56,7 +56,8 @@ if (tag !== expected) {
 const changelogFile = changelogPath(target);
 const changelogLabel = target === 'vscode' ? 'packages/vscode/CHANGELOG.md' : 'CHANGELOG.md';
 const changelog = readFileSync(changelogFile, 'utf8');
-if (!hasVersionSection(changelog, version)) {
+const hasSection = hasVersionSection(changelog, version);
+if (!hasSection) {
   console.warn(`  ! ${changelogLabel} has no "## ${version}" section; Release notes will be generated`);
 }
 if (hasUnreleasedEntries(changelog)) {
@@ -72,5 +73,7 @@ if (drift.length > 0) {
 }
 
 console.log(`  ✓ tag ${tag} matches the ${target} version ${version}`);
-console.log(`  ✓ ${changelogLabel} covers ${version}`);
-console.log('  ✓ packages/vscode/themes are in sync with the palette\n');
+if (hasSection) {
+  console.log(`  ✓ ${changelogLabel} covers ${version}`);
+}
+console.log('  ✓ generated files are in sync with the palette\n');
