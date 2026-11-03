@@ -13,6 +13,8 @@
  *   inkstone-kaku-<themeVersion>.zip
  *   inkstone-opencode-<themeVersion>.zip
  *   inkstone-zed-<themeVersion>.zip
+ *   inkstone-dsh-<themeVersion>.tgz
+ *   inkstone-dsh-<variant>-<themeVersion>.tgz
  *   inkstone-<themeVersion>.zip          (theme targets + manifest)
  *   Konata9.inkstone-<vscodeVersion>.vsix
  *   manifest.json
@@ -31,6 +33,7 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import {
   copyFileSync,
+  cpSync,
   existsSync,
   mkdirSync,
   readFileSync,
@@ -42,7 +45,14 @@ import {
 import { join } from 'node:path';
 
 import { flavors } from '../src/palette/index.ts';
+import { DSH_MENU_FLAVORS, DSH_PAIRS } from '../src/targets/dsh.ts';
 import {
+  dshDisplayName,
+  dshMenuPackageName,
+  dshMenuRowId,
+  dshPackageName,
+  dshRowId,
+  dshTarballFileName,
   ghosttyThemeName,
   kakuFileName,
   kakuTomlFileName,
@@ -214,6 +224,28 @@ for (const file of kakuFiles) assertFile(join(root, 'dist', 'kaku', file));
 for (const file of kakuTomlFiles) assertFile(join(root, 'dist', 'kaku', file));
 for (const file of opencodeFiles) assertFile(join(root, 'dist', 'opencode', file));
 assertFile(join(root, 'dist', 'zed', ZED_FILE_NAME));
+
+for (const pair of DSH_PAIRS) {
+  const packageDir = join(root, 'dist', 'dsh', dshPackageName(pair.id));
+  assertFile(join(packageDir, 'package.json'));
+  assertFile(join(packageDir, 'cordis.patch.yml'));
+  assertFile(join(packageDir, 'lib', 'client.js'));
+
+  // A drifted row id would install a package that never adds its Loader row.
+  if (!readFileSync(join(packageDir, 'cordis.patch.yml'), 'utf8').includes(dshRowId(pair.id))) {
+    fail(`${packageDir}/cordis.patch.yml is missing the ${dshRowId(pair.id)} row; run \`pnpm build\` first`);
+  }
+}
+
+const menuPackageName = dshMenuPackageName();
+const menuPackageDir = join(root, 'dist', 'dsh', menuPackageName);
+assertFile(join(menuPackageDir, 'package.json'));
+assertFile(join(menuPackageDir, 'cordis.patch.yml'));
+assertFile(join(menuPackageDir, 'lib', 'client.js'));
+if (!readFileSync(join(menuPackageDir, 'cordis.patch.yml'), 'utf8').includes(dshMenuRowId())) {
+  fail(`${menuPackageDir}/cordis.patch.yml is missing the ${dshMenuRowId()} row; run \`pnpm build\` first`);
+}
+
 assertFile(vsixPath);
 
 const ghosttyArchive = `inkstone-ghostty-${themeVersion}.zip`;
@@ -234,6 +266,18 @@ zipFlat(kakuArchive, join(root, 'dist', 'kaku'), [...kakuFiles, ...kakuTomlFiles
 zipFlat(opencodeArchive, join(root, 'dist', 'opencode'), opencodeFiles);
 zipFlat(zedArchive, join(root, 'dist', 'zed'), [ZED_FILE_NAME]);
 copyFileSync(vsixPath, join(releaseDir, vsixName));
+
+// DSH plugins ship as tarballs so `dsh plugin add file:<path>` works from one
+// download; the generated package directories also go into the bundle below.
+for (const pair of DSH_PAIRS) {
+  const pkg = dshPackageName(pair.id);
+  execFileSync('npm', ['pack', '--pack-destination', releaseDir, join(root, 'dist', 'dsh', pkg)], {
+    stdio: 'inherit',
+  });
+  assertFile(join(releaseDir, dshTarballFileName(pkg, version)));
+}
+execFileSync('npm', ['pack', '--pack-destination', releaseDir, menuPackageDir], { stdio: 'inherit' });
+assertFile(join(releaseDir, dshTarballFileName(menuPackageName, version)));
 
 const themes: ThemeManifest[] = flavors.map((flavor) => ({
   id: flavor.meta.id,
@@ -288,6 +332,27 @@ const manifest = {
       archive: zedArchive,
       format: 'json',
     },
+    dsh: {
+      menu: {
+        name: menuPackageName,
+        archive: dshTarballFileName(menuPackageName, version),
+        themes: DSH_MENU_FLAVORS.map((flavor) => ({
+          themeId: flavor.themeId,
+          flavor: flavor.id,
+          appearance: flavor.appearance,
+        })),
+      },
+      packages: DSH_PAIRS.map((pair) => {
+        const name = dshPackageName(pair.id);
+        return {
+          name,
+          pair: [pair.light, pair.dark],
+          archive: dshTarballFileName(name, version),
+        };
+      }),
+      install: 'dsh plugin --profile web add file:<absolute-path>/inkstone-dsh-<version>.tgz',
+      remove: 'dsh plugin --profile web remove inkstone-dsh',
+    },
   },
   vscode: {
     id: `${vscodePkg.publisher}.${vscodePkg.name}`,
@@ -299,6 +364,18 @@ const manifest = {
 
 const manifestJson = `${JSON.stringify(manifest, null, 2)}\n`;
 writeFileSync(join(releaseDir, 'manifest.json'), manifestJson, 'utf8');
+
+const dshVariantRows = [
+  `| \`${menuPackageName}\` | 菜单版：宣纸 / 宣纸 Dimmed / 玄墨 / 玄墨 Dimmed / 沧海 / 青瓷（Settings → General 直接切换） |`,
+  ...DSH_PAIRS.map((pair) => {
+    const light = flavors.find((flavor) => flavor.meta.id === pair.light);
+    const dark = flavors.find((flavor) => flavor.meta.id === pair.dark);
+    if (!light || !dark) {
+      fail(`DSH pair "${pair.id}" points at an unknown flavour; check src/targets/dsh.ts`);
+    }
+    return `| \`${dshPackageName(pair.id)}\` | ${dshDisplayName(light, dark)} |`;
+  }),
+].join('\n');
 
 const installDoc = `# 墨观 Inkstone ${themeVersion}
 
@@ -396,6 +473,37 @@ code --install-extension ${vsixName}
 \`\`\`
 
 Then run **Preferences: Color Theme** and pick an Inkstone variant.
+
+## DeepSeek Harness (DSH)
+
+Download \`inkstone-dsh-<version>.tgz\` (menu edition) and install it:
+
+\`\`\`bash
+dsh plugin --profile web add file:/absolute/path/to/inkstone-dsh-<version>.tgz
+\`\`\`
+
+Restart \`dsh web\`, then open **Settings → General** and pick 宣纸 / 宣纸 Dimmed /
+玄墨 / 玄墨 Dimmed / 沧海 / 青瓷 from the Inkstone row; the choice applies
+immediately and is remembered.
+"跟随 DSH" hands control back to Appearance (Light → 宣纸, Dark → 玄墨). Remove
+the plugin with:
+
+\`\`\`bash
+dsh plugin --profile web remove inkstone-dsh
+\`\`\`
+
+The two-variant pair packages are still available for Appearance-driven use;
+install exactly one DSH theme package at a time because they all override the
+same tokens, and any other DSH theme plugin (for example Catppuccin) is
+mutually exclusive with them.
+
+| Package | Variants |
+| --- | --- |
+${dshVariantRows}
+
+The packages declare \`engines.dsh: ">=0.2.1-rc.3 <0.3.0"\`; a pre-release DSH
+outside that range refuses the install. Terminal ANSI colours are chosen by the
+terminal itself and are out of scope here.
 `;
 
 mkdirSync(join(stagingDir, 'ghostty'), { recursive: true });
@@ -417,6 +525,12 @@ for (const file of opencodeFiles) {
 }
 copyFileSync(join(root, 'dist', 'zed', ZED_FILE_NAME), join(stagingDir, 'zed', ZED_FILE_NAME));
 
+for (const pair of DSH_PAIRS) {
+  const pkg = dshPackageName(pair.id);
+  cpSync(join(root, 'dist', 'dsh', pkg), join(stagingDir, 'dsh', pkg), { recursive: true });
+}
+cpSync(menuPackageDir, join(stagingDir, 'dsh', menuPackageName), { recursive: true });
+
 writeFileSync(join(stagingDir, 'manifest.json'), manifestJson, 'utf8');
 writeFileSync(join(stagingDir, 'INSTALL.md'), installDoc, 'utf8');
 copyFileSync(join(root, 'LICENSE'), join(stagingDir, 'LICENSE'));
@@ -424,7 +538,7 @@ copyFileSync(join(root, 'CHANGELOG.md'), join(stagingDir, 'CHANGELOG.md'));
 
 execFileSync(
   'zip',
-  ['-r', '-X', '-q', join(releaseDir, bundleArchive), 'ghostty', 'kaku', 'opencode', 'zed', 'manifest.json', 'INSTALL.md', 'LICENSE', 'CHANGELOG.md'],
+  ['-r', '-X', '-q', join(releaseDir, bundleArchive), 'ghostty', 'kaku', 'opencode', 'zed', 'dsh', 'manifest.json', 'INSTALL.md', 'LICENSE', 'CHANGELOG.md'],
   { cwd: stagingDir, stdio: 'inherit' },
 );
 
