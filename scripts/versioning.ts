@@ -17,7 +17,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { collectCommittedOutputs, GENERATED_BINARY_OUTPUTS } from '../src/outputs.ts';
+import { collectShowcaseOutputs, SHOWCASE_BINARY_OUTPUTS } from '../showcase/outputs.ts';
+import { collectCommittedOutputs } from '../src/outputs.ts';
 import { readJson } from './packaging.ts';
 import type { PackageJson } from './packaging.ts';
 
@@ -95,14 +96,14 @@ export function assertTagMatchesVersion(
 }
 
 /**
- * Committed files that `pnpm build` generates and that must stay in the tree.
- * Returns one message per file that is stale or missing.
+ * Committed files that the theme and showcase builds generate and that must
+ * stay in the tree. Returns one message per file that is stale or missing.
  */
 export function findGeneratedDrift(): string[] {
   const drift: string[] = [];
   const version = String(readRootPkg().version);
 
-  for (const file of collectCommittedOutputs(version)) {
+  for (const file of [...collectCommittedOutputs(version), ...collectShowcaseOutputs(version)]) {
     const path = join(root, file.path);
     if (!existsSync(path)) {
       drift.push(`${file.path} is missing`);
@@ -111,7 +112,7 @@ export function findGeneratedDrift(): string[] {
     }
   }
 
-  for (const file of GENERATED_BINARY_OUTPUTS) {
+  for (const file of SHOWCASE_BINARY_OUTPUTS) {
     const path = join(root, file.path);
     if (!existsSync(path)) {
       drift.push(`${file.path} is missing`);

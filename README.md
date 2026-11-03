@@ -260,7 +260,7 @@ dsh plugin --profile web remove inkstone-dsh
 ## 仓库结构
 
 ```
-src/
+src/                       主题 + 各端软件 target
   color.ts                色彩工具：对比度、混色、alpha
   audit.ts                色板审计（构建时强制）
   check.ts                产物检查（主题 key、Ghostty、Lua 语法）
@@ -268,7 +268,7 @@ src/
   palette/
     data/zhongguose.json  526 个中国传统颜色（唯一色值来源）
     data/SOURCE.md        数据来源与署名
-    labels.ts             语义角色的中文标签（docs 与 preview 共用）
+    labels.ts             语义角色的中文标签（色板文档与展示共用）
     xuanmo.ts             玄墨语义色板
     xuanmo-dimmed.ts      玄墨 Dimmed 语义色板
     xuanzhi.ts            宣纸语义色板
@@ -284,19 +284,27 @@ src/
     zed.ts                Zed 主题（ThemeFamily + extension.toml）
     dsh.ts                DSH 主题插件（三对明暗变体 + 浏览器 bundle）
     dsh-tokens.ts         DSH 0.2.1 颜色 token 冻结清单
-    preview.ts            预览页 / gallery
-    site.ts · site-copy.ts 官网数据注入（文案 / 版本 / 色板）
-    docs.ts               色板文档
-templates/site/           官网 Liquid 模板（结构 / CSS / JS）
+showcase/                  展示层源码（与 src/ 平级）
+  specimen.ts              CSS 变量、色卡、编辑器示意（官网与截图共用）
+  build.ts                 展示层构建入口（site + docs/palette.md）
+  outputs.ts               展示层产物清单（供 drift check）
+  site/
+    outputs.ts             页面渲染、SEO 文件与产物清单
+    copy.ts                官网中英文案
+    templates/             Liquid 模板（结构 / CSS / JS）
+    assets/                OG 图等静态素材
+  docs/
+    palette.ts             色板文档生成
+  preview/
+    gallery.ts             3×2 编辑器总览（内存渲染）
+    capture.ts             Playwright 截图入口
 scripts/                  安装脚本、VSIX 与 Release 打包
 packages/vscode/          VS Code 扩展（VSIX）
 dist/                     生成物：Ghostty 主题、Kaku 色表、OpenCode 主题、Zed 主题、DSH 插件包、VSIX
-preview/index.html        本地预览页（生成物）
-preview/gallery.html      README / Marketplace 用的编辑器总览（生成物）
-site/                     官网静态页（生成物，GitHub Pages）
+site/                     官网产物，只含构建结果（生成物，GitHub Pages）
 docs/palette.md           色板对照表（生成物）
-docs/preview.png          六个编辑器窗口截图（`pnpm capture:preview`）
-docs/publishing.md        Marketplace / Open VSX 发布与 Trusted Publishing 配置
+docs/preview.png          六个编辑器窗口截图（生成物，`pnpm capture:preview`）
+docs/publishing.md        Marketplace / Open VSX 发布与 Trusted Publishing 配置（手写）
 .github/workflows/        构建、打包与发布 CI
 ```
 
@@ -306,15 +314,15 @@ docs/publishing.md        Marketplace / Open VSX 发布与 Trusted Publishing �
 
 ```bash
 pnpm install
-pnpm build        # 审计色板 → 清空 dist/ → 生成全部产物
-pnpm test         # 色板审计 + 产物检查（与 build 的检查一致）
+pnpm build            # 审计色板 → 清空 dist/ → 生成主题产物
+pnpm build:showcase   # 清空 site/ → 生成官网静态页与 docs/palette.md
+pnpm test             # 色板审计 + 产物检查（与 build 的检查一致）
 pnpm typecheck
-pnpm preview      # 构建并在浏览器打开预览页
-pnpm capture:preview  # 从 gallery.html 截取 docs/preview.png（需 Playwright）
-pnpm site         # 构建并打开官网（site/index.html）
+pnpm capture:preview  # 内存渲染 gallery 并直接截图到 docs/preview.png（需 Playwright）
+pnpm site             # 构建展示层并在浏览器打开官网（site/index.html）
 ```
 
-生成器保证各端一致：改一处色板，VS Code、Ghostty、Kaku、OpenCode 与官网同时更新。构建会拒绝落在对比度区间或彩度预算之外的配色。官网页面结构与样式在 `templates/site/`，构建只注入文案、版本与色板数据；默认英文（`site/`），中文在 `site/zh/`；页面 chrome 跟随系统明暗选用玄墨 / 宣纸，可切换六个变体。
+生成器保证各端一致：改一处色板，VS Code、Ghostty、Kaku、OpenCode 与官网同时更新。构建会拒绝落在对比度区间或彩度预算之外的配色。`src/` 只保留主题与各端软件 target；官网、色板文档与 README 截图的源码都在 `showcase/`，产物分别落到 `site/` 和 `docs/`。官网默认英文（`site/`），中文在 `site/zh/`；页面 chrome 跟随系统明暗选用玄墨 / 宣纸，可切换六个变体。
 
 ### 设计约束
 

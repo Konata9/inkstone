@@ -15,5 +15,5 @@
     "noEmit": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*.ts", "packages/**/*.ts", "scripts/**/*.ts"]
+  "include": ["src/**/*.ts", "showcase/**/*.ts", "packages/**/*.ts", "scripts/**/*.ts"]
 }

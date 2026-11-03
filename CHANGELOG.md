@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- **Showcase split from the theme**: every presentation source now lives under `showcase/` (shared specimen rendering, the product site, the palette reference and the README screenshot pipeline), built with `pnpm build:showcase` and `pnpm capture:preview`. `src/` only contains the palette and the supported software targets, while `site/` and `docs/` hold build outputs. The gallery is rendered in memory and screenshotted directly, so `preview/index.html` and `preview/gallery.html` are no longer generated.
+
 ## 0.5.0
 - **DeepSeek Harness (DSH)**: a new target generates four installable theme plugins under `dist/dsh/`. The menu edition packs all six flavors into one plugin with a **Settings → General** switcher, while `inkstone-dsh-ink` / `-ink-dimmed` / `-sea` override DSH's built-in light/dark palettes for people who never want to pick a theme. Install from source with `pnpm install:dsh`; releases attach the matching `.tgz` files. Post-build checks run each browser bundle in a sandbox and assert it covers the frozen DSH 0.2.1 token ladder, so a token change fails the build instead of shipping a partial theme.
 - **Zed extension version**: `dist/zed/extension.toml` now takes its version from the root `package.json` through `src/version.ts`, the same helper the checks use, so the manifest can no longer drift from the built themes.

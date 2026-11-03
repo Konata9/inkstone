@@ -12,18 +12,17 @@
  *   dist/zed/inkstone.json
  *   dist/zed/extension.toml
  *   dist/dsh/<package>/**  (four installable DeepSeek Harness theme plugins)
- *   preview/index.html
- *   preview/gallery.html   (editor-only shot source for docs/preview.png)
- *   site/                  (product site for GitHub Pages)
- *   docs/palette.md
+ *
+ * Showcase outputs (site, palette reference, README screenshot) are built
+ * separately with `pnpm build:showcase` / `pnpm capture:preview`.
  */
 
-import { copyFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { reportFailures, runChecks } from './checks.ts';
-import { collectAllOutputs, GENERATED_BINARY_OUTPUTS } from './outputs.ts';
+import { collectAllOutputs } from './outputs.ts';
 import { flavors } from './palette/index.ts';
 import { readRootVersion } from './version.ts';
 
@@ -50,16 +49,9 @@ for (const file of files) {
   console.log(`  ✓ ${file.path}`);
 }
 
-for (const binary of GENERATED_BINARY_OUTPUTS) {
-  const destination = join(root, binary.path);
-  mkdirSync(dirname(destination), { recursive: true });
-  copyFileSync(join(root, binary.source), destination);
-  console.log(`  ✓ ${binary.path}`);
-}
-
 console.log(
-  `\nBuilt ${files.length + GENERATED_BINARY_OUTPUTS.length} files for ${flavors.length} flavors ` +
+  `\nBuilt ${files.length} files for ${flavors.length} flavors ` +
     `(${checks.audit.checks} palette checks, ${flavors.length} VS Code themes, ` +
     `${flavors.length} Ghostty themes, ${flavors.length} Kaku schemes (Lua + TOML), ` +
-    `${flavors.length} OpenCode themes, Zed themes, DSH theme plugins, site pages).\n`,
+    `${flavors.length} OpenCode themes, Zed themes, DSH theme plugins).\n`,
 );

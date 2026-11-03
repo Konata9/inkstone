@@ -3,12 +3,12 @@
  * the traditional color it comes from, and its contrast on the canvas.
  */
 
-import { contrast, formatRatio } from '../color.ts';
-import { colorLabel, traditionalColors } from '../palette/data.ts';
-import { borderLabels, statusLabels, surfaceLabels, syntaxLabels, textLabels } from '../palette/labels.ts';
-import { actionHover, flavorFamilies, flavorName, flavors } from '../palette/index.ts';
-import type { Flavor } from '../palette/types.ts';
-import { ANSI_NAMES } from '../palette/types.ts';
+import { contrast, formatRatio } from '../../src/color.ts';
+import { colorLabel, traditionalColors } from '../../src/palette/data.ts';
+import { borderLabels, statusLabels, surfaceLabels, syntaxLabels, textLabels } from '../../src/palette/labels.ts';
+import { actionHover, flavorFamilies, flavorName, flavors } from '../../src/palette/index.ts';
+import type { Flavor } from '../../src/palette/types.ts';
+import { ANSI_NAMES } from '../../src/palette/types.ts';
 
 const accentRows: Array<[string, keyof Flavor['syntax']]> = [
   ['关键字', 'keyword'],
@@ -99,7 +99,7 @@ export function renderPaletteDoc(): string {
   return [
     '# 墨观 Inkstone · 色板',
     '',
-    '> 本文件由 `pnpm build` 自动生成，请勿手动修改。',
+    '> 本文件由 `pnpm build:showcase` 自动生成，请勿手动修改。',
     '',
     '## 数据来源',
     '',

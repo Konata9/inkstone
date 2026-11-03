@@ -1,11 +1,14 @@
 /**
- * Product site generator.
+ * Product site outputs.
  *
- * Renders `templates/site/page.liquid` (LiquidJS) into static HTML under site/
- * for GitHub Pages. The template owns structure, CSS and client script; this
- * module only supplies locale copy, version, support lists, flavor
- * tokens/panels and SEO companions so the site cannot drift from the six
- * flavor palettes.
+ * Renders `showcase/site/templates/page.liquid` (LiquidJS) into static HTML
+ * under `site/` for GitHub Pages. The template owns structure, CSS and client
+ * script; this module only supplies locale copy, version, support lists,
+ * flavor tokens/panels and SEO companions so the site cannot drift from the
+ * six flavor palettes.
+ *
+ * The site is a consumer of the theme: it reads palettes and specimen markup
+ * from `src/` and `showcase/specimen.ts`, and nothing under `src/` imports it.
  */
 
 import { readFileSync } from 'node:fs';
@@ -14,7 +17,7 @@ import { join } from 'node:path';
 
 import { Liquid } from 'liquidjs';
 
-import { flavors, flavorName } from '../palette/index.ts';
+import { flavors, flavorName } from '../../src/palette/index.ts';
 import {
   accents,
   cssVars,
@@ -22,15 +25,34 @@ import {
   editorStyles,
   galleryTsLines,
   surfaces,
-} from './preview.ts';
-import { siteCopy, type SiteLocale } from './site-copy.ts';
-import type { GeneratedFile } from './types.ts';
+} from '../specimen.ts';
+import { siteCopy, type SiteLocale } from './copy.ts';
 
-const root = fileURLToPath(new URL('../..', import.meta.url));
-const templateRoot = join(root, 'templates', 'site');
+/** One text file the site build writes. */
+export interface SiteOutput {
+  path: string;
+  content: string;
+}
+
+/** A committed site asset copied rather than rendered. */
+export interface SiteBinaryOutput {
+  /** Destination, relative to the repository root. */
+  path: string;
+  /** Source file, relative to the repository root. */
+  source: string;
+}
+
+const siteRoot = fileURLToPath(new URL('.', import.meta.url));
+const templateRoot = join(siteRoot, 'templates');
 
 /** Public origin for canonical / hreflang / sitemap. Change when a custom domain is attached. */
 export const SITE_ORIGIN = 'https://konata9.github.io/inkstone';
+
+/** Site assets that are copied into `site/` rather than rendered. */
+export const SITE_BINARY_OUTPUTS: SiteBinaryOutput[] = [
+  { path: 'site/favicon.png', source: 'packages/vscode/icon.png' },
+  { path: 'site/og.jpg', source: 'showcase/site/assets/og.jpg' },
+];
 
 const RELEASES_URL = 'https://github.com/Konata9/inkstone/releases';
 const REPO_URL = 'https://github.com/Konata9/inkstone';
@@ -345,7 +367,7 @@ Terminal themes: use the Ghostty / Kaku zip assets from the same release, or
 }
 
 /** All text files for the static site (HTML + SEO companions). */
-export function generateSite(version: string): GeneratedFile[] {
+export function collectSiteOutputs(version: string): SiteOutput[] {
   return [
     { path: 'site/index.html', content: renderPage('en', version) },
     { path: 'site/zh/index.html', content: renderPage('zh', version) },
@@ -353,5 +375,6 @@ export function generateSite(version: string): GeneratedFile[] {
     { path: 'site/sitemap.xml', content: sitemapXml() },
     { path: 'site/llms.txt', content: llmsTxt(version) },
     { path: 'site/llms-full.txt', content: llmsFullTxt(version) },
+    { path: 'site/.nojekyll', content: '' },
   ];
 }
