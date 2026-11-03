@@ -326,7 +326,7 @@ export function buildExtensionToml(version: string): string {
   ].join('\n');
 }
 
-export function generateZed(version = '0.3.5'): GeneratedFile[] {
+export function generateZed(version: string): GeneratedFile[] {
   const familyContent = `${JSON.stringify(buildZedFamily(), null, 2)}\n`;
   return [
     {

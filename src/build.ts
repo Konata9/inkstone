@@ -24,6 +24,7 @@ import { fileURLToPath } from 'node:url';
 
 import { reportFailures, runChecks } from './checks.ts';
 import { flavors } from './palette/index.ts';
+import { readRootVersion } from './version.ts';
 import { renderPaletteDoc } from './targets/docs.ts';
 import { generateDsh } from './targets/dsh.ts';
 import { generateGhostty } from './targets/ghostty.ts';
@@ -35,9 +36,7 @@ import { generateVscode } from './targets/vscode.ts';
 import { generateZed } from './targets/zed.ts';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const rootPkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as {
-  version: string;
-};
+const version = readRootVersion();
 
 const checks = runChecks();
 if (!checks.ok) {
@@ -56,8 +55,8 @@ const files = [
   ...generateKaku(),
   ...generateKakuToml(),
   ...generateOpencode(),
-  ...generateZed(rootPkg.version),
-  ...generateDsh(rootPkg.version, readFileSync(join(root, 'LICENSE'), 'utf8')),
+  ...generateZed(version),
+  ...generateDsh(version, readFileSync(join(root, 'LICENSE'), 'utf8')),
   { path: 'preview/index.html', content: renderPreview() },
   { path: 'preview/gallery.html', content: renderGallery() },
   ...generateSite(),

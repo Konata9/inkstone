@@ -32,6 +32,7 @@ import {
 import { buildTheme } from './targets/vscode.ts';
 import { generateZed } from './targets/zed.ts';
 import { ZED_FAMILY_NAME } from './targets/naming.ts';
+import { readRootVersion } from './version.ts';
 
 /** Workbench key for an ANSI slot, e.g. `terminal.ansiBrightBlack`. */
 function terminalAnsiKey(slot: number): string {
@@ -450,7 +451,7 @@ export function checkThemes(): string[] {
     'punctuation',
   ];
 
-  for (const file of generateZed()) {
+  for (const file of generateZed(readRootVersion())) {
     if (file.path.endsWith('.toml')) {
       let doc: Record<string, unknown>;
       try {
