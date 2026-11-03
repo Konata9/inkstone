@@ -7,6 +7,9 @@
  *   `config.color_schemes` and WezTerm loads with `config.color_schemes`.
  * - WezTerm-compatible TOML in `dist/kaku/*.toml`, which Kaku 0.27.1+ lists
  *   from its `<config-dir>/colors/` directory (Settings → Theme).
+ *
+ * The palette is mapped to {@link KakuTheme} once; the two serializers below
+ * only handle quoting and table syntax, so a color cannot drift between files.
  */
 
 import { parseHex } from '../color.ts';
@@ -14,6 +17,36 @@ import { flavors, flavorName } from '../palette/index.ts';
 import type { Flavor } from '../palette/types.ts';
 import { inkstoneThemeName, kakuFileName, kakuTomlFileName } from './naming.ts';
 import type { GeneratedFile } from './types.ts';
+
+export interface KakuTabStyle {
+  bg: string;
+  fg: string;
+}
+
+export interface KakuTheme {
+  foreground: string;
+  background: string;
+  cursorBg: string;
+  cursorFg: string;
+  cursorBorder: string;
+  selectionBg: string;
+  selectionFg: string;
+  composeCursor: string;
+  scrollbarThumb: string;
+  split: string;
+  visualBell: string;
+  ansi: string[];
+  brights: string[];
+  tabBar: {
+    background: string;
+    inactiveTabEdge: string;
+    activeTab: KakuTabStyle;
+    inactiveTab: KakuTabStyle;
+    inactiveTabHover: KakuTabStyle;
+    newTab: KakuTabStyle;
+    newTabHover: KakuTabStyle;
+  };
+}
 
 function quote(value: string): string {
   return `'${value}'`;
@@ -37,15 +70,44 @@ function rgba(hex: string, a: number): string {
   return `rgba(${r},${g},${b},${a.toFixed(2)})`;
 }
 
-export function buildKakuScheme(flavor: Flavor): string {
+/** Shared terminal model: every color both serializers need, computed once. */
+export function buildKakuTheme(flavor: Flavor): KakuTheme {
   const f = flavor;
   const s = f.surface;
   const t = f.text;
   const y = f.syntax;
   const dark = f.meta.appearance === 'dark';
-  const tabFg = t.secondary;
-  const tabActiveBg = s.active;
-  const hoverBg = s.overlay;
+
+  return {
+    foreground: t.primary,
+    background: s.base,
+    cursorBg: t.cursor,
+    cursorFg: s.base,
+    cursorBorder: t.cursor,
+    selectionBg: s.selection,
+    selectionFg: t.primary,
+    composeCursor: y.number,
+    scrollbarThumb: rgba(t.primary, dark ? 0.18 : 0.22),
+    split: s.overlay,
+    visualBell: y.number,
+    ansi: f.ansi.slice(0, 8),
+    brights: f.ansi.slice(8, 16),
+    tabBar: {
+      background: s.alt,
+      inactiveTabEdge: s.alt,
+      activeTab: { bg: s.active, fg: t.primary },
+      inactiveTab: { bg: s.alt, fg: t.secondary },
+      inactiveTabHover: { bg: s.overlay, fg: t.primary },
+      newTab: { bg: s.alt, fg: t.secondary },
+      newTabHover: { bg: s.overlay, fg: t.primary },
+    },
+  };
+}
+
+export function buildKakuScheme(flavor: Flavor): string {
+  const f = flavor;
+  const theme = buildKakuTheme(f);
+  const tabBar = theme.tabBar;
   const zh = flavorName(f, 'zh');
   const en = flavorName(f, 'en');
 
@@ -65,36 +127,36 @@ export function buildKakuScheme(flavor: Flavor): string {
 --   config.color_scheme = '${inkstoneThemeName(f)}'
 
 return {
-  foreground = ${quote(t.primary)},
-  background = ${quote(s.base)},
+  foreground = ${quote(theme.foreground)},
+  background = ${quote(theme.background)},
 
-  cursor_bg = ${quote(t.cursor)},
-  cursor_fg = ${quote(s.base)},
-  cursor_border = ${quote(t.cursor)},
+  cursor_bg = ${quote(theme.cursorBg)},
+  cursor_fg = ${quote(theme.cursorFg)},
+  cursor_border = ${quote(theme.cursorBorder)},
 
-  selection_bg = ${quote(s.selection)},
-  selection_fg = ${quote(t.primary)},
+  selection_bg = ${quote(theme.selectionBg)},
+  selection_fg = ${quote(theme.selectionFg)},
 
-  compose_cursor = ${quote(y.number)},
-  scrollbar_thumb = ${quote(rgba(t.primary, dark ? 0.18 : 0.22))},
-  split = ${quote(s.overlay)},
-  visual_bell = ${quote(y.number)},
+  compose_cursor = ${quote(theme.composeCursor)},
+  scrollbar_thumb = ${quote(theme.scrollbarThumb)},
+  split = ${quote(theme.split)},
+  visual_bell = ${quote(theme.visualBell)},
 
   ansi = {
-${hexList(f.ansi.slice(0, 8))}
+${hexList(theme.ansi)}
   },
 
   brights = {
-${hexList(f.ansi.slice(8, 16))}
+${hexList(theme.brights)}
   },
 
   tab_bar = {
-    background = ${quote(s.alt)},
-    inactive_tab_edge = ${quote(s.alt)},
+    background = ${quote(tabBar.background)},
+    inactive_tab_edge = ${quote(tabBar.inactiveTabEdge)},
 
     active_tab = {
-      bg_color = ${quote(tabActiveBg)},
-      fg_color = ${quote(t.primary)},
+      bg_color = ${quote(tabBar.activeTab.bg)},
+      fg_color = ${quote(tabBar.activeTab.fg)},
       intensity = 'Bold',
       underline = 'None',
       italic = false,
@@ -102,25 +164,25 @@ ${hexList(f.ansi.slice(8, 16))}
     },
 
     inactive_tab = {
-      bg_color = ${quote(s.alt)},
-      fg_color = ${quote(tabFg)},
+      bg_color = ${quote(tabBar.inactiveTab.bg)},
+      fg_color = ${quote(tabBar.inactiveTab.fg)},
       intensity = 'Normal',
     },
 
     inactive_tab_hover = {
-      bg_color = ${quote(hoverBg)},
-      fg_color = ${quote(t.primary)},
+      bg_color = ${quote(tabBar.inactiveTabHover.bg)},
+      fg_color = ${quote(tabBar.inactiveTabHover.fg)},
       italic = false,
     },
 
     new_tab = {
-      bg_color = ${quote(s.alt)},
-      fg_color = ${quote(tabFg)},
+      bg_color = ${quote(tabBar.newTab.bg)},
+      fg_color = ${quote(tabBar.newTab.fg)},
     },
 
     new_tab_hover = {
-      bg_color = ${quote(hoverBg)},
-      fg_color = ${quote(t.primary)},
+      bg_color = ${quote(tabBar.newTabHover.bg)},
+      fg_color = ${quote(tabBar.newTabHover.fg)},
     },
   },
 
@@ -144,12 +206,8 @@ export function generateKaku(): GeneratedFile[] {
  */
 export function buildKakuTomlScheme(flavor: Flavor): string {
   const f = flavor;
-  const s = f.surface;
-  const t = f.text;
-  const y = f.syntax;
-  const dark = f.meta.appearance === 'dark';
-  const tabFg = t.secondary;
-  const hoverBg = s.overlay;
+  const theme = buildKakuTheme(f);
+  const tabBar = theme.tabBar;
   const zh = flavorName(f, 'zh');
   const en = flavorName(f, 'en');
   const name = inkstoneThemeName(f);
@@ -164,49 +222,49 @@ export function buildKakuTomlScheme(flavor: Flavor): string {
 #   config.color_scheme = "${name}"
 
 [colors]
-foreground = ${tomlString(t.primary)}
-background = ${tomlString(s.base)}
-cursor_bg = ${tomlString(t.cursor)}
-cursor_fg = ${tomlString(s.base)}
-cursor_border = ${tomlString(t.cursor)}
-selection_bg = ${tomlString(s.selection)}
-selection_fg = ${tomlString(t.primary)}
-compose_cursor = ${tomlString(y.number)}
-scrollbar_thumb = ${tomlString(rgba(t.primary, dark ? 0.18 : 0.22))}
-split = ${tomlString(s.overlay)}
-visual_bell = ${tomlString(y.number)}
-ansi = ${tomlArray(f.ansi.slice(0, 8))}
-brights = ${tomlArray(f.ansi.slice(8, 16))}
+foreground = ${tomlString(theme.foreground)}
+background = ${tomlString(theme.background)}
+cursor_bg = ${tomlString(theme.cursorBg)}
+cursor_fg = ${tomlString(theme.cursorFg)}
+cursor_border = ${tomlString(theme.cursorBorder)}
+selection_bg = ${tomlString(theme.selectionBg)}
+selection_fg = ${tomlString(theme.selectionFg)}
+compose_cursor = ${tomlString(theme.composeCursor)}
+scrollbar_thumb = ${tomlString(theme.scrollbarThumb)}
+split = ${tomlString(theme.split)}
+visual_bell = ${tomlString(theme.visualBell)}
+ansi = ${tomlArray(theme.ansi)}
+brights = ${tomlArray(theme.brights)}
 
 [colors.tab_bar]
-background = ${tomlString(s.alt)}
-inactive_tab_edge = ${tomlString(s.alt)}
+background = ${tomlString(tabBar.background)}
+inactive_tab_edge = ${tomlString(tabBar.inactiveTabEdge)}
 
 [colors.tab_bar.active_tab]
-bg_color = ${tomlString(s.active)}
-fg_color = ${tomlString(t.primary)}
+bg_color = ${tomlString(tabBar.activeTab.bg)}
+fg_color = ${tomlString(tabBar.activeTab.fg)}
 intensity = "Bold"
 underline = "None"
 italic = false
 strikethrough = false
 
 [colors.tab_bar.inactive_tab]
-bg_color = ${tomlString(s.alt)}
-fg_color = ${tomlString(tabFg)}
+bg_color = ${tomlString(tabBar.inactiveTab.bg)}
+fg_color = ${tomlString(tabBar.inactiveTab.fg)}
 intensity = "Normal"
 
 [colors.tab_bar.inactive_tab_hover]
-bg_color = ${tomlString(hoverBg)}
-fg_color = ${tomlString(t.primary)}
+bg_color = ${tomlString(tabBar.inactiveTabHover.bg)}
+fg_color = ${tomlString(tabBar.inactiveTabHover.fg)}
 italic = false
 
 [colors.tab_bar.new_tab]
-bg_color = ${tomlString(s.alt)}
-fg_color = ${tomlString(tabFg)}
+bg_color = ${tomlString(tabBar.newTab.bg)}
+fg_color = ${tomlString(tabBar.newTab.fg)}
 
 [colors.tab_bar.new_tab_hover]
-bg_color = ${tomlString(hoverBg)}
-fg_color = ${tomlString(t.primary)}
+bg_color = ${tomlString(tabBar.newTabHover.bg)}
+fg_color = ${tomlString(tabBar.newTabHover.fg)}
 
 [metadata]
 name = ${tomlString(name)}
