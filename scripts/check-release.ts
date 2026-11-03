@@ -17,6 +17,7 @@ import { createFail, parseArgs } from './args.ts';
 import type { Fail } from './args.ts';
 import { hasUnreleasedEntries, hasVersionSection } from './changelog.ts';
 import {
+  changelogLabel,
   changelogPath,
   expectedReleaseTag,
   findGeneratedDrift,
@@ -54,15 +55,15 @@ if (tag !== expected) {
 }
 
 const changelogFile = changelogPath(target);
-const changelogLabel = target === 'vscode' ? 'packages/vscode/CHANGELOG.md' : 'CHANGELOG.md';
+const changelogLabelText = changelogLabel(target);
 const changelog = readFileSync(changelogFile, 'utf8');
 const hasSection = hasVersionSection(changelog, version);
 if (!hasSection) {
-  console.warn(`  ! ${changelogLabel} has no "## ${version}" section; Release notes will be generated`);
+  console.warn(`  ! ${changelogLabelText} has no "## ${version}" section; Release notes will be generated`);
 }
 if (hasUnreleasedEntries(changelog)) {
   console.warn(
-    `  ! ${changelogLabel} still has "## Unreleased" entries; ` +
+    `  ! ${changelogLabelText} still has "## Unreleased" entries; ` +
       'they will not appear in the Release notes',
   );
 }
@@ -74,6 +75,6 @@ if (drift.length > 0) {
 
 console.log(`  ✓ tag ${tag} matches the ${target} version ${version}`);
 if (hasSection) {
-  console.log(`  ✓ ${changelogLabel} covers ${version}`);
+  console.log(`  ✓ ${changelogLabelText} covers ${version}`);
 }
 console.log('  ✓ generated files are in sync with the palette\n');

@@ -25,7 +25,7 @@ import type { Flavor } from '../palette/types.ts';
 import { DSH_TOKENS } from './dsh-tokens.ts';
 import type { DshToken } from './dsh-tokens.ts';
 import { dshDisplayName, dshMenuPackageName, dshMenuRowId, dshPackageName, dshRowId, dshThemeId } from './naming.ts';
-import type { GeneratedFile } from './vscode.ts';
+import type { GeneratedFile } from './types.ts';
 
 /** One DSH package: a light flavour paired with a dark flavour. */
 export interface DshPair {

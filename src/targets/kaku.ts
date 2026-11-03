@@ -12,8 +12,8 @@
 import { parseHex } from '../color.ts';
 import { flavors, flavorName } from '../palette/index.ts';
 import type { Flavor } from '../palette/types.ts';
-import { kakuFileName, kakuSchemeName, kakuTomlFileName } from './naming.ts';
-import type { GeneratedFile } from './vscode.ts';
+import { inkstoneThemeName, kakuFileName, kakuTomlFileName } from './naming.ts';
+import type { GeneratedFile } from './types.ts';
 
 function quote(value: string): string {
   return `'${value}'`;
@@ -60,9 +60,9 @@ export function buildKakuScheme(flavor: Flavor): string {
 -- your config:
 --
 --   config.color_schemes = config.color_schemes or {}
---   config.color_schemes['${kakuSchemeName(f)}'] =
+--   config.color_schemes['${inkstoneThemeName(f)}'] =
 --     dofile(wezterm.config_dir .. '/inkstone-${f.meta.id}.lua')
---   config.color_scheme = '${kakuSchemeName(f)}'
+--   config.color_scheme = '${inkstoneThemeName(f)}'
 
 return {
   foreground = ${quote(t.primary)},
@@ -152,7 +152,7 @@ export function buildKakuTomlScheme(flavor: Flavor): string {
   const hoverBg = s.overlay;
   const zh = flavorName(f, 'zh');
   const en = flavorName(f, 'en');
-  const name = kakuSchemeName(f);
+  const name = inkstoneThemeName(f);
 
   return `# 墨观 Inkstone · ${zh} · ${en}
 # ${f.meta.description.en}

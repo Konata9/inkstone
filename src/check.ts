@@ -13,14 +13,12 @@ import { runInNewContext } from 'node:vm';
 
 import { parse as parseLua } from 'luaparse';
 import { parse as parseToml } from 'smol-toml';
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 
 import { contrast, isValidHex } from './color.ts';
 import { flavors } from './palette/index.ts';
-import { ANSI_NAMES } from './palette/types.ts';
 import { buildDshTokens, buildFlavorTokens, DSH_MENU_FLAVORS, DSH_PAIRS, renderDshMenuPackage, renderDshPackage } from './targets/dsh.ts';
 import { DSH_TOKENS } from './targets/dsh-tokens.ts';
+import { vscodeAnsiKey, zedAnsiKey } from './targets/ansi.ts';
 import { generateGhostty } from './targets/ghostty.ts';
 import { generateKaku, generateKakuToml } from './targets/kaku.ts';
 import { dshMenuPackageName, dshMenuRowId, dshPackageName, dshRowId, kakuTomlFileName } from './targets/naming.ts';
@@ -35,13 +33,6 @@ import { buildTheme, vscodeThemeContribution } from './targets/vscode.ts';
 import { generateZed } from './targets/zed.ts';
 import { ZED_FAMILY_NAME } from './targets/naming.ts';
 import { readRootVersion } from './version.ts';
-
-/** Workbench key for an ANSI slot, e.g. `terminal.ansiBrightBlack`. */
-function terminalAnsiKey(slot: number): string {
-  const name = ANSI_NAMES[slot];
-  if (!name) throw new Error(`ANSI slot ${slot} is out of range`);
-  return `terminal.ansi${name.charAt(0).toUpperCase()}${name.slice(1)}`;
-}
 
 const requiredColors = [
   'editor.background',
@@ -202,7 +193,7 @@ export function checkThemes(): string[] {
     if (semantic.length < 20) issues.push(`${label}: semanticTokenColors looks too small (${semantic.length})`);
 
     for (const [slot, hex] of flavor.ansi.entries()) {
-      const key = terminalAnsiKey(slot);
+      const key = vscodeAnsiKey(slot);
       if (theme.colors[key] !== hex) issues.push(`${label}: ${key} drifted from the ANSI palette`);
     }
   }
@@ -586,24 +577,7 @@ export function checkThemes(): string[] {
         if (!(key in style)) issues.push(`zed ${file.path}: theme "${themeName}" missing style.${key}`);
       }
 
-      const zedAnsiKeys = [
-        'terminal.ansi.black',
-        'terminal.ansi.red',
-        'terminal.ansi.green',
-        'terminal.ansi.yellow',
-        'terminal.ansi.blue',
-        'terminal.ansi.magenta',
-        'terminal.ansi.cyan',
-        'terminal.ansi.white',
-        'terminal.ansi.bright_black',
-        'terminal.ansi.bright_red',
-        'terminal.ansi.bright_green',
-        'terminal.ansi.bright_yellow',
-        'terminal.ansi.bright_blue',
-        'terminal.ansi.bright_magenta',
-        'terminal.ansi.bright_cyan',
-        'terminal.ansi.bright_white',
-      ];
+      const zedAnsiKeys = Array.from({ length: 16 }, (_, slot) => zedAnsiKey(slot));
       for (const ansiKey of zedAnsiKeys) {
         if (!style[ansiKey] || !isValidHex(String(style[ansiKey]))) {
           issues.push(`zed ${file.path}: theme "${themeName}" invalid or missing ${ansiKey}`);

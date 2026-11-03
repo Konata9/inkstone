@@ -44,6 +44,16 @@ export function changelogPath(target: ReleaseTarget): string {
     : join(root, 'CHANGELOG.md');
 }
 
+const CHANGELOG_LABELS: Record<ReleaseTarget, string> = {
+  themes: 'CHANGELOG.md',
+  vscode: 'packages/vscode/CHANGELOG.md',
+};
+
+/** Repository-relative changelog label used in release output. */
+export function changelogLabel(target: ReleaseTarget): string {
+  return CHANGELOG_LABELS[target];
+}
+
 /** Release tag for a theme version, e.g. `v0.4.0`. */
 export function releaseTag(version: string): string {
   return `v${version}`;

@@ -53,7 +53,7 @@ import {
   dshPackageName,
   dshRowId,
   dshTarballFileName,
-  ghosttyThemeName,
+  inkstoneThemeName,
   kakuFileName,
   kakuTomlFileName,
   opencodeFileName,
@@ -67,6 +67,7 @@ import { extractReleaseNotes, hasUnreleasedEntries } from './changelog.ts';
 import { repoUrl, vsixFileName } from './packaging.ts';
 import {
   assertTagMatchesVersion,
+  changelogLabel,
   changelogPath,
   readRootPkg,
   readVscodePkg,
@@ -141,7 +142,7 @@ const vsixPath = join(root, 'dist', vsixName);
 
 function writeNotes(): void {
   const changelog = readFileSync(changelogPath(target), 'utf8');
-  const label = target === 'vscode' ? 'packages/vscode/CHANGELOG.md' : 'CHANGELOG.md';
+  const label = changelogLabel(target);
   const notes = extractReleaseNotes(changelog, version);
   if (notes) {
     writeFileSync(notesPath, notes, 'utf8');
@@ -213,7 +214,7 @@ if (target === 'vscode') {
 
 zipCommand();
 
-const ghosttyFiles = flavors.map(ghosttyThemeName);
+const ghosttyFiles = flavors.map(inkstoneThemeName);
 const kakuFiles = flavors.map(kakuFileName);
 const kakuTomlFiles = flavors.map(kakuTomlFileName);
 const opencodeFiles = flavors.map(opencodeFileName);
@@ -280,12 +281,12 @@ assertFile(join(releaseDir, dshTarballFileName(menuPackageName, version)));
 
 const themes: ThemeManifest[] = flavors.map((flavor) => ({
   id: flavor.meta.id,
-  name: ghosttyThemeName(flavor),
+  name: inkstoneThemeName(flavor),
   displayName: themeDisplayName(flavor),
   mode: flavor.meta.appearance,
   family: flavor.meta.family,
   files: {
-    ghostty: ghosttyThemeName(flavor),
+    ghostty: inkstoneThemeName(flavor),
     kaku: kakuFileName(flavor),
     kakuToml: kakuTomlFileName(flavor),
     opencode: opencodeFileName(flavor),

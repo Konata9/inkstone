@@ -24,6 +24,7 @@ import {
   surfaces,
 } from './preview.ts';
 import { siteCopy, type SiteLocale } from './site-copy.ts';
+import type { GeneratedFile } from './types.ts';
 
 const root = fileURLToPath(new URL('../..', import.meta.url));
 const templateRoot = join(root, 'templates', 'site');
@@ -108,11 +109,6 @@ const bootJs = `(function () {
   root.dataset.appearance = c.appearance[id] || 'dark';
   root.style.colorScheme = root.dataset.appearance;
 })();`;
-
-export interface GeneratedSiteFile {
-  path: string;
-  content: string;
-}
 
 /** One flavor row shared by the rail, hero stage, and specimen panels. */
 function buildFlavors(locale: SiteLocale) {
@@ -349,7 +345,7 @@ Terminal themes: use the Ghostty / Kaku zip assets from the same release, or
 }
 
 /** All text files for the static site (HTML + SEO companions). */
-export function generateSite(version: string): GeneratedSiteFile[] {
+export function generateSite(version: string): GeneratedFile[] {
   return [
     { path: 'site/index.html', content: renderPage('en', version) },
     { path: 'site/zh/index.html', content: renderPage('zh', version) },

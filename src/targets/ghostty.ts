@@ -9,8 +9,8 @@
 import { flavors, flavorName } from '../palette/index.ts';
 import type { Flavor } from '../palette/types.ts';
 import { ANSI_NAMES } from '../palette/types.ts';
-import { ghosttyThemeName } from './naming.ts';
-import type { GeneratedFile } from './vscode.ts';
+import { inkstoneThemeName } from './naming.ts';
+import type { GeneratedFile } from './types.ts';
 
 export function buildGhosttyTheme(flavor: Flavor): string {
   const f = flavor;
@@ -47,7 +47,7 @@ export function buildGhosttyTheme(flavor: Flavor): string {
 
 export function generateGhostty(): GeneratedFile[] {
   return flavors.map((flavor) => ({
-    path: `dist/ghostty/${ghosttyThemeName(flavor)}`,
+    path: `dist/ghostty/${inkstoneThemeName(flavor)}`,
     content: buildGhosttyTheme(flavor),
   }));
 }

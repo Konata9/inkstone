@@ -32,6 +32,7 @@ import {
 } from './git.ts';
 import { repoUrl } from './packaging.ts';
 import {
+  changelogLabel,
   changelogPath,
   expectedReleaseTag,
   findGeneratedDrift,
@@ -120,7 +121,7 @@ const pkgPath =
   target === 'vscode' ? join(root, 'packages', 'vscode', 'package.json') : join(root, 'package.json');
 const pkgLabel = target === 'vscode' ? 'packages/vscode/package.json' : 'package.json';
 const changelogFile = changelogPath(target);
-const changelogLabel = target === 'vscode' ? 'packages/vscode/CHANGELOG.md' : 'CHANGELOG.md';
+const changelogLabelText = changelogLabel(target);
 
 const current = String(pkg.version);
 const next = resolveVersion(current, bump);
@@ -149,13 +150,13 @@ if (remoteTag === undefined) {
 
 const changelog = readFileSync(changelogFile, 'utf8');
 if (!/^##\s+Unreleased\s*$/m.test(changelog)) {
-  fail(`${changelogLabel} has no "## Unreleased" section; add release notes first`);
+  fail(`${changelogLabelText} has no "## Unreleased" section; add release notes first`);
 }
 if (!hasUnreleasedEntries(changelog)) {
-  fail(`${changelogLabel} "## Unreleased" section is empty; add release notes first`);
+  fail(`${changelogLabelText} "## Unreleased" section is empty; add release notes first`);
 }
 if (hasVersionSection(changelog, next)) {
-  fail(`${changelogLabel} already has a "## ${next}" section`);
+  fail(`${changelogLabelText} already has a "## ${next}" section`);
 }
 const nextChangelog = changelog.replace(/^##\s+Unreleased\s*$/m, `## ${next}`);
 const fromTag = previousTag(target === 'vscode' ? 'vscode-v*' : 'v[0-9]*');
@@ -165,7 +166,7 @@ const finalChangelog = appendAcknowledgements(nextChangelog, next, acknowledgeme
 if (dryRun) {
   console.log(`\nWould release ${target} ${current} -> ${next}`);
   console.log(`  • ${pkgLabel}: ${current} -> ${next}`);
-  console.log(`  • ${changelogLabel}: "## Unreleased" -> "## ${next}"`);
+  console.log(`  • ${changelogLabelText}: "## Unreleased" -> "## ${next}"`);
   if (acknowledgements.length > 0) {
     console.log(`  • acknowledgements: ${acknowledgements.length} contributor(s)`);
   }

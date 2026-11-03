@@ -13,7 +13,7 @@ import { contrast, darken, lighten, luminance, mix } from '../color.ts';
 import { flavors } from '../palette/index.ts';
 import type { Flavor } from '../palette/types.ts';
 import { opencodeFileName } from './naming.ts';
-import type { GeneratedFile } from './vscode.ts';
+import type { GeneratedFile } from './types.ts';
 
 type Mode = 'dark' | 'light';
 

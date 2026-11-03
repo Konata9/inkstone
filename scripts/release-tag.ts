@@ -26,6 +26,7 @@ import {
   workingTreeStatus,
 } from './git.ts';
 import {
+  changelogLabel,
   changelogPath,
   expectedReleaseTag,
   findGeneratedDrift,
@@ -58,7 +59,7 @@ const version = String(
   target === 'vscode' ? readVscodePkg().version : readRootPkg().version,
 );
 const tag = expectedReleaseTag(target, version);
-const changelogLabel = target === 'vscode' ? 'packages/vscode/CHANGELOG.md' : 'CHANGELOG.md';
+const changelogLabelText = changelogLabel(target);
 
 const status = workingTreeStatus();
 if (status.length > 0) {
@@ -72,11 +73,11 @@ if (branch !== 'main' && !force) {
 
 const changelog = readFileSync(changelogPath(target), 'utf8');
 if (!hasVersionSection(changelog, version)) {
-  fail(`${changelogLabel} has no "## ${version}" section; rename "## Unreleased" or add one`);
+  fail(`${changelogLabelText} has no "## ${version}" section; rename "## Unreleased" or add one`);
 }
 if (hasUnreleasedEntries(changelog)) {
   fail(
-    `${changelogLabel} still has entries under "## Unreleased"; ` +
+    `${changelogLabelText} still has entries under "## Unreleased"; ` +
       'move them into the release section before tagging',
   );
 }
@@ -99,7 +100,7 @@ if (drift.length > 0) {
 }
 
 console.log(`  ✓ working tree clean, on ${branch}`);
-console.log(`  ✓ ${changelogLabel} has a ${version} section with no Unreleased entries`);
+console.log(`  ✓ ${changelogLabelText} has a ${version} section with no Unreleased entries`);
 console.log('  ✓ generated files are in sync with the palette');
 console.log(`  ✓ tag ${tag} is unused`);
 
