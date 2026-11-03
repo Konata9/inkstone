@@ -16,6 +16,8 @@
 import { readFileSync } from 'node:fs';
 
 import { hasUnreleasedEntries, hasVersionSection } from './changelog.ts';
+import { createFail, parseArgs } from './args.ts';
+import type { Fail } from './args.ts';
 import {
   branchName,
   git,
@@ -32,30 +34,20 @@ import {
 } from './versioning.ts';
 import type { ReleaseTarget } from './versioning.ts';
 
-function fail(message: string): never {
-  console.error(`\nRelease tag check failed: ${message}\n`);
-  process.exit(1);
-}
+const fail: Fail = createFail('Release tag check failed');
 
 function warn(message: string): void {
   console.warn(`  ! ${message}`);
 }
 
-const args = process.argv.slice(2);
-const dryRun = args.includes('--dry-run');
-const force = args.includes('--force');
-
-let targetArg: string | undefined;
-for (let index = 0; index < args.length; index += 1) {
-  const arg = args[index]!;
-  if (arg === '--target') {
-    targetArg = args[index + 1];
-    if (!targetArg || targetArg.startsWith('--')) fail('--target requires a value');
-    index += 1;
-  } else if (arg.startsWith('--target=')) {
-    targetArg = arg.slice('--target='.length);
-  }
-}
+const parsedArgs = parseArgs(
+  process.argv.slice(2),
+  { valueFlags: ['--target'], knownFlags: ['--dry-run', '--force'] },
+  fail,
+);
+const dryRun = parsedArgs.flags.has('--dry-run');
+const force = parsedArgs.flags.has('--force');
+const targetArg = parsedArgs.values.get('--target');
 
 const target: ReleaseTarget = (targetArg ?? 'themes') as ReleaseTarget;
 if (target !== 'themes' && target !== 'vscode') {

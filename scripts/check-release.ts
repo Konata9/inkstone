@@ -13,7 +13,8 @@
 
 import { readFileSync } from 'node:fs';
 
-import { argValue } from './args.ts';
+import { createFail, parseArgs } from './args.ts';
+import type { Fail } from './args.ts';
 import { hasUnreleasedEntries, hasVersionSection } from './changelog.ts';
 import {
   changelogPath,
@@ -25,17 +26,14 @@ import {
 } from './versioning.ts';
 import type { ReleaseTarget } from './versioning.ts';
 
-function fail(message: string): never {
-  console.error(`\nRelease tag check failed: ${message}\n`);
-  process.exit(1);
-}
-
-const requestedTarget = argValue('--target', fail) as ReleaseTarget | undefined;
+const fail: Fail = createFail('Release tag check failed');
+const parsedArgs = parseArgs(process.argv.slice(2), { valueFlags: ['--tag', '--target'] }, fail);
+const requestedTarget = parsedArgs.values.get('--target') as ReleaseTarget | undefined;
 if (requestedTarget && requestedTarget !== 'themes' && requestedTarget !== 'vscode') {
   fail('--target must be "themes" or "vscode"');
 }
 
-const requestedTag = argValue('--tag', fail);
+const requestedTag = parsedArgs.values.get('--tag');
 const parsed = requestedTag ? parseReleaseTag(requestedTag) : undefined;
 if (requestedTag && !parsed) {
   fail(`tag ${requestedTag} must look like v<version> or vscode-v<version>`);

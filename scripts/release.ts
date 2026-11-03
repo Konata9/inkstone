@@ -16,6 +16,8 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { hasUnreleasedEntries, hasVersionSection } from './changelog.ts';
+import { createFail, parseArgs } from './args.ts';
+import type { Fail } from './args.ts';
 import {
   appendAcknowledgements,
   findAcknowledgements,
@@ -41,14 +43,10 @@ import type { ReleaseTarget } from './versioning.ts';
 
 const USAGE =
   'usage: pnpm release patch|minor|major|<x.y.z> [--target themes|vscode] [--no-push] [--dry-run] [--force]';
-const KNOWN_FLAGS = new Set(['--dry-run', '--no-push', '--force', '--help']);
 
 type Version = [number, number, number];
 
-function fail(message: string): never {
-  console.error(`\nRelease failed: ${message}\n`);
-  process.exit(1);
-}
+const fail: Fail = createFail('Release failed');
 
 function parseVersion(value: string): Version | undefined {
   const match = /^(\d+)\.(\d+)\.(\d+)$/.exec(value);
@@ -88,38 +86,25 @@ function run(command: string, commandArgs: string[]): void {
   execFileSync(command, commandArgs, { cwd: root, stdio: 'inherit' });
 }
 
-const args = process.argv.slice(2);
-const flags = new Set<string>();
-const positional: string[] = [];
-let targetArg: string | undefined;
-
-for (let index = 0; index < args.length; index += 1) {
-  const arg = args[index]!;
-  if (arg === '--target') {
-    targetArg = args[index + 1];
-    if (!targetArg || targetArg.startsWith('--')) fail(`--target requires a value\n${USAGE}`);
-    index += 1;
-    continue;
-  }
-  if (arg.startsWith('--target=')) {
-    targetArg = arg.slice('--target='.length);
-    continue;
-  }
-  if (arg.startsWith('--')) flags.add(arg);
-  else positional.push(arg);
-}
-
-for (const flag of flags) {
-  if (!KNOWN_FLAGS.has(flag)) fail(`unknown option ${flag}\n${USAGE}`);
-}
+const parsedArgs = parseArgs(
+  process.argv.slice(2),
+  {
+    valueFlags: ['--target'],
+    knownFlags: ['--dry-run', '--no-push', '--force', '--help'],
+    allowPositional: true,
+  },
+  fail,
+);
+const flags = parsedArgs.flags;
+const targetArg = parsedArgs.values.get('--target');
 
 if (flags.has('--help')) {
   console.log(`\n${USAGE}\n`);
   process.exit(0);
 }
 
-const bump = positional[0];
-if (!bump || positional.length > 1) fail(USAGE);
+const bump = parsedArgs.positional[0];
+if (!bump || parsedArgs.positional.length > 1) fail(USAGE);
 
 const target: ReleaseTarget = (targetArg ?? 'themes') as ReleaseTarget;
 if (target !== 'themes' && target !== 'vscode') {

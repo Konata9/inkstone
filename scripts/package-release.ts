@@ -61,7 +61,8 @@ import {
   vscodeFileName,
   ZED_FILE_NAME,
 } from '../src/targets/naming.ts';
-import { argValue } from './args.ts';
+import { createFail, parseArgs } from './args.ts';
+import type { Fail } from './args.ts';
 import { extractReleaseNotes, hasUnreleasedEntries } from './changelog.ts';
 import { repoUrl, vsixFileName } from './packaging.ts';
 import {
@@ -89,10 +90,7 @@ interface ThemeManifest {
   };
 }
 
-function fail(message: string): never {
-  console.error(`\nRelease packaging failed: ${message}\n`);
-  process.exit(1);
-}
+const fail: Fail = createFail('Release packaging failed');
 
 function assertFile(path: string): void {
   if (!existsSync(path) || !statSync(path).isFile()) {
@@ -108,7 +106,8 @@ function zipCommand(): void {
   }
 }
 
-const target = (argValue('--target', fail) ?? 'themes') as ReleaseTarget;
+const parsedArgs = parseArgs(process.argv.slice(2), { valueFlags: ['--tag', '--target'] }, fail);
+const target = (parsedArgs.values.get('--target') ?? 'themes') as ReleaseTarget;
 if (target !== 'themes' && target !== 'vscode') {
   fail('--target must be "themes" or "vscode"');
 }
@@ -122,7 +121,7 @@ const vscodePkg = readVscodePkg();
 const themeVersion = String(rootPkg.version);
 const vscodeVersion = String(vscodePkg.version);
 const version = target === 'vscode' ? vscodeVersion : themeVersion;
-const tag = argValue('--tag', fail);
+const tag = parsedArgs.values.get('--tag');
 
 if (tag) {
   try {
