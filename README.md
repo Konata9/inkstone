@@ -1,12 +1,34 @@
-# 墨观 Inkstone
+<div align="center">
+  <img src="packages/vscode/icon.png" width="96" alt="墨观 Inkstone">
+  <h1>墨观 Inkstone</h1>
+  <p>一套从 <a href="https://zhongguose.com/">526 个中国传统颜色</a> 里长出来的代码配色。</p>
+  <p>
+    <a href="https://konata9.github.io/inkstone/">官网</a> ·
+    <a href="docs/README.md">文档</a> ·
+    <a href="https://github.com/Konata9/inkstone/releases">Releases</a> ·
+    <a href="README_EN.md">English</a>
+  </p>
+  <p>
+    <a href="https://konata9.github.io/inkstone/"><img src="https://img.shields.io/badge/website-konata9.github.io%2Finkstone-c34435?style=flat-square" alt="Website"></a>
+    <a href="https://github.com/Konata9/inkstone/stargazers"><img src="https://img.shields.io/github/stars/Konata9/inkstone?style=flat-square&color=c34435" alt="Stars"></a>
+    <a href="https://github.com/Konata9/inkstone/releases"><img src="https://img.shields.io/github/v/release/Konata9/inkstone?label=release&style=flat-square&color=c34435" alt="Release"></a>
+    <a href="https://marketplace.visualstudio.com/items?itemName=Konata9.inkstone"><img src="https://img.shields.io/visual-studio-marketplace/v/Konata9.inkstone?label=marketplace&style=flat-square&color=c34435" alt="Marketplace"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-c34435?style=flat-square" alt="MIT License"></a>
+  </p>
+</div>
 
-<img src="packages/vscode/icon.png" width="96" align="right" alt="墨观 Inkstone">
+## 预览
 
-一套从 **526 个中国传统颜色** 里长出来的代码配色。墨纸组（玄墨 / 宣纸 + Dimmed）与海瓷组（沧海 / 青瓷）共六个变体，共用同一套色相骨架。
+![墨观 Inkstone 六个变体](docs/preview.png)
 
-A traditional Chinese color theme for editors and terminals, built from the 526-color [zhongguose](https://zhongguose.com/) palette and the matching Figma color chart.
+## 为什么是墨观
 
-![墨观 Inkstone 预览](docs/preview.png)
+墨观不是一组随机的暗色主题，而是同一幅画在不同光线下的六个房间。强调色取自 526 个中国传统颜色：关键字用朱砂系，字符串用铜绿或竹绿，类型用土黄或紫色系，中性色则是墨、纸、深海与青瓷釉。
+
+- **六个变体，一套骨架**：色相顺序始终是朱 → 蓝 → 绿 → 橙 → 紫 → 青 → 绛，切换时只换光线与饱和度。
+- **红做记号，青做动作**：关键字、标签、错误、删除保留朱砂；按钮、徽标、进度、焦点与选中态统一用各变体的交互蓝。
+- **Dimmed 降光不降墨**：画布更沉，墨色仍 ≥ 10.5:1，强调色保留可辨识的色相，不会褪成灰雾。
+- **生成器保证一致**：一份语义色板同时生成 VS Code、Ghostty、Kaku、OpenCode、Zed 与 DSH；构建会拒绝落在对比度区间或彩度预算之外的配色。
 
 ## 六个变体
 
@@ -26,54 +48,33 @@ A traditional Chinese color theme for editors and terminals, built from the 526-
 | **沧海 Canghai**（暗） | 深海暮色，青绿矿物 | `#0d1822` | 银朱 · 降彩 `#dc5e41` | 竹绿 `#1ba784` | 萝兰紫 `#c08eaf` |
 | **青瓷 Qingci**（亮） | 月白釉底，青灰题字 | `#e8f0ec` | 尖晶玉红 · 降彩 `#bc3a46` | 荷叶绿 `#1a6840` | 桔梗紫 `#813c85` |
 
-- 墨纸组关键字用**朱批红**，呼应古籍朱笔批注：玄墨落在砖红/鱼鳃红一侧，宣纸落在鹤顶红一侧；海瓷组把银朱 / 尖晶玉红当作釉面上的印章。
-- 海瓷组取青绿山水的矿物色：霁青、海青、竹绿、石绿，配少量暖色反光。
-- 朱砂系保留传统色相与明度，只把彩度压到屏幕友好的范围，标注为「降彩」；错误态保留更高一档彩度。
-- 暖色只留一层：玄墨的数字与类型不再同时占用杏黄 + 土黄，数字归土黄、类型归萝兰紫，杏黄只留给警告。
-- Dimmed 只用于墨纸组：**降环境光，不降墨色**。画布更沉、墨色仍 ≥ 10.5:1，强调色保留可辨识的色相（C ≥ 0.045），避免褪成灰雾。
-- 光标改用各变体的冷色交互色（羽扇豆蓝 / 涧石蓝 / 玉鈫蓝），不再复用关键字红。
-- **红做记号，青做动作**：关键字、标签、错误、删除保留朱砂；按钮、徽标、进度、焦点、选中态、范围高亮、括号匹配与命令反馈统一用各变体的交互蓝（羽扇豆蓝 / 涧石蓝 / 飞燕草蓝 / 鷃蓝 / 霁青 / 玉鈫蓝），主操作与危险操作不再共用色相。
-- 强调色尽量保留传统色原值；中性表面、弱化前景与降彩颜料均在 [色板文档](docs/palette.md) 中标注。
-- 872 项检查：对比度上下限 + OKLCH 彩度带，六个变体执行同一套阈值。
+完整色值与对比度见 [色板对照](docs/palette.md)。
+
+## 支持的软件
+
+**编辑器**
+
+| 软件 | 安装 |
+| --- | --- |
+| VS Code / Cursor / Windsurf / VSCodium | [Marketplace](https://marketplace.visualstudio.com/items?itemName=Konata9.inkstone) · [Open VSX](https://open-vsx.org/extension/Konata9/inkstone) · [VSIX](https://github.com/Konata9/inkstone/releases) |
+| Zed | `pnpm install:zed` |
+
+**终端与 AI 工具**
+
+| 软件 | 安装 |
+| --- | --- |
+| Ghostty | `pnpm install:ghostty` |
+| Kaku / WezTerm | `pnpm install:kaku` |
+| OpenCode | `pnpm install:opencode` |
+| DeepSeek Harness (DSH) | `pnpm install:dsh` |
 
 ## 安装
 
-### GitHub Releases
-
-每个主题版本都会在 [Releases](https://github.com/Konata9/inkstone/releases) 附带：
-
-| 产物 | 用途 |
-| --- | --- |
-| `Konata9.inkstone-<vscode-version>.vsix` | VS Code / Cursor / Windsurf / VSCodium（扩展版本独立递增） |
-| `inkstone-ghostty-<version>.zip` | Ghostty 主题文件 |
-| `inkstone-kaku-<version>.zip` | Kaku / WezTerm 色表（Lua + TOML） |
-| `inkstone-opencode-<version>.zip` | OpenCode V2 主题 |
-| `inkstone-zed-<version>.zip` | Zed 主题包 |
-| `inkstone-dsh-<version>.tgz` | DeepSeek Harness (DSH) 主题插件（菜单版，六主题切换） |
-| `inkstone-dsh-<variant>-<version>.tgz` | DSH 主题插件（按明暗自动配对） |
-| `inkstone-<version>.zip` | 全部主题产物 + `manifest.json` + 安装说明 |
-| `manifest.json` / `SHA256SUMS` | 机器可读索引与校验和 |
-
-下面的本地安装方式仍然适用于从源码构建。
-
 ### VS Code / Cursor / Windsurf / VSCodium
 
-从 [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Konata9.inkstone) 安装；VSCodium / Open VSX 用户使用 [Open VSX](https://open-vsx.org/extension/Konata9/inkstone)。也可以从 [Releases](https://github.com/Konata9/inkstone/releases) 下载最新 VSIX / 本地构建。
+从 [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Konata9.inkstone) 或 [Open VSX](https://open-vsx.org/extension/Konata9/inkstone) 安装，也可以从 [Releases](https://github.com/Konata9/inkstone/releases) 下载最新 VSIX。扩展 ID 是 `Konata9.inkstone`，同一份 VSIX 适用于所有 VS Code 衍生编辑器。
 
-```bash
-pnpm install
-pnpm package:vscode
-```
-
-产物在 `dist/Konata9.inkstone-<vscode-version>.vsix`。安装：
-
-```bash
-code --install-extension dist/Konata9.inkstone-0.3.5.vsix
-# Cursor:
-cursor --install-extension dist/Konata9.inkstone-0.3.5.vsix
-```
-
-然后在命令面板执行 **Preferences: Color Theme**，选择：
+安装后在命令面板执行 **Preferences: Color Theme**，选择：
 
 - `墨观 · 玄墨 (Inkstone Xuanmo)`
 - `墨观 · 玄墨 Dimmed (Inkstone Xuanmo Dimmed)`
@@ -82,330 +83,32 @@ cursor --install-extension dist/Konata9.inkstone-0.3.5.vsix
 - `墨观 · 沧海 (Inkstone Canghai)`
 - `墨观 · 青瓷 (Inkstone Qingci)`
 
-扩展 ID 为 `Konata9.inkstone`，同一份 VSIX 适用于所有 VS Code 衍生编辑器。
-
-### Ghostty
-
-```bash
-pnpm install:ghostty
-```
-
-或手动复制：
-
-```bash
-mkdir -p ~/.config/ghostty/themes
-cp "dist/ghostty/Inkstone Xuanmo" "dist/ghostty/Inkstone Xuanmo Dimmed" \
-   "dist/ghostty/Inkstone Xuanzhi" "dist/ghostty/Inkstone Xuanzhi Dimmed" \
-   "dist/ghostty/Inkstone Canghai" "dist/ghostty/Inkstone Qingci" \
-   ~/.config/ghostty/themes/
-```
-
-在 `~/.config/ghostty/config` 中加入：
-
-```ini
-theme = light:Inkstone Xuanzhi,dark:Inkstone Xuanmo
-```
-
-想要低饱和的一对：
-
-```ini
-theme = light:Inkstone Xuanzhi Dimmed,dark:Inkstone Xuanmo Dimmed
-```
-
-想要海瓷组：
-
-```ini
-theme = light:Inkstone Qingci,dark:Inkstone Canghai
-```
-
-只想要一个变体就写 `theme = Inkstone Canghai`。`ghostty +list-themes` 可以确认主题已被识别。
-
-### Kaku / WezTerm
-
-Kaku 从 **0.27.1** 起会把 `~/.config/kaku/colors/` 里的 TOML 配色列进 Settings → Theme，所以安装脚本按版本分流：
-
-```bash
-pnpm install:kaku
-```
-
-脚本先读 `kaku --version`，没有 CLI 时读 `/Applications/Kaku.app` 里的版本号：
-
-- **0.27.1 及以上**：只把六个 `.toml` 复制到 `~/.config/kaku/colors/`，并删掉旧版脚本留下的 `~/.config/kaku/inkstone-*.lua`。打开 Settings（`Cmd + ,`），Theme 列表里直接出现下表的六个名字，选中即可，Kaku 会自己写入 `config.color_scheme`。
-- **低于 0.27.1 或没装 Kaku**：不写入任何文件，只提示版本过低；按下面的「旧版 Kaku / WezTerm」手动装 Lua 表。
-
-| 变体 | Settings 里的名称 |
-| --- | --- |
-| 玄墨（dark） | `Inkstone Xuanmo` |
-| 玄墨 Dimmed（muted dark） | `Inkstone Xuanmo Dimmed` |
-| 宣纸（warm light） | `Inkstone Xuanzhi` |
-| 宣纸 Dimmed（muted warm light） | `Inkstone Xuanzhi Dimmed` |
-| 沧海（deep-sea dark） | `Inkstone Canghai` |
-| 青瓷（celadon light） | `Inkstone Qingci` |
-
-从旧脚本升级时注意：`kaku.lua` 里如果还留着 `dofile(wezterm.config_dir .. '/inkstone-xuanmo.lua')` 这类行，Lua 文件一被删掉就会报错，需要把这些行删掉或注释掉。已经选好的 `config.color_scheme = 'Inkstone Xuanmo'` 不用动，TOML 里的方案同名。
-
-#### 旧版 Kaku / WezTerm（Lua）
-
-0.27.1 之前的 Kaku（Settings 里只有 Auto / Kaku Dark / Kaku Light）和 WezTerm 继续用 Lua 表。手动把六个 `.lua` 复制到 Kaku 的配置目录：
-
-```bash
-mkdir -p ~/.config/kaku
-cp dist/kaku/inkstone-*.lua ~/.config/kaku/
-```
-
-再把下面三行追加到 `~/.config/kaku/kaku.lua`（Kaku 会自动重载）：
-
-```lua
-config.color_schemes = config.color_schemes or {}
-config.color_schemes['Inkstone Xuanmo'] = dofile(wezterm.config_dir .. '/inkstone-xuanmo.lua')
-config.color_scheme = 'Inkstone Xuanmo'
-```
-
-想要暖色就把 `inkstone-xuanmo.lua` 与 `'Inkstone Xuanmo'` 换成上表里对应的文件与名称。
-
-WezTerm 用户把六个 `.lua` 文件放到 `~/.config/wezterm/`，接入方式相同；也可以把 `.toml` 放进 `~/.config/wezterm/colors/`，再让 `config.color_scheme` 等于表里的名称。两种格式都同时包含 `tab_bar` 与 `split`。
-
-### OpenCode
-
-```bash
-pnpm install:opencode
-```
-
-六个主题会复制到 `~/.config/opencode/themes/`。然后在 `~/.config/opencode/cli.json` 里指定：
-
-```json
-{
-  "$schema": "https://opencode.ai/v2/cli.json",
-  "theme": { "name": "inkstone-xuanmo-dimmed", "mode": "dark" }
-}
-```
-
-也可以按 `Ctrl+P` → **Open settings** → **Theme**，或运行 `/themes` 直接切换。文件名就是主题名：
-
-| 主题名 | 变体 | 模式 |
-| --- | --- | --- |
-| `inkstone-xuanmo` | 玄墨 | 暗 |
-| `inkstone-xuanmo-dimmed` | 玄墨 Dimmed | 暗 |
-| `inkstone-xuanzhi` | 宣纸 | 亮 |
-| `inkstone-xuanzhi-dimmed` | 宣纸 Dimmed | 亮 |
-| `inkstone-canghai` | 沧海 | 暗 |
-| `inkstone-qingci` | 青瓷 | 亮 |
-
-OpenCode 的语义 token 全部从同一份色板映射：正文、背景层、语法、diff、Markdown、反馈色与九级 hue scale 都由生成器输出；`accent` 与 `interactive` 都指向各变体的交互蓝，`destructive` 独占错误红。新增主题文件后需要重启 OpenCode。
-
-### Zed
-
-```bash
-pnpm install:zed
-```
-
-`inkstone.json` 会复制到 `~/.config/zed/themes/`。
-
-可以通过命令面板（`Cmd+K Cmd+T`）搜索选择主题，或在 `~/.config/zed/settings.json` 中配置：
-
-```json
-{
-  "theme": {
-    "mode": "system",
-    "light": "墨观 · 宣纸 (Inkstone Xuanzhi)",
-    "dark": "墨观 · 玄墨 (Inkstone Xuanmo)"
-  }
-}
-```
-
-可选主题名称：
-
-| 主题名称 | 变体 | 模式 |
-| --- | --- | --- |
-| `墨观 · 玄墨 (Inkstone Xuanmo)` | 玄墨 | 暗 |
-| `墨观 · 玄墨 Dimmed (Inkstone Xuanmo Dimmed)` | 玄墨 Dimmed | 暗 |
-| `墨观 · 宣纸 (Inkstone Xuanzhi)` | 宣纸 | 亮 |
-| `墨观 · 宣纸 Dimmed (Inkstone Xuanzhi Dimmed)` | 宣纸 Dimmed | 亮 |
-| `墨观 · 沧海 (Inkstone Canghai)` | 沧海 | 暗 |
-| `墨观 · 青瓷 (Inkstone Qingci)` | 青瓷 | 亮 |
-
-### DeepSeek Harness (DSH)
-
-DSH 的 Web GUI 与 Desktop 共用同一套渲染层，主题以插件形式安装。**菜单版** `inkstone-dsh-<version>.tgz` 把宣纸 / 宣纸 Dimmed / 玄墨 / 玄墨 Dimmed / 沧海 / 青瓷六个主题装进一个插件，在 **Settings → General** 里直接切换：
-
-```bash
-dsh plugin --profile web add file:/absolute/path/to/inkstone-dsh-<version>.tgz
-```
-
-从源码构建后也可以直接安装目录，`pnpm install:dsh` 默认安装菜单版：
-
-```bash
-pnpm install && pnpm build
-dsh plugin --profile web add "$PWD/dist/dsh/inkstone-dsh"
-```
-
-重启 `dsh web`，打开 **Settings → General**，在「墨观 Inkstone」一行点选宣纸 / 宣纸 Dimmed / 玄墨 / 玄墨 Dimmed / 沧海 / 青瓷：选择立即生效并记住。「跟随 DSH」把控制权交回 **Appearance** 的 Light / Dark / System —— Light 用宣纸，Dark 用玄墨。卸载：
-
-```bash
-dsh plugin --profile web remove inkstone-dsh
-```
-
-如果不需要菜单，也可以安装按明暗自动配对的单包：
-
-| 包 | 明（Light） | 暗（Dark） |
-| --- | --- | --- |
-| `inkstone-dsh-ink` | 宣纸 | 玄墨 |
-| `inkstone-dsh-ink-dimmed` | 宣纸 Dimmed | 玄墨 Dimmed |
-| `inkstone-dsh-sea` | 青瓷 | 沧海 |
-
-菜单版与配对版都覆盖同一套 token，**一次只装一个**；它们也与其它 DSH 主题插件（如 Catppuccin）互斥，请只保留一个。
-
-插件声明 `engines.dsh: ">=0.2.1-rc.3 <0.3.0"`；DSH 仍在预发布期，版本超出区间时会拒绝安装。终端 16 色由终端程序自身决定，不在主题范围内。
-
-## 仓库结构
-
-```
-src/                       主题 + 各端软件 target
-  color.ts                色彩工具：对比度、混色、alpha
-  audit.ts                色板审计（构建时强制）
-  check.ts                产物检查（主题 key、Ghostty、Lua 语法）
-  checks.ts               build 与 validate 共用的检查入口
-  palette/
-    data/zhongguose.json  526 个中国传统颜色（唯一色值来源）
-    data/SOURCE.md        数据来源与署名
-    labels.ts             语义角色的中文标签（色板文档与展示共用）
-    xuanmo.ts             玄墨语义色板
-    xuanmo-dimmed.ts      玄墨 Dimmed 语义色板
-    xuanzhi.ts            宣纸语义色板
-    xuanzhi-dimmed.ts     宣纸 Dimmed 语义色板
-    canghai.ts            沧海语义色板
-    qingci.ts             青瓷语义色板
-  targets/
-    naming.ts             各端文件名与主题显示名（唯一来源）
-    vscode.ts             workbench + TextMate + 语义 token
-    ghostty.ts            Ghostty 主题
-    kaku.ts               Kaku / WezTerm 色表（Lua + TOML）
-    opencode.ts           OpenCode V2 主题（base + hue scale）
-    zed.ts                Zed 主题（ThemeFamily + extension.toml）
-    dsh.ts                DSH 主题插件（三对明暗变体 + 浏览器 bundle）
-    dsh-tokens.ts         DSH 0.2.1 颜色 token 冻结清单
-showcase/                  展示层源码（与 src/ 平级）
-  specimen.ts              CSS 变量、色卡、编辑器示意（官网与截图共用）
-  outputs.ts               展示层产物清单（供 drift check）
-  site/
-    build.ts               官网构建入口（清空并写入 site/）
-    outputs.ts             页面渲染、SEO 文件与产物清单
-    copy.ts                官网中英文案
-    templates/             Liquid 模板（结构 / CSS / JS）
-    assets/                OG 图等静态素材
-  docs/
-    build.ts               文档构建入口（写入 docs/palette.md）
-    outputs.ts             文档产物清单
-    palette.ts             色板文档生成
-  preview/
-    gallery.ts             3×2 编辑器总览（内存渲染）
-    capture.ts             Playwright 截图入口
-scripts/                  安装脚本、VSIX 与 Release 打包
-packages/vscode/          VS Code 扩展（VSIX）
-dist/                     生成物：Ghostty 主题、Kaku 色表、OpenCode 主题、Zed 主题、DSH 插件包、VSIX
-site/                     官网产物，只含构建结果（生成物，GitHub Pages）
-docs/palette.md           色板对照表（生成物）
-docs/preview.png          六个编辑器窗口截图（生成物，`pnpm capture:preview`）
-docs/publishing.md        Marketplace / Open VSX 发布与 Trusted Publishing 配置（手写）
-.github/workflows/        构建、打包与发布 CI
-```
-
-## 开发
-
-需要 Node 20+（打包 VSIX 时 `vsce` 建议 Node 22）。
+### 终端与其它编辑器
 
 ```bash
 pnpm install
-pnpm build            # 审计色板 → 清空 dist/ → 生成主题产物
-pnpm build:site       # 清空 site/ → 生成官网静态页
-pnpm build:docs       # 生成 docs/palette.md
-pnpm test             # 色板审计 + 产物检查（与 build 的检查一致）
-pnpm typecheck
-pnpm capture:preview  # 内存渲染 gallery 并直接截图到 docs/preview.png（需 Playwright）
-pnpm site             # 构建官网并在浏览器打开（site/index.html）
+pnpm install:ghostty
+pnpm install:kaku
+pnpm install:opencode
+pnpm install:zed
+pnpm install:dsh
 ```
 
-生成器保证各端一致：改一处色板，VS Code、Ghostty、Kaku、OpenCode 与官网同时更新。构建会拒绝落在对比度区间或彩度预算之外的配色。`src/` 只保留主题与各端软件 target；官网、色板文档与 README 截图的源码都在 `showcase/`，产物分别落到 `site/` 和 `docs/`。官网默认英文（`site/`），中文在 `site/zh/`；页面 chrome 跟随系统明暗选用玄墨 / 宣纸，可切换六个变体。
+每个安装脚本都会先构建主题，再复制到对应软件的配置目录。Kaku 0.27.1+ 只要 TOML 色表，旧版 Kaku / WezTerm 用 Lua；DSH 默认安装六主题菜单版，也可以换成按明暗自动配对的单包。不想克隆仓库时，可从 [Releases](https://github.com/Konata9/inkstone/releases) 下载对应 zip；手动安装、OpenCode 配置、DSH 配对包与排障见 [安装详解](docs/installation.md)。
 
-### 设计约束
+## 文档
 
-1. **三组光线**：墨纸组以墨与纸为底，Dimmed 把灯调暗而不是蒙灰；海瓷组以深海与青瓷釉为底。
-2. **对比度是区间**：正文 10.5–12.5:1、语法色 4.5–9:1；过低伤可读性，过高伤耐受度。
-3. **彩度有预算**：朱砂系 C ≤ 0.175，其余强调色 C ≤ 0.175，光标 C ≤ 0.105；超出时保留色相与明度、只压彩度。
-4. **传统色可追溯**：`nameOf()` 反查原值，降彩颜料通过 `soften()` 记录来源，`docs/palette.md` 自动列出。
-5. **同一骨架**：六个变体的色相顺序一致（朱 → 蓝 → 绿 → 橙 → 紫 → 青 → 绛），切换只换光线与饱和度。
-6. **不做花活**：无渐变、无斜体注释、无玻璃拟态；只做耐看的纸墨与海色。
-7. **红做记号，青做动作**：朱砂只留在语法、印章与危险态；按钮、徽标、进度、焦点与选中态用交互蓝，主操作和危险操作各占一个色相。
+| 文档 | 内容 |
+| --- | --- |
+| [设计约束](docs/design.md) | 三组光线、六个变体、色相骨架、对比度与彩度预算 |
+| [色板对照](docs/palette.md) | 每个语义角色的色值、传统色名与画布对比度 |
+| [安装详解](docs/installation.md) | 各平台手动安装、旧版 Kaku、DSH 配对包与排障 |
+| [开发](docs/development.md) | 仓库结构、构建命令、生成管线与扩展方式 |
+| [发布](docs/publishing.md) | 两条版本线、Marketplace / Open VSX、预发布与重试 |
 
-## 发布
-
-项目有两条独立版本线，各自打 tag：
-
-| 发布线 | 版本源 | tag | 产物 |
-| --- | --- | --- | --- |
-| 主题 / 项目 | 根 `package.json` | `v0.4.0` | Ghostty / Kaku / OpenCode / Zed / bundle，并附带当前 VSIX（仅打包，不发布市场） |
-| VS Code 扩展 | `packages/vscode/package.json` | `vscode-v0.3.6` | VSIX，发布到 VS Code Marketplace 与 Open VSX |
-
-扩展版本独立递增，主题发版不会自动提升扩展版本，扩展也可以长期停在旧版本。扩展的变更日志单独维护在 `packages/vscode/CHANGELOG.md`。
-
-外部贡献会在发版时自动追加 `### Acknowledgements` 并 @ 贡献者（从 merged PR 的 `Merge pull request #N from <login>/...` 识别）；如果版本小节里已经有手写的 `### Acknowledgements`，则保留手写内容。
-
-```bash
-pnpm release minor                  # 主题：v<version>
-pnpm release patch --target vscode  # 扩展：vscode-v<version>
-```
-
-稳定 tag 才会发布市场；预发布 tag（如 `vscode-v0.3.6-beta.1`）只生成 GitHub prerelease。Open VSX Trusted Publishing 需要在 open-vsx.org 的 publisher 设置里登记 `.github/workflows/release-vscode.yml`。
-
-## 许可与致谢
+## 致谢与许可
 
 - 代码以 [MIT](LICENSE) 发布。
 - 色值来自 [zhongguose.com](https://zhongguose.com/)（作者 Perchouli）整理的 526 个中国传统颜色，与 Figma 社区色谱「526 个中国传统颜色」同为一套；传统色名属于公共文化资产。
 - 架构上参考了 [Catppuccin](https://catppuccin.com/) 的多端生成方式，气质上受益于 Tokyo Night 与 Gruvbox 的克制。
 - 预览页使用系统字体，无外部依赖；图标由 `scripts/make-icon.py` 生成。
-
----
-
-## English
-
-**Inkstone (墨观)** is a traditional Chinese color theme for VS Code-likes and terminals. It takes its accents from the 526-color `zhongguose` palette: cinnabar for keywords, verdigris for strings, turmeric for types, and layered ink neutrals.
-
-- **Xuanmo (玄墨)** — dark, pine-soot ink and cinnabar annotations.
-- **Xuanmo Dimmed** — dark, lower ambient light with pigments that keep their hue; ink still clears 10.5:1.
-- **Xuanzhi (宣纸)** — warm light, raw xuan paper and mineral pigments.
-- **Xuanzhi Dimmed** — warm light, aged paper and deeper ink; faded pigments, not grey ones.
-- **Canghai (沧海)** — deep-sea twilight, blue-green minerals and a cinnabar seal.
-- **Qingci (青瓷)** — cool light, moon-white celadon glaze and grey ink.
-
-Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Konata9.inkstone) or [Open VSX](https://open-vsx.org/extension/Konata9/inkstone), or use the VSIX from `dist/`; the Ghostty / Kaku / OpenCode themes install with the scripts above. In Kaku 0.27.1 and newer the installer drops only the TOML schemes into `~/.config/kaku/colors/`; the same-named Lua scheme stays available for WezTerm and older Kaku builds.
-
-Built with a generator: one semantic palette produces the VS Code themes, the Ghostty themes and the terminal ANSI schemes, and the build fails if any token leaves its contrast band or OKLCH chroma budget.
-
-Red stays a mark (keywords, errors, deletions, the seal) while each flavor's interaction blue carries buttons, badges, progress, focus and selected chrome, so confirmation and destruction never share a hue.
-
-### DeepSeek Harness (DSH)
-
-DSH's Web GUI and Desktop share one renderer and take themes as plugins. The **menu edition** `inkstone-dsh-<version>.tgz` packs all six themes (宣纸 / 宣纸 Dimmed / 玄墨 / 玄墨 Dimmed / 沧海 / 青瓷) into one plugin with a switcher under **Settings → General**:
-
-```bash
-dsh plugin --profile web add file:/absolute/path/to/inkstone-dsh-<version>.tgz
-```
-
-Building from source installs the generated directory instead (`pnpm install:dsh` builds and installs the menu edition):
-
-```bash
-pnpm install && pnpm build
-dsh plugin --profile web add "$PWD/dist/dsh/inkstone-dsh"
-```
-
-Restart `dsh web`, open **Settings → General**, and pick one of the Inkstone buttons: the choice applies immediately and is remembered. "跟随 DSH" hands control back to **Appearance** (Light uses 宣纸, Dark uses 玄墨). Remove it with `dsh plugin --profile web remove inkstone-dsh`.
-
-Prefer no menu? Install one Appearance-driven pair package instead:
-
-| Package | Light | Dark |
-| --- | --- | --- |
-| `inkstone-dsh-ink` | 宣纸 | 玄墨 |
-| `inkstone-dsh-ink-dimmed` | 宣纸 Dimmed | 玄墨 Dimmed |
-| `inkstone-dsh-sea` | 青瓷 | 沧海 |
-
-All DSH theme packages override the same tokens, so install **one at a time**; they are also mutually exclusive with other DSH theme plugins such as Catppuccin. The packages declare `engines.dsh: ">=0.2.1-rc.3 <0.3.0"`, and a pre-release DSH outside that range refuses the install. Terminal ANSI colours are chosen by the terminal itself and stay out of scope.

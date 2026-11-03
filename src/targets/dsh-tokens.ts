@@ -8,7 +8,7 @@
  * Source: DSH 0.2.1-rc.3, packages/client/ui-theme/src/styles/*.css. Only
  * colour-valued custom properties are listed: fonts, sizes, radii, shadows,
  * motion and the pointer-modality-only `--dsw-focus-ring-color` are out of
- * scope. The extraction recipe lives in docs/dsh-target-plan.md, appendix D.
+ * scope.
  */
 
 export const DSH_TOKENS = [
