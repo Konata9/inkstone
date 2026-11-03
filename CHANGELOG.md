@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+- **DeepSeek Harness (DSH)**: a new target generates four installable theme plugins under `dist/dsh/`. The menu edition packs all six flavors into one plugin with a **Settings → General** switcher, while `inkstone-dsh-ink` / `-ink-dimmed` / `-sea` override DSH's built-in light/dark palettes for people who never want to pick a theme. Install from source with `pnpm install:dsh`; releases attach the matching `.tgz` files. Post-build checks run each browser bundle in a sandbox and assert it covers the frozen DSH 0.2.1 token ladder, so a token change fails the build instead of shipping a partial theme.
+- **Zed extension version**: `dist/zed/extension.toml` now takes its version from the root `package.json` through `src/version.ts`, the same helper the checks use, so the manifest can no longer drift from the built themes.
+- **Release drift check covers every committed output**: `src/outputs.ts` owns one list of generated files, and `pnpm release:check` verifies the site pages, `docs/palette.md` and `site/favicon.png` alongside the VS Code themes instead of trusting whatever `dist/` happens to hold.
+- **Stricter release inputs**: every release script accepts `--flag=value`, rejects unknown flags instead of ignoring them, and refuses to tag when the changelog has no section for the version being released.
+- **Palette registry**: flavors are derived from their families and the registry asserts itself, and the VS Code `contributes.themes` list is validated against the palette, so a renamed or missing flavor fails the audit.
+- **Shared target plumbing**: `GeneratedFile` lives in `src/targets/types.ts`, ANSI key spelling lives in `src/targets/ansi.ts` (with tests), and the Kaku Lua and TOML schemes serialize from one terminal model.
+
+### Acknowledgements
+- @uoiszero — feat: 新增 DeepSeek Harness (DSH) 主题 target (#3)
+
 ## 0.4.0
 - **Zed support**: six-flavor ThemeFamily (`dist/zed/inkstone.json`) plus `extension.toml`; install with `pnpm install:zed`, and Zed joins the generated targets and post-build checks.
 - **Independent VS Code versioning**: the extension owns its version in `packages/vscode/package.json` and releases as `vscode-v*`; theme releases no longer bump or publish the VSIX, but still attach the current one.
