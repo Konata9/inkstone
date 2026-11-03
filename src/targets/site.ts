@@ -31,9 +31,6 @@ const templateRoot = join(root, 'templates', 'site');
 /** Public origin for canonical / hreflang / sitemap. Change when a custom domain is attached. */
 export const SITE_ORIGIN = 'https://konata9.github.io/inkstone';
 
-/** Favicon source copied into `site/` by the build step. */
-export const SITE_FAVICON_SOURCE = join(root, 'packages', 'vscode', 'icon.png');
-
 const RELEASES_URL = 'https://github.com/Konata9/inkstone/releases';
 const REPO_URL = 'https://github.com/Konata9/inkstone';
 const MARKETPLACE_URL = 'https://marketplace.visualstudio.com/items?itemName=Konata9.inkstone';
@@ -115,11 +112,6 @@ const bootJs = `(function () {
 export interface GeneratedSiteFile {
   path: string;
   content: string;
-}
-
-function readVersion(): string {
-  const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as { version: string };
-  return pkg.version;
 }
 
 /** One flavor row shared by the rail, hero stage, and specimen panels. */
@@ -357,8 +349,7 @@ Terminal themes: use the Ghostty / Kaku zip assets from the same release, or
 }
 
 /** All text files for the static site (HTML + SEO companions). */
-export function generateSite(): GeneratedSiteFile[] {
-  const version = readVersion();
+export function generateSite(version: string): GeneratedSiteFile[] {
   return [
     { path: 'site/index.html', content: renderPage('en', version) },
     { path: 'site/zh/index.html', content: renderPage('zh', version) },

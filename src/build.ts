@@ -18,22 +18,14 @@
  *   docs/palette.md
  */
 
-import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { reportFailures, runChecks } from './checks.ts';
+import { collectAllOutputs, GENERATED_BINARY_OUTPUTS } from './outputs.ts';
 import { flavors } from './palette/index.ts';
 import { readRootVersion } from './version.ts';
-import { renderPaletteDoc } from './targets/docs.ts';
-import { generateDsh } from './targets/dsh.ts';
-import { generateGhostty } from './targets/ghostty.ts';
-import { generateKaku, generateKakuToml } from './targets/kaku.ts';
-import { generateOpencode } from './targets/opencode.ts';
-import { renderGallery, renderPreview } from './targets/preview.ts';
-import { generateSite, SITE_FAVICON_SOURCE } from './targets/site.ts';
-import { generateVscode } from './targets/vscode.ts';
-import { generateZed } from './targets/zed.ts';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const version = readRootVersion();
@@ -49,19 +41,7 @@ if (!checks.ok) {
 rmSync(join(root, 'dist'), { recursive: true, force: true });
 console.log('  ✓ dist/ cleaned');
 
-const files = [
-  ...generateVscode(),
-  ...generateGhostty(),
-  ...generateKaku(),
-  ...generateKakuToml(),
-  ...generateOpencode(),
-  ...generateZed(version),
-  ...generateDsh(version, readFileSync(join(root, 'LICENSE'), 'utf8')),
-  { path: 'preview/index.html', content: renderPreview() },
-  { path: 'preview/gallery.html', content: renderGallery() },
-  ...generateSite(),
-  { path: 'docs/palette.md', content: renderPaletteDoc() },
-];
+const files = collectAllOutputs(version);
 
 for (const file of files) {
   const destination = join(root, file.path);
@@ -70,14 +50,15 @@ for (const file of files) {
   console.log(`  ✓ ${file.path}`);
 }
 
-mkdirSync(join(root, 'site'), { recursive: true });
-copyFileSync(SITE_FAVICON_SOURCE, join(root, 'site', 'favicon.png'));
-writeFileSync(join(root, 'site', '.nojekyll'), '');
-console.log('  ✓ site/favicon.png');
-console.log('  ✓ site/.nojekyll');
+for (const binary of GENERATED_BINARY_OUTPUTS) {
+  const destination = join(root, binary.path);
+  mkdirSync(dirname(destination), { recursive: true });
+  copyFileSync(join(root, binary.source), destination);
+  console.log(`  ✓ ${binary.path}`);
+}
 
 console.log(
-  `\nBuilt ${files.length} files for ${flavors.length} flavors ` +
+  `\nBuilt ${files.length + GENERATED_BINARY_OUTPUTS.length} files for ${flavors.length} flavors ` +
     `(${checks.audit.checks} palette checks, ${flavors.length} VS Code themes, ` +
     `${flavors.length} Ghostty themes, ${flavors.length} Kaku schemes (Lua + TOML), ` +
     `${flavors.length} OpenCode themes, Zed themes, DSH theme plugins, site pages).\n`,

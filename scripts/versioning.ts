@@ -17,7 +17,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { generateVscode } from '../src/targets/vscode.ts';
+import { collectCommittedOutputs, GENERATED_BINARY_OUTPUTS } from '../src/outputs.ts';
 import { readJson } from './packaging.ts';
 import type { PackageJson } from './packaging.ts';
 
@@ -90,13 +90,23 @@ export function assertTagMatchesVersion(
  */
 export function findGeneratedDrift(): string[] {
   const drift: string[] = [];
+  const version = String(readRootPkg().version);
 
-  for (const file of generateVscode()) {
+  for (const file of collectCommittedOutputs(version)) {
     const path = join(root, file.path);
     if (!existsSync(path)) {
       drift.push(`${file.path} is missing`);
     } else if (readFileSync(path, 'utf8') !== file.content) {
       drift.push(`${file.path} is out of sync with the current palette`);
+    }
+  }
+
+  for (const file of GENERATED_BINARY_OUTPUTS) {
+    const path = join(root, file.path);
+    if (!existsSync(path)) {
+      drift.push(`${file.path} is missing`);
+    } else if (!readFileSync(path).equals(readFileSync(join(root, file.source)))) {
+      drift.push(`${file.path} is out of sync with ${file.source}`);
     }
   }
 
