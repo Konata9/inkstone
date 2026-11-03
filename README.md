@@ -300,6 +300,8 @@ pnpm site         # 构建并打开官网（site/index.html）
 
 扩展版本独立递增，主题发版不会自动提升扩展版本，扩展也可以长期停在旧版本。扩展的变更日志单独维护在 `packages/vscode/CHANGELOG.md`。
 
+外部贡献会在发版时自动追加 `### Acknowledgements` 并 @ 贡献者（从 merged PR 的 `Merge pull request #N from <login>/...` 识别）；如果版本小节里已经有手写的 `### Acknowledgements`，则保留手写内容。
+
 ```bash
 pnpm release minor                  # 主题：v<version>
 pnpm release patch --target vscode  # 扩展：vscode-v<version>

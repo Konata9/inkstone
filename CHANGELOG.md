@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+- **Zed support**: six-flavor ThemeFamily (`dist/zed/inkstone.json`) plus `extension.toml`; install with `pnpm install:zed`, and Zed joins the generated targets and post-build checks.
+- **Independent VS Code versioning**: the extension owns its version in `packages/vscode/package.json` and releases as `vscode-v*`; theme releases no longer bump or publish the VSIX, but still attach the current one.
+- **Split release workflows**: `release.yml` handles theme tags only, while `release-vscode.yml` publishes stable extension tags to VS Code Marketplace and Open VSX with notes from `packages/vscode/CHANGELOG.md`.
+- **Kaku 0.27.1+**: custom themes install as TOML under `~/.config/kaku/colors/`; the Lua table stays for older Kaku and WezTerm.
+- **Deterministic sitemap**: the sitemap no longer embeds the build date, so `pnpm build` stops producing a different file every day.
+
+### Acknowledgements
+- @freejool — feat: 实现 Zed 主题支持 (#1)
+
 ## 0.3.5
 - **玄墨关键字离开粉红侧**: `keyword` / `storage` / `deleted` move from 海棠红 · 降彩 (`#da5761`, H≈18.6) to 鱼鳃红 · 降彩 (`#d8574a`, H≈28.5), keeping the same lightness and chroma. 玄墨 Dimmed moves from 山黎豆红 (`#c27c88`) to 桂红 · 降彩 (`#c57f73`), a muted brick instead of dusty rose.
 - **Red leaves the interaction layer**: selection highlight, range highlight, bracket match, overview ruler and chat slash commands now use each flavor's action blue instead of the keyword red; the bracket color cycle ends on red instead of starting with it. Annotation red is left to keywords, errors and deletions.

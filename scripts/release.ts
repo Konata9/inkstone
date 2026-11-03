@@ -17,6 +17,11 @@ import { join } from 'node:path';
 
 import { hasUnreleasedEntries, hasVersionSection } from './changelog.ts';
 import {
+  appendAcknowledgements,
+  findAcknowledgements,
+  previousTag,
+} from './acknowledgements.ts';
+import {
   branchName,
   git,
   localTagExists,
@@ -168,11 +173,17 @@ if (hasVersionSection(changelog, next)) {
   fail(`${changelogLabel} already has a "## ${next}" section`);
 }
 const nextChangelog = changelog.replace(/^##\s+Unreleased\s*$/m, `## ${next}`);
+const fromTag = previousTag(target === 'vscode' ? 'vscode-v*' : 'v[0-9]*');
+const acknowledgements = fromTag ? findAcknowledgements(fromTag) : [];
+const finalChangelog = appendAcknowledgements(nextChangelog, next, acknowledgements);
 
 if (dryRun) {
   console.log(`\nWould release ${target} ${current} -> ${next}`);
   console.log(`  • ${pkgLabel}: ${current} -> ${next}`);
   console.log(`  • ${changelogLabel}: "## Unreleased" -> "## ${next}"`);
+  if (acknowledgements.length > 0) {
+    console.log(`  • acknowledgements: ${acknowledgements.length} contributor(s)`);
+  }
   console.log(`  • build + typecheck, commit "chore: release ${tag}", tag ${tag}`);
   console.log(noPush ? '  • no push (--no-push)' : `  • push origin ${branch} and ${tag}`);
   console.log('\nDry run: no files changed.\n');
@@ -180,7 +191,7 @@ if (dryRun) {
 }
 
 writeFileSync(pkgPath, `${JSON.stringify({ ...pkg, version: next }, null, 2)}\n`, 'utf8');
-writeFileSync(changelogFile, nextChangelog, 'utf8');
+writeFileSync(changelogFile, finalChangelog, 'utf8');
 
 try {
   run('pnpm', ['build']);
