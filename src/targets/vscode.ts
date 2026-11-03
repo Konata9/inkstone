@@ -846,6 +846,21 @@ export interface GeneratedFile {
   content: string;
 }
 
+export interface VscodeThemeContribution {
+  label: string;
+  uiTheme: 'vs-dark' | 'vs';
+  path: string;
+}
+
+/** One entry of `contributes.themes` in `packages/vscode/package.json`. */
+export function vscodeThemeContribution(flavor: Flavor): VscodeThemeContribution {
+  return {
+    label: themeDisplayName(flavor),
+    uiTheme: flavor.meta.appearance === 'dark' ? 'vs-dark' : 'vs',
+    path: `./themes/${vscodeFileName(flavor)}`,
+  };
+}
+
 export function generateVscode(): GeneratedFile[] {
   return flavors.map((flavor) => ({
     path: `packages/vscode/themes/${vscodeFileName(flavor)}`,

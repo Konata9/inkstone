@@ -13,6 +13,8 @@ import { runInNewContext } from 'node:vm';
 
 import { parse as parseLua } from 'luaparse';
 import { parse as parseToml } from 'smol-toml';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 import { contrast, isValidHex } from './color.ts';
 import { flavors } from './palette/index.ts';
@@ -29,7 +31,7 @@ import {
   OPENCODE_STEPS,
   OPENCODE_SYNTAX_KEYS,
 } from './targets/opencode.ts';
-import { buildTheme } from './targets/vscode.ts';
+import { buildTheme, vscodeThemeContribution } from './targets/vscode.ts';
 import { generateZed } from './targets/zed.ts';
 import { ZED_FAMILY_NAME } from './targets/naming.ts';
 import { readRootVersion } from './version.ts';
@@ -94,8 +96,78 @@ const requiredScopes = [
   'markup.heading',
 ];
 
+interface VscodeManifest {
+  contributes?: {
+    themes?: Array<{
+      label?: string;
+      uiTheme?: string;
+      path?: string;
+    }>;
+  };
+}
+
+/**
+ * The extension manifest lists its themes by hand. Compare it with the
+ * generator so a new flavor cannot ship with a missing picker entry.
+ *
+ * This checks the manifest only; theme-file existence is covered by the
+ * release drift check, which runs after `pnpm build`.
+ */
+function checkVscodeManifest(issues: string[]): void {
+  const manifestPath = fileURLToPath(new URL('../packages/vscode/package.json', import.meta.url));
+  let manifest: VscodeManifest;
+  try {
+    manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as VscodeManifest;
+  } catch (error) {
+    issues.push(
+      `packages/vscode/package.json: cannot read manifest — ${(error as Error).message}`,
+    );
+    return;
+  }
+
+  const contributed = manifest.contributes?.themes;
+  if (!Array.isArray(contributed)) {
+    issues.push('packages/vscode/package.json: contributes.themes is missing');
+    return;
+  }
+
+  const expected = flavors.map(vscodeThemeContribution);
+  if (contributed.length !== expected.length) {
+    issues.push(
+      `packages/vscode/package.json: contributes.themes has ${contributed.length} entries, ` +
+        `expected ${expected.length}`,
+    );
+  }
+
+  const total = Math.max(contributed.length, expected.length);
+  for (let index = 0; index < total; index += 1) {
+    const actual = contributed[index];
+    const want = expected[index];
+    if (!actual) {
+      issues.push(
+        `packages/vscode/package.json: missing theme entry "${want?.label}" -> ${want?.path}`,
+      );
+      continue;
+    }
+    if (!want) {
+      issues.push(`packages/vscode/package.json: unexpected theme entry "${actual.label}"`);
+      continue;
+    }
+    for (const field of ['label', 'uiTheme', 'path'] as const) {
+      if (actual[field] !== want[field]) {
+        issues.push(
+          `packages/vscode/package.json: contributes.themes[${index}].${field} is ` +
+            `${JSON.stringify(actual[field])}, expected ${JSON.stringify(want[field])} for ${want.label}`,
+        );
+      }
+    }
+  }
+}
+
 export function checkThemes(): string[] {
   const issues: string[] = [];
+
+  checkVscodeManifest(issues);
 
   for (const flavor of flavors) {
     const theme = buildTheme(flavor);
