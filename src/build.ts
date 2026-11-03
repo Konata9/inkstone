@@ -4,9 +4,7 @@
  *   pnpm build
  *
  * Outputs:
- *   packages/vscode/package.json   (version synced from the root package.json)
  *   packages/vscode/themes/*.json
- *   packages/vscode/CHANGELOG.md   (copy of the root CHANGELOG.md)
  *   dist/ghostty/Inkstone *
  *   dist/kaku/*.lua                (WezTerm-compatible Lua tables)
  *   dist/kaku/*.toml               (Kaku `colors/` directory schemes)
@@ -39,15 +37,6 @@ const rootPkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as 
   version: string;
 };
 
-/** Keep the extension manifest on the root version; the file stays committed. */
-function syncVscodeVersion(): string {
-  const manifest = JSON.parse(
-    readFileSync(join(root, 'packages', 'vscode', 'package.json'), 'utf8'),
-  ) as Record<string, unknown>;
-  return `${JSON.stringify({ ...manifest, version: rootPkg.version }, null, 2)}\n`;
-}
-
-
 const checks = runChecks();
 if (!checks.ok) {
   reportFailures(checks, 'Build stopped');
@@ -60,15 +49,7 @@ rmSync(join(root, 'dist'), { recursive: true, force: true });
 console.log('  ✓ dist/ cleaned');
 
 const files = [
-  {
-    path: 'packages/vscode/package.json',
-    content: syncVscodeVersion(),
-  },
   ...generateVscode(),
-  {
-    path: 'packages/vscode/CHANGELOG.md',
-    content: readFileSync(join(root, 'CHANGELOG.md'), 'utf8'),
-  },
   ...generateGhostty(),
   ...generateKaku(),
   ...generateKakuToml(),

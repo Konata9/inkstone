@@ -40,16 +40,16 @@ A traditional Chinese color theme for editors and terminals, built from the 526-
 
 ### GitHub Releases
 
-每个版本都会在 [Releases](https://github.com/Konata9/inkstone/releases) 附带：
+每个主题版本都会在 [Releases](https://github.com/Konata9/inkstone/releases) 附带：
 
 | 产物 | 用途 |
 | --- | --- |
-| `Konata9.inkstone-<version>.vsix` | VS Code / Cursor / Windsurf / VSCodium |
+| `Konata9.inkstone-<vscode-version>.vsix` | VS Code / Cursor / Windsurf / VSCodium（扩展版本独立递增） |
 | `inkstone-ghostty-<version>.zip` | Ghostty 主题文件 |
 | `inkstone-kaku-<version>.zip` | Kaku / WezTerm 色表（Lua + TOML） |
 | `inkstone-opencode-<version>.zip` | OpenCode V2 主题 |
 | `inkstone-zed-<version>.zip` | Zed 主题包 |
-| `inkstone-<version>.zip` | 全部产物 + `manifest.json` + 安装说明 |
+| `inkstone-<version>.zip` | 全部主题产物 + `manifest.json` + 安装说明 |
 | `manifest.json` / `SHA256SUMS` | 机器可读索引与校验和 |
 
 下面的本地安装方式仍然适用于从源码构建。
@@ -63,12 +63,12 @@ pnpm install
 pnpm package:vscode
 ```
 
-产物在 `dist/Konata9.inkstone-<version>.vsix`。安装：
+产物在 `dist/Konata9.inkstone-<vscode-version>.vsix`。安装：
 
 ```bash
-code --install-extension dist/Konata9.inkstone-0.3.2.vsix
+code --install-extension dist/Konata9.inkstone-0.3.5.vsix
 # Cursor:
-cursor --install-extension dist/Konata9.inkstone-0.3.2.vsix
+cursor --install-extension dist/Konata9.inkstone-0.3.5.vsix
 ```
 
 然后在命令面板执行 **Preferences: Color Theme**，选择：
@@ -291,7 +291,21 @@ pnpm site         # 构建并打开官网（site/index.html）
 
 ## 发布
 
-稳定 tag（`v*`）会由 GitHub Actions 自动发布到 VS Code Marketplace 与 Open VSX；预发布 tag 只生成 GitHub prerelease。维护者配置、Open VSX Trusted Publishing 的首次 bootstrap 与重试方式见 [发布文档](docs/publishing.md)。
+项目有两条独立版本线，各自打 tag：
+
+| 发布线 | 版本源 | tag | 产物 |
+| --- | --- | --- | --- |
+| 主题 / 项目 | 根 `package.json` | `v0.4.0` | Ghostty / Kaku / OpenCode / Zed / bundle，并附带当前 VSIX（仅打包，不发布市场） |
+| VS Code 扩展 | `packages/vscode/package.json` | `vscode-v0.3.6` | VSIX，发布到 VS Code Marketplace 与 Open VSX |
+
+扩展版本独立递增，主题发版不会自动提升扩展版本，扩展也可以长期停在旧版本。扩展的变更日志单独维护在 `packages/vscode/CHANGELOG.md`。
+
+```bash
+pnpm release minor                  # 主题：v<version>
+pnpm release patch --target vscode  # 扩展：vscode-v<version>
+```
+
+稳定 tag 才会发布市场；预发布 tag（如 `vscode-v0.3.6-beta.1`）只生成 GitHub prerelease。Open VSX Trusted Publishing 需要在 open-vsx.org 的 publisher 设置里登记 `.github/workflows/release-vscode.yml`。
 
 ## 许可与致谢
 

@@ -248,19 +248,16 @@ function sitemapAlternates(): string {
 }
 
 function sitemapXml(): string {
-  const today = new Date().toISOString().slice(0, 10);
   const alternates = sitemapAlternates();
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>${SITE_ORIGIN}/</loc>
-    <lastmod>${today}</lastmod>
 ${alternates}
   </url>
   <url>
     <loc>${SITE_ORIGIN}/zh/</loc>
-    <lastmod>${today}</lastmod>
 ${alternates}
   </url>
 </urlset>

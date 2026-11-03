@@ -1,0 +1,107 @@
+name: release-vscode
+
+# VS Code extension release stream: tags like vscode-v0.3.6.
+# Theme releases live in release.yml and never publish to the marketplaces.
+on:
+  push:
+    tags:
+      - 'vscode-v*'
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # pnpm version comes from package.json "packageManager"; do not set `version` here.
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Verify VS Code release tag
+        run: pnpm release:check --tag "$GITHUB_REF_NAME" --target vscode
+
+      # The VSIX bundles generated themes, so run the full build first.
+      - name: Build themes (audits contrast)
+        run: pnpm build
+
+      - run: pnpm typecheck
+
+      - name: Package VSIX
+        run: pnpm package:vscode
+
+      - name: Assemble VS Code release assets
+        run: pnpm exec tsx scripts/package-release.ts --tag "$GITHUB_REF_NAME" --target vscode
+
+      # Stable tags only. The tag prefix contains a hyphen, so test the version
+      # after `vscode-v`, not the raw ref name: vscode-v0.3.6 is stable,
+      # vscode-v0.3.6-beta.1 is a prerelease.
+      - name: Publish to VS Code Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#vscode-v}"
+          if [[ "$version" == *-* ]]; then
+            echo "Prerelease $version: skipping Marketplace publish"
+            exit 0
+          fi
+          if [ -z "${VSCE_PAT:-}" ]; then
+            echo "::error::VSCE_PAT is not configured. Add an organization-scoped Marketplace PAT as a repository secret."
+            exit 1
+          fi
+          vsix="$(find dist -maxdepth 1 -name '*.vsix' -print -quit)"
+          test -n "$vsix"
+          pnpm dlx @vscode/vsce publish --packagePath "$vsix" --skip-duplicate
+
+      # Trusted publishing: register Konata9 / inkstone / release-vscode.yml at
+      # open-vsx.org → Settings → Trusted Publishers. No OVSX_PAT is needed.
+      - name: Publish to Open VSX
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#vscode-v}"
+          if [[ "$version" == *-* ]]; then
+            echo "Prerelease $version: skipping Open VSX publish"
+            exit 0
+          fi
+          vsix="$(find dist -maxdepth 1 -name '*.vsix' -print -quit)"
+          test -n "$vsix"
+          pnpm dlx ovsx publish --packagePath "$vsix" --trusted-publishing --skip-duplicate
+
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          tag="$GITHUB_REF_NAME"
+          version="${tag#vscode-v}"
+          notes="dist/release-notes.md"
+          args=(--title "墨观 Inkstone VS Code $version" --verify-tag)
+          if [[ "$version" == *-* ]]; then
+            args+=(--prerelease)
+          fi
+
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" dist/release/* --clobber
+            if [ -f "$notes" ]; then
+              gh release edit "$tag" --notes-file "$notes"
+            fi
+          elif [ -f "$notes" ]; then
+            gh release create "$tag" dist/release/* "${args[@]}" --notes-file "$notes"
+          else
+            gh release create "$tag" dist/release/* "${args[@]}" --generate-notes
+          fi

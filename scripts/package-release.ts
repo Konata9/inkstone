@@ -1,23 +1,30 @@
 #!/usr/bin/env node
 /**
- * Assemble the GitHub Release assets.
+ * Assemble the GitHub Release assets for one release stream.
  *
  * Usage:
  *   pnpm build
  *   pnpm package:vscode
- *   pnpm package:release -- --tag v0.4.0
+ *   pnpm package:release --target themes --tag v0.4.0
+ *   pnpm package:release --target vscode --tag vscode-v0.3.6
  *
- * Outputs to dist/release/:
- *   inkstone-ghostty-<version>.zip
- *   inkstone-kaku-<version>.zip
- *   inkstone-opencode-<version>.zip
- *   inkstone-<version>.zip          (all targets + manifest)
- *   Konata9.inkstone-<version>.vsix
+ * `themes` writes to dist/release/:
+ *   inkstone-ghostty-<themeVersion>.zip
+ *   inkstone-kaku-<themeVersion>.zip
+ *   inkstone-opencode-<themeVersion>.zip
+ *   inkstone-zed-<themeVersion>.zip
+ *   inkstone-<themeVersion>.zip          (theme targets + manifest)
+ *   Konata9.inkstone-<vscodeVersion>.vsix
  *   manifest.json
  *   SHA256SUMS
  *
- * Release notes, when the version exists in CHANGELOG.md, are written to
- * dist/release-notes.md for `gh release create --notes-file`.
+ * `vscode` writes to dist/release/:
+ *   Konata9.inkstone-<vscodeVersion>.vsix
+ *   manifest.json
+ *   SHA256SUMS
+ *
+ * Release notes, when the version exists in the stream's changelog, are
+ * written to dist/release-notes.md for `gh release create --notes-file`.
  */
 
 import { execFileSync } from 'node:child_process';
@@ -49,10 +56,12 @@ import { extractReleaseNotes, hasUnreleasedEntries } from './changelog.ts';
 import { repoUrl, vsixFileName } from './packaging.ts';
 import {
   assertTagMatchesVersion,
+  changelogPath,
   readRootPkg,
   readVscodePkg,
   root,
 } from './versioning.ts';
+import type { ReleaseTarget } from './versioning.ts';
 
 interface ThemeManifest {
   id: string;
@@ -89,29 +98,111 @@ function zipCommand(): void {
   }
 }
 
+const target = (argValue('--target', fail) ?? 'themes') as ReleaseTarget;
+if (target !== 'themes' && target !== 'vscode') {
+  fail('--target must be "themes" or "vscode"');
+}
+
 const releaseDir = join(root, 'dist', 'release');
 const stagingDir = join(root, 'dist', '.release-staging');
 const notesPath = join(root, 'dist', 'release-notes.md');
 
 const rootPkg = readRootPkg();
 const vscodePkg = readVscodePkg();
-const version = String(rootPkg.version);
+const themeVersion = String(rootPkg.version);
+const vscodeVersion = String(vscodePkg.version);
+const version = target === 'vscode' ? vscodeVersion : themeVersion;
 const tag = argValue('--tag', fail);
 
 if (tag) {
   try {
-    assertTagMatchesVersion(tag, version);
+    assertTagMatchesVersion(tag, version, target);
   } catch (error) {
     fail((error as Error).message);
   }
 }
 
-zipCommand();
-
 rmSync(releaseDir, { recursive: true, force: true });
 rmSync(stagingDir, { recursive: true, force: true });
 rmSync(notesPath, { force: true });
 mkdirSync(releaseDir, { recursive: true });
+
+const vsixName = vsixFileName(vscodePkg);
+const vsixPath = join(root, 'dist', vsixName);
+
+function writeNotes(): void {
+  const changelog = readFileSync(changelogPath(target), 'utf8');
+  const label = target === 'vscode' ? 'packages/vscode/CHANGELOG.md' : 'CHANGELOG.md';
+  const notes = extractReleaseNotes(changelog, version);
+  if (notes) {
+    writeFileSync(notesPath, notes, 'utf8');
+    console.log(`  ✓ dist/release-notes.md (from ${label} ${version})`);
+  } else {
+    console.warn(
+      `  ! ${label} has no "## ${version}" section; the workflow will use generated notes`,
+    );
+  }
+
+  if (notes && hasUnreleasedEntries(changelog)) {
+    console.warn(
+      `  ! ${label} still has an "## Unreleased" section; ` +
+        `those entries are not in the ${version} release notes. ` +
+        'Rename it to the release version or move the entries before tagging.',
+    );
+  }
+}
+
+function writeChecksums(): void {
+  const assets = readdirSync(releaseDir)
+    .filter((name) => name !== 'SHA256SUMS' && statSync(join(releaseDir, name)).isFile())
+    .sort();
+
+  writeFileSync(
+    join(releaseDir, 'SHA256SUMS'),
+    `${assets.map((name) => `${sha256(join(releaseDir, name))}  ${name}`).join('\n')}\n`,
+    'utf8',
+  );
+
+  console.log(`\nRelease assets for ${target} ${version}:`);
+  for (const name of [...assets, 'SHA256SUMS']) {
+    console.log(`  ✓ dist/release/${name}`);
+  }
+  console.log();
+}
+
+function sha256(path: string): string {
+  return createHash('sha256').update(readFileSync(path)).digest('hex');
+}
+
+if (target === 'vscode') {
+  assertFile(vsixPath);
+  copyFileSync(vsixPath, join(releaseDir, vsixName));
+
+  const manifest = {
+    schemaVersion: 2,
+    name: 'inkstone',
+    displayName: '墨观 Inkstone',
+    license: rootPkg.license ?? 'MIT',
+    repository: repoUrl(rootPkg),
+    versions: { vscode: vscodeVersion },
+    vscode: {
+      id: `${vscodePkg.publisher}.${vscodePkg.name}`,
+      version: vscodeVersion,
+      archive: vsixName,
+    },
+  };
+  writeFileSync(
+    join(releaseDir, 'manifest.json'),
+    `${JSON.stringify(manifest, null, 2)}\n`,
+    'utf8',
+  );
+
+  writeNotes();
+  writeChecksums();
+  process.exit(0);
+}
+
+zipCommand();
 
 const ghosttyFiles = flavors.map(ghosttyThemeName);
 const kakuFiles = flavors.map(kakuFileName);
@@ -123,16 +214,13 @@ for (const file of kakuFiles) assertFile(join(root, 'dist', 'kaku', file));
 for (const file of kakuTomlFiles) assertFile(join(root, 'dist', 'kaku', file));
 for (const file of opencodeFiles) assertFile(join(root, 'dist', 'opencode', file));
 assertFile(join(root, 'dist', 'zed', ZED_FILE_NAME));
-
-const ghosttyArchive = `inkstone-ghostty-${version}.zip`;
-const kakuArchive = `inkstone-kaku-${version}.zip`;
-const opencodeArchive = `inkstone-opencode-${version}.zip`;
-const zedArchive = `inkstone-zed-${version}.zip`;
-const bundleArchive = `inkstone-${version}.zip`;
-const vsixName = vsixFileName({ ...vscodePkg, version });
-const vsixPath = join(root, 'dist', vsixName);
-
 assertFile(vsixPath);
+
+const ghosttyArchive = `inkstone-ghostty-${themeVersion}.zip`;
+const kakuArchive = `inkstone-kaku-${themeVersion}.zip`;
+const opencodeArchive = `inkstone-opencode-${themeVersion}.zip`;
+const zedArchive = `inkstone-zed-${themeVersion}.zip`;
+const bundleArchive = `inkstone-${themeVersion}.zip`;
 
 function zipFlat(archive: string, directory: string, files: string[]): void {
   execFileSync('zip', ['-j', '-X', '-q', join(releaseDir, archive), ...files], {
@@ -164,10 +252,11 @@ const themes: ThemeManifest[] = flavors.map((flavor) => ({
 }));
 
 const manifest = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   name: 'inkstone',
   displayName: '墨观 Inkstone',
-  version,
+  version: themeVersion,
+  versions: { themes: themeVersion, vscode: vscodeVersion },
   license: rootPkg.license ?? 'MIT',
   repository: repoUrl(rootPkg),
   themes,
@@ -202,6 +291,7 @@ const manifest = {
   },
   vscode: {
     id: `${vscodePkg.publisher}.${vscodePkg.name}`,
+    version: vscodeVersion,
     archive: vsixName,
   },
   bundle: bundleArchive,
@@ -210,10 +300,13 @@ const manifest = {
 const manifestJson = `${JSON.stringify(manifest, null, 2)}\n`;
 writeFileSync(join(releaseDir, 'manifest.json'), manifestJson, 'utf8');
 
-const installDoc = `# 墨观 Inkstone ${version}
+const installDoc = `# 墨观 Inkstone ${themeVersion}
 
-This bundle contains every theme file for the ${version} release.
+This bundle contains every theme file for the ${themeVersion} release.
 The machine-readable index is \`manifest.json\`.
+
+The VS Code extension is versioned separately: this release ships
+\`${vsixName}\` (extension ${vscodeVersion}), which may be older than ${themeVersion}.
 
 ## Ghostty
 
@@ -337,39 +430,5 @@ execFileSync(
 
 rmSync(stagingDir, { recursive: true, force: true });
 
-const changelog = readFileSync(join(root, 'CHANGELOG.md'), 'utf8');
-const notes = extractReleaseNotes(changelog, version);
-if (notes) {
-  writeFileSync(notesPath, notes, 'utf8');
-  console.log(`  ✓ dist/release-notes.md (from CHANGELOG.md ${version})`);
-} else {
-  console.warn(`  ! CHANGELOG.md has no "## ${version}" section; the workflow will use generated notes`);
-}
-
-if (notes && hasUnreleasedEntries(changelog)) {
-  console.warn(
-    '  ! CHANGELOG.md still has an "## Unreleased" section; ' +
-      `those entries are not in the ${version} release notes. ` +
-      'Rename it to the release version or move the entries before tagging.',
-  );
-}
-
-function sha256(path: string): string {
-  return createHash('sha256').update(readFileSync(path)).digest('hex');
-}
-
-const assets = readdirSync(releaseDir)
-  .filter((name) => name !== 'SHA256SUMS' && statSync(join(releaseDir, name)).isFile())
-  .sort();
-
-writeFileSync(
-  join(releaseDir, 'SHA256SUMS'),
-  `${assets.map((name) => `${sha256(join(releaseDir, name))}  ${name}`).join('\n')}\n`,
-  'utf8',
-);
-
-console.log(`\nRelease assets for ${version}:`);
-for (const name of [...assets, 'SHA256SUMS']) {
-  console.log(`  ✓ dist/release/${name}`);
-}
-console.log();
+writeNotes();
+writeChecksums();
