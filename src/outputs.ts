@@ -7,7 +7,7 @@
  *
  * Showcase outputs (the product site, the palette reference and the README
  * screenshot) are not theme targets: they live under `showcase/` and are built
- * with `pnpm build:showcase` / `pnpm capture:preview`.
+ * with `pnpm build:site`, `pnpm build:docs` and `pnpm capture:preview`.
  */
 
 import { readFileSync } from 'node:fs';

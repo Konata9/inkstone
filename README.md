@@ -286,14 +286,16 @@ src/                       主题 + 各端软件 target
     dsh-tokens.ts         DSH 0.2.1 颜色 token 冻结清单
 showcase/                  展示层源码（与 src/ 平级）
   specimen.ts              CSS 变量、色卡、编辑器示意（官网与截图共用）
-  build.ts                 展示层构建入口（site + docs/palette.md）
   outputs.ts               展示层产物清单（供 drift check）
   site/
+    build.ts               官网构建入口（清空并写入 site/）
     outputs.ts             页面渲染、SEO 文件与产物清单
     copy.ts                官网中英文案
     templates/             Liquid 模板（结构 / CSS / JS）
     assets/                OG 图等静态素材
   docs/
+    build.ts               文档构建入口（写入 docs/palette.md）
+    outputs.ts             文档产物清单
     palette.ts             色板文档生成
   preview/
     gallery.ts             3×2 编辑器总览（内存渲染）
@@ -315,11 +317,12 @@ docs/publishing.md        Marketplace / Open VSX 发布与 Trusted Publishing �
 ```bash
 pnpm install
 pnpm build            # 审计色板 → 清空 dist/ → 生成主题产物
-pnpm build:showcase   # 清空 site/ → 生成官网静态页与 docs/palette.md
+pnpm build:site       # 清空 site/ → 生成官网静态页
+pnpm build:docs       # 生成 docs/palette.md
 pnpm test             # 色板审计 + 产物检查（与 build 的检查一致）
 pnpm typecheck
 pnpm capture:preview  # 内存渲染 gallery 并直接截图到 docs/preview.png（需 Playwright）
-pnpm site             # 构建展示层并在浏览器打开官网（site/index.html）
+pnpm site             # 构建官网并在浏览器打开（site/index.html）
 ```
 
 生成器保证各端一致：改一处色板，VS Code、Ghostty、Kaku、OpenCode 与官网同时更新。构建会拒绝落在对比度区间或彩度预算之外的配色。`src/` 只保留主题与各端软件 target；官网、色板文档与 README 截图的源码都在 `showcase/`，产物分别落到 `site/` 和 `docs/`。官网默认英文（`site/`），中文在 `site/zh/`；页面 chrome 跟随系统明暗选用玄墨 / 宣纸，可切换六个变体。

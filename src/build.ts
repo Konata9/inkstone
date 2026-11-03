@@ -14,7 +14,7 @@
  *   dist/dsh/<package>/**  (four installable DeepSeek Harness theme plugins)
  *
  * Showcase outputs (site, palette reference, README screenshot) are built
- * separately with `pnpm build:showcase` / `pnpm capture:preview`.
+ * separately with `pnpm build:site`, `pnpm build:docs` and `pnpm capture:preview`.
  */
 
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';

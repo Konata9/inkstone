@@ -1,22 +1,20 @@
 /**
- * Every file `pnpm build:showcase` writes, in build order.
+ * Every committed file the showcase builds write, in build order.
  *
- * The showcase build and the release drift check share this list: the product
- * site under `site/`, the generated palette reference under `docs/`, and the
- * copied site assets. `docs/preview.png` is produced separately by
- * `pnpm capture:preview`.
+ * The drift check shares this list: the product site under `site/`, the
+ * generated palette reference under `docs/`, and the copied site assets.
+ *
+ * Site and docs have separate entries (`pnpm build:site` / `pnpm build:docs`);
+ * `docs/preview.png` is produced separately by `pnpm capture:preview`.
  */
 
-import { renderPaletteDoc } from './docs/palette.ts';
+import { collectDocsOutputs } from './docs/outputs.ts';
 import { collectSiteOutputs, SITE_BINARY_OUTPUTS } from './site/outputs.ts';
 import type { SiteBinaryOutput, SiteOutput } from './site/outputs.ts';
 
-/** Text outputs for the site and the palette reference. */
+/** Text outputs for the site and the generated docs. */
 export function collectShowcaseOutputs(version: string): SiteOutput[] {
-  return [
-    ...collectSiteOutputs(version),
-    { path: 'docs/palette.md', content: renderPaletteDoc() },
-  ];
+  return [...collectSiteOutputs(version), ...collectDocsOutputs()];
 }
 
 /** Showcase assets that are copied rather than rendered. */

@@ -1,6 +1,6 @@
 # 墨观 Inkstone · 色板
 
-> 本文件由 `pnpm build:showcase` 自动生成，请勿手动修改。
+> 本文件由 `pnpm build:docs` 自动生成，请勿手动修改。
 
 ## 数据来源
 
