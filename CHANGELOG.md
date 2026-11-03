@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.4.0
 - **Zed support**: six-flavor ThemeFamily (`dist/zed/inkstone.json`) plus `extension.toml`; install with `pnpm install:zed`, and Zed joins the generated targets and post-build checks.
 - **Independent VS Code versioning**: the extension owns its version in `packages/vscode/package.json` and releases as `vscode-v*`; theme releases no longer bump or publish the VSIX, but still attach the current one.
 - **Split release workflows**: `release.yml` handles theme tags only, while `release-vscode.yml` publishes stable extension tags to VS Code Marketplace and Open VSX with notes from `packages/vscode/CHANGELOG.md`.
