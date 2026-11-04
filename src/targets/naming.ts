@@ -9,7 +9,7 @@
 import { flavorName } from '../palette/index.ts';
 import type { Flavor } from '../palette/types.ts';
 
-/** Theme name shared by Ghostty files and Kaku schemes: `Inkstone Xuanmo Dimmed`. */
+/** Theme name shared by Ghostty files, Kaku schemes and Warp themes: `Inkstone Xuanmo Dimmed`. */
 export function inkstoneThemeName(flavor: Flavor): string {
   return `Inkstone ${flavorName(flavor, 'en')}`;
 }
@@ -22,6 +22,11 @@ export function kakuFileName(flavor: Flavor): string {
 /** Kaku `colors` directory file name: `inkstone-xuanmo.toml`. */
 export function kakuTomlFileName(flavor: Flavor): string {
   return `inkstone-${flavor.meta.id}.toml`;
+}
+
+/** Warp theme YAML file name: `inkstone-xuanmo.yaml`. */
+export function warpFileName(flavor: Flavor): string {
+  return `inkstone-${flavor.meta.id}.yaml`;
 }
 
 /** VS Code theme JSON file name: `xuanmo-color-theme.json`. */

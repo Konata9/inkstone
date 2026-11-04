@@ -17,6 +17,7 @@ import { generateGhostty } from './targets/ghostty.ts';
 import { generateKaku, generateKakuToml } from './targets/kaku.ts';
 import { generateOpencode } from './targets/opencode.ts';
 import { generateVscode } from './targets/vscode.ts';
+import { generateWarp } from './targets/warp.ts';
 import { generateZed } from './targets/zed.ts';
 
 export interface GeneratedOutput {
@@ -42,6 +43,7 @@ export function collectAllOutputs(version: string): GeneratedOutput[] {
     ...generateKaku(),
     ...generateKakuToml(),
     ...generateOpencode(),
+    ...generateWarp(),
     ...generateZed(version),
     ...generateDsh(version, licenseText()),
   ].map((file) => ({ ...file, committed: isCommitted(file.path) }));

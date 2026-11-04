@@ -28,7 +28,7 @@
 - **六个变体，一套骨架**：色相顺序始终是朱 → 蓝 → 绿 → 橙 → 紫 → 青 → 绛，切换时只换光线与饱和度。
 - **红做记号，青做动作**：关键字、标签、错误、删除保留朱砂；按钮、徽标、进度、焦点与选中态统一用各变体的交互蓝。
 - **Dimmed 降光不降墨**：画布更沉，墨色仍 ≥ 10.5:1，强调色保留可辨识的色相，不会褪成灰雾。
-- **生成器保证一致**：一份语义色板同时生成 VS Code、Ghostty、Kaku、OpenCode、Zed 与 DSH；构建会拒绝落在对比度区间或彩度预算之外的配色。
+- **生成器保证一致**：一份语义色板同时生成 VS Code、Ghostty、Kaku、Warp、OpenCode、Zed 与 DSH；构建会拒绝落在对比度区间或彩度预算之外的配色。
 
 ## 六个变体
 
@@ -65,6 +65,7 @@
 | --- | --- |
 | Ghostty | `pnpm install:ghostty` |
 | Kaku / WezTerm | `pnpm install:kaku` |
+| Warp | `pnpm install:warp` |
 | OpenCode | `pnpm install:opencode` |
 | DeepSeek Harness (DSH) | `pnpm install:dsh` |
 
@@ -89,6 +90,7 @@
 pnpm install
 pnpm install:ghostty
 pnpm install:kaku
+pnpm install:warp
 pnpm install:opencode
 pnpm install:zed
 pnpm install:dsh

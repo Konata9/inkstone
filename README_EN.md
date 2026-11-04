@@ -28,7 +28,7 @@ Inkstone is not a random set of dark themes. It is one painting shown in six roo
 - **Six variants, one skeleton**: the hue order stays cinnabar → blue → green → orange → violet → cyan → crimson. Switching changes light and saturation, not the order.
 - **Red marks, blue acts**: keywords, tags, errors and deletions keep cinnabar; buttons, badges, progress, focus and selected chrome use each variant's interaction blue.
 - **Dimmed lowers the light, not the ink**: the canvas gets deeper while body text stays at ≥ 10.5:1 and pigments keep a recognisable hue instead of fading to grey.
-- **The generator keeps every target in sync**: one semantic palette produces VS Code, Ghostty, Kaku, OpenCode, Zed and DSH themes, and the build rejects colors outside the contrast bands or chroma budget.
+- **The generator keeps every target in sync**: one semantic palette produces VS Code, Ghostty, Kaku, Warp, OpenCode, Zed and DSH themes, and the build rejects colors outside the contrast bands or chroma budget.
 
 ## Six variants
 
@@ -65,6 +65,7 @@ Every role, hex and contrast ratio is in the [palette reference](docs/palette.md
 | --- | --- |
 | Ghostty | `pnpm install:ghostty` |
 | Kaku / WezTerm | `pnpm install:kaku` |
+| Warp | `pnpm install:warp` |
 | OpenCode | `pnpm install:opencode` |
 | DeepSeek Harness (DSH) | `pnpm install:dsh` |
 
@@ -89,6 +90,7 @@ Then run **Preferences: Color Theme** and pick:
 pnpm install
 pnpm install:ghostty
 pnpm install:kaku
+pnpm install:warp
 pnpm install:opencode
 pnpm install:zed
 pnpm install:dsh

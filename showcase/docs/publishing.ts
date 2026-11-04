@@ -11,7 +11,7 @@ const streams = table(
       '主题 / 项目',
       '根 `package.json`',
       '`v0.5.0`',
-      'Ghostty / Kaku / OpenCode / Zed / DSH / bundle，并附带当前 VSIX（仅打包，不发布市场）',
+      'Ghostty / Kaku / Warp / OpenCode / Zed / DSH / bundle，并附带当前 VSIX（仅打包，不发布市场）',
     ],
     [
       'VS Code 扩展',
@@ -147,7 +147,7 @@ export function renderPublishingDoc(): string {
         'pnpm release:check --tag v0.5.0',
         '```',
         '',
-        '产物在 `dist/release/`：`inkstone-ghostty-<version>.zip`、`inkstone-kaku-<version>.zip`、`inkstone-opencode-<version>.zip`、`inkstone-zed-<version>.zip`、`inkstone-dsh-<version>.tgz`、`inkstone-<version>.zip`、VSIX、`manifest.json` 与 `SHA256SUMS`。',
+        '产物在 `dist/release/`：`inkstone-ghostty-<version>.zip`、`inkstone-kaku-<version>.zip`、`inkstone-opencode-<version>.zip`、`inkstone-warp-<version>.zip`、`inkstone-zed-<version>.zip`、`inkstone-dsh-<version>.tgz`、`inkstone-<version>.zip`、VSIX、`manifest.json` 与 `SHA256SUMS`。',
       ].join('\n'),
       [
         '## 致谢',

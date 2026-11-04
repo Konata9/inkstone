@@ -9,6 +9,7 @@
  *   dist/kaku/*.lua                (WezTerm-compatible Lua tables)
  *   dist/kaku/*.toml               (Kaku `colors/` directory schemes)
  *   dist/opencode/*.json
+ *   dist/warp/*.yaml
  *   dist/zed/inkstone.json
  *   dist/zed/extension.toml
  *   dist/dsh/<package>/**  (four installable DeepSeek Harness theme plugins)
@@ -53,5 +54,5 @@ console.log(
   `\nBuilt ${files.length} files for ${flavors.length} flavors ` +
     `(${checks.audit.checks} palette checks, ${flavors.length} VS Code themes, ` +
     `${flavors.length} Ghostty themes, ${flavors.length} Kaku schemes (Lua + TOML), ` +
-    `${flavors.length} OpenCode themes, Zed themes, DSH theme plugins).\n`,
+    `${flavors.length} OpenCode themes, ${flavors.length} Warp themes, Zed themes, DSH theme plugins).\n`,
 );

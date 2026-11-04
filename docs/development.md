@@ -2,7 +2,7 @@
 
 > 本文件由 `pnpm build:docs` 自动生成，请勿手动修改。
 
-主题由一份语义色板生成到所有平台。改一处颜色，VS Code、Ghostty、Kaku、OpenCode、Zed、DSH 与官网同时更新；越界的配色会让构建直接失败。
+主题由一份语义色板生成到所有平台。改一处颜色，VS Code、Ghostty、Kaku、Warp、OpenCode、Zed、DSH 与官网同时更新；越界的配色会让构建直接失败。
 
 需要 Node 20+（打包 VSIX 时 `vsce` 建议 Node 22）和 pnpm 10。
 
@@ -57,6 +57,7 @@ src/                        主题 + 各端软件 target
     ghostty.ts              Ghostty 主题
     kaku.ts                 Kaku / WezTerm 色表（Lua + TOML）
     opencode.ts             OpenCode V2 主题（base + hue scale）
+    warp.ts                 Warp 主题（YAML）
     zed.ts                  Zed 主题（ThemeFamily + extension.toml）
     dsh.ts                  DSH 主题插件（菜单版 + 三对明暗变体）
     dsh-tokens.ts           DSH 0.2.1 颜色 token 冻结清单
@@ -84,7 +85,7 @@ showcase/                   展示层源码（与 src/ 平级）
     capture.ts              Playwright 截图入口
 scripts/                    安装脚本、VSIX 与 Release 打包、发布辅助
 packages/vscode/            VS Code 扩展（VSIX 源码与生成的主题 JSON）
-dist/                       生成物：Ghostty、Kaku、OpenCode、Zed、DSH、VSIX
+dist/                       生成物：Ghostty、Kaku、Warp、OpenCode、Zed、DSH、VSIX
 site/                       官网产物（生成物，GitHub Pages）
 docs/                       文档产物（生成物；preview.png 由截图命令生成）
 .github/workflows/          构建、打包与发布 CI
