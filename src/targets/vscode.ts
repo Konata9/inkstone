@@ -8,7 +8,9 @@
 import { alpha } from '../color.ts';
 import { actionHover, flavors } from '../palette/index.ts';
 import type { Flavor } from '../palette/types.ts';
+import { vscodeAnsiKey } from './ansi.ts';
 import { themeDisplayName, vscodeFileName } from './naming.ts';
+import type { GeneratedFile } from './types.ts';
 
 interface TokenSpec {
   name: string;
@@ -326,22 +328,9 @@ function workbench(flavor: Flavor): Record<string, string> {
     'terminal.border': b.subtle,
     'terminal.findMatchBackground': alpha(y.number, 0.3),
     'terminal.findMatchHighlightBackground': alpha(y.number, 0.16),
-    'terminal.ansiBlack': f.ansi[0],
-    'terminal.ansiRed': f.ansi[1],
-    'terminal.ansiGreen': f.ansi[2],
-    'terminal.ansiYellow': f.ansi[3],
-    'terminal.ansiBlue': f.ansi[4],
-    'terminal.ansiMagenta': f.ansi[5],
-    'terminal.ansiCyan': f.ansi[6],
-    'terminal.ansiWhite': f.ansi[7],
-    'terminal.ansiBrightBlack': f.ansi[8],
-    'terminal.ansiBrightRed': f.ansi[9],
-    'terminal.ansiBrightGreen': f.ansi[10],
-    'terminal.ansiBrightYellow': f.ansi[11],
-    'terminal.ansiBrightBlue': f.ansi[12],
-    'terminal.ansiBrightMagenta': f.ansi[13],
-    'terminal.ansiBrightCyan': f.ansi[14],
-    'terminal.ansiBrightWhite': f.ansi[15],
+    ...Object.fromEntries(
+      f.ansi.map((hex, slot): [string, string] => [vscodeAnsiKey(slot), hex]),
+    ),
 
     // -------------------------------------------------------- breadcrumbs
     'breadcrumb.foreground': t.muted,
@@ -841,9 +830,19 @@ export function buildTheme(flavor: Flavor): ThemeFile {
   };
 }
 
-export interface GeneratedFile {
+export interface VscodeThemeContribution {
+  label: string;
+  uiTheme: 'vs-dark' | 'vs';
   path: string;
-  content: string;
+}
+
+/** One entry of `contributes.themes` in `packages/vscode/package.json`. */
+export function vscodeThemeContribution(flavor: Flavor): VscodeThemeContribution {
+  return {
+    label: themeDisplayName(flavor),
+    uiTheme: flavor.meta.appearance === 'dark' ? 'vs-dark' : 'vs',
+    path: `./themes/${vscodeFileName(flavor)}`,
+  };
 }
 
 export function generateVscode(): GeneratedFile[] {

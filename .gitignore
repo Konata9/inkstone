@@ -1,7 +1,7 @@
 node_modules/
 .DS_Store
 *.vsix
-preview/index.html
-preview/gallery.html
 dist/
 *.tsbuildinfo
+
+site/

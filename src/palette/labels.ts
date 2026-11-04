@@ -1,7 +1,7 @@
 /**
  * Chinese labels for every semantic role.
  *
- * Both generated references — `docs/palette.md` and the preview page — read
+ * Both generated references — `docs/palette.md` and the site specimens — read
  * these maps, so a new token cannot ship with a missing or divergent label.
  * Keying each map by `keyof Flavor[...]` makes an omitted role a type error.
  */

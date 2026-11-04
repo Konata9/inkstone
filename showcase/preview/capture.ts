@@ -2,26 +2,21 @@
 /**
  * Capture the editor-only gallery into docs/preview.png.
  *
- * Usage:
- *   pnpm build
  *   pnpm capture:preview
  *
+ * The gallery HTML is rendered in memory and handed straight to Playwright, so
+ * no intermediate page is written to disk.
+ *
  * Needs Playwright Chromium once:
- *   pnpm add -D playwright && pnpm exec playwright install chromium
+ *   pnpm exec playwright install chromium
  */
 
-import { existsSync, statSync } from 'node:fs';
-import { join } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { statSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
-const root = fileURLToPath(new URL('..', import.meta.url));
-const galleryPath = join(root, 'preview', 'gallery.html');
-const outputPath = join(root, 'docs', 'preview.png');
+import { renderGallery } from './gallery.ts';
 
-if (!existsSync(galleryPath)) {
-  console.error('preview/gallery.html is missing; run `pnpm build` first.');
-  process.exit(1);
-}
+const outputPath = fileURLToPath(new URL('../../docs/preview.png', import.meta.url));
 
 let chromium: typeof import('playwright').chromium;
 try {
@@ -41,7 +36,7 @@ const page = await browser.newPage({
   deviceScaleFactor: 2,
 });
 
-await page.goto(pathToFileURL(galleryPath).href, { waitUntil: 'networkidle' });
+await page.setContent(renderGallery(), { waitUntil: 'networkidle' });
 const gallery = page.locator('.gallery');
 await gallery.waitFor();
 await gallery.screenshot({ path: outputPath, type: 'png' });

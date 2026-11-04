@@ -6,15 +6,22 @@
  * OpenCode token references, and Lua themes that do not parse.
  */
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { runInNewContext } from 'node:vm';
+
 import { parse as parseLua } from 'luaparse';
 import { parse as parseToml } from 'smol-toml';
 
 import { contrast, isValidHex } from './color.ts';
 import { flavors } from './palette/index.ts';
-import { ANSI_NAMES } from './palette/types.ts';
+import { buildDshTokens, buildFlavorTokens, DSH_MENU_FLAVORS, DSH_PAIRS, renderDshMenuPackage, renderDshPackage } from './targets/dsh.ts';
+import { DSH_TOKENS } from './targets/dsh-tokens.ts';
+import { vscodeAnsiKey, zedAnsiKey } from './targets/ansi.ts';
 import { generateGhostty } from './targets/ghostty.ts';
 import { generateKaku, generateKakuToml } from './targets/kaku.ts';
-import { kakuTomlFileName } from './targets/naming.ts';
+import { dshMenuPackageName, dshMenuRowId, dshPackageName, dshRowId, kakuTomlFileName } from './targets/naming.ts';
 import {
   generateOpencode,
   OPENCODE_HUES,
@@ -22,17 +29,11 @@ import {
   OPENCODE_STEPS,
   OPENCODE_SYNTAX_KEYS,
 } from './targets/opencode.ts';
-import { buildTheme } from './targets/vscode.ts';
+import { buildTheme, vscodeThemeContribution } from './targets/vscode.ts';
 import { generateWarp, WARP_COLOR_NAMES } from './targets/warp.ts';
 import { generateZed } from './targets/zed.ts';
-import { warpFileName, warpThemeName, ZED_FAMILY_NAME } from './targets/naming.ts';
-
-/** Workbench key for an ANSI slot, e.g. `terminal.ansiBrightBlack`. */
-function terminalAnsiKey(slot: number): string {
-  const name = ANSI_NAMES[slot];
-  if (!name) throw new Error(`ANSI slot ${slot} is out of range`);
-  return `terminal.ansi${name.charAt(0).toUpperCase()}${name.slice(1)}`;
-}
+import { inkstoneThemeName, warpFileName, ZED_FAMILY_NAME } from './targets/naming.ts';
+import { readRootVersion } from './version.ts';
 
 const requiredColors = [
   'editor.background',
@@ -87,8 +88,78 @@ const requiredScopes = [
   'markup.heading',
 ];
 
+interface VscodeManifest {
+  contributes?: {
+    themes?: Array<{
+      label?: string;
+      uiTheme?: string;
+      path?: string;
+    }>;
+  };
+}
+
+/**
+ * The extension manifest lists its themes by hand. Compare it with the
+ * generator so a new flavor cannot ship with a missing picker entry.
+ *
+ * This checks the manifest only; theme-file existence is covered by the
+ * release drift check, which runs after `pnpm build`.
+ */
+function checkVscodeManifest(issues: string[]): void {
+  const manifestPath = fileURLToPath(new URL('../packages/vscode/package.json', import.meta.url));
+  let manifest: VscodeManifest;
+  try {
+    manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as VscodeManifest;
+  } catch (error) {
+    issues.push(
+      `packages/vscode/package.json: cannot read manifest — ${(error as Error).message}`,
+    );
+    return;
+  }
+
+  const contributed = manifest.contributes?.themes;
+  if (!Array.isArray(contributed)) {
+    issues.push('packages/vscode/package.json: contributes.themes is missing');
+    return;
+  }
+
+  const expected = flavors.map(vscodeThemeContribution);
+  if (contributed.length !== expected.length) {
+    issues.push(
+      `packages/vscode/package.json: contributes.themes has ${contributed.length} entries, ` +
+        `expected ${expected.length}`,
+    );
+  }
+
+  const total = Math.max(contributed.length, expected.length);
+  for (let index = 0; index < total; index += 1) {
+    const actual = contributed[index];
+    const want = expected[index];
+    if (!actual) {
+      issues.push(
+        `packages/vscode/package.json: missing theme entry "${want?.label}" -> ${want?.path}`,
+      );
+      continue;
+    }
+    if (!want) {
+      issues.push(`packages/vscode/package.json: unexpected theme entry "${actual.label}"`);
+      continue;
+    }
+    for (const field of ['label', 'uiTheme', 'path'] as const) {
+      if (actual[field] !== want[field]) {
+        issues.push(
+          `packages/vscode/package.json: contributes.themes[${index}].${field} is ` +
+            `${JSON.stringify(actual[field])}, expected ${JSON.stringify(want[field])} for ${want.label}`,
+        );
+      }
+    }
+  }
+}
+
 export function checkThemes(): string[] {
   const issues: string[] = [];
+
+  checkVscodeManifest(issues);
 
   for (const flavor of flavors) {
     const theme = buildTheme(flavor);
@@ -123,7 +194,7 @@ export function checkThemes(): string[] {
     if (semantic.length < 20) issues.push(`${label}: semanticTokenColors looks too small (${semantic.length})`);
 
     for (const [slot, hex] of flavor.ansi.entries()) {
-      const key = terminalAnsiKey(slot);
+      const key = vscodeAnsiKey(slot);
       if (theme.colors[key] !== hex) issues.push(`${label}: ${key} drifted from the ANSI palette`);
     }
   }
@@ -186,8 +257,8 @@ export function checkThemes(): string[] {
     const flavor = flavors.find((candidate) => file.path.endsWith(warpFileName(candidate)));
     if (!flavor) {
       issues.push(`warp ${file.path}: no flavor matches this file name`);
-    } else if (top.get('name') !== `'${warpThemeName(flavor)}'`) {
-      issues.push(`warp ${file.path}: name must be the quoted '${warpThemeName(flavor)}'`);
+    } else if (top.get('name') !== `'${inkstoneThemeName(flavor)}'`) {
+      issues.push(`warp ${file.path}: name must be the quoted '${inkstoneThemeName(flavor)}'`);
     }
     for (const key of ['accent', 'cursor', 'background', 'foreground']) {
       const value = /^'(.*)'$/.exec(top.get(key) ?? '')?.[1];
@@ -493,7 +564,7 @@ export function checkThemes(): string[] {
     'punctuation',
   ];
 
-  for (const file of generateZed()) {
+  for (const file of generateZed(readRootVersion())) {
     if (file.path.endsWith('.toml')) {
       let doc: Record<string, unknown>;
       try {
@@ -556,24 +627,7 @@ export function checkThemes(): string[] {
         if (!(key in style)) issues.push(`zed ${file.path}: theme "${themeName}" missing style.${key}`);
       }
 
-      const zedAnsiKeys = [
-        'terminal.ansi.black',
-        'terminal.ansi.red',
-        'terminal.ansi.green',
-        'terminal.ansi.yellow',
-        'terminal.ansi.blue',
-        'terminal.ansi.magenta',
-        'terminal.ansi.cyan',
-        'terminal.ansi.white',
-        'terminal.ansi.bright_black',
-        'terminal.ansi.bright_red',
-        'terminal.ansi.bright_green',
-        'terminal.ansi.bright_yellow',
-        'terminal.ansi.bright_blue',
-        'terminal.ansi.bright_magenta',
-        'terminal.ansi.bright_cyan',
-        'terminal.ansi.bright_white',
-      ];
+      const zedAnsiKeys = Array.from({ length: 16 }, (_, slot) => zedAnsiKey(slot));
       for (const ansiKey of zedAnsiKeys) {
         if (!style[ansiKey] || !isValidHex(String(style[ansiKey]))) {
           issues.push(`zed ${file.path}: theme "${themeName}" invalid or missing ${ansiKey}`);
@@ -611,5 +665,653 @@ export function checkThemes(): string[] {
     }
   }
 
+  checkDsh(issues);
+
   return issues;
+}
+
+/** One registration passed to the DSH module loader by a generated client bundle. */
+interface DshRegistration {
+  id?: unknown;
+  factory?: unknown;
+}
+
+/** Generated values accepted by the DSH token legality check. */
+function isDshColorValue(value: string): boolean {
+  if (/^#[0-9a-f]{6}([0-9a-f]{2})?$/i.test(value)) return true;
+  if (/^rgba?\(/.test(value)) return true;
+  if (/^color-mix\(in srgb,/.test(value)) return true;
+  if (value === 'transparent') return true;
+  if (/^linear-gradient\(/.test(value)) return true;
+  // Onboarding gradient stops are a bare four-stop list: three positioned
+  // stops plus the closing colour at the implicit 100%.
+  return /^(#[0-9a-f]{6}(?:[0-9a-f]{2})? [0-9.]+%, ){3}#[0-9a-f]{6}(?:[0-9a-f]{2})?$/i.test(value);
+}
+
+/** Assert one contrast pair from a token map, with optional ceiling. */
+function checkDshContrast(
+  values: Record<string, string>,
+  issues: string[],
+  label: string,
+  foreground: string,
+  background: string,
+  min: number,
+  max?: number,
+): void {
+  const fg = values[foreground];
+  const bg = values[background];
+  if (fg === undefined || bg === undefined) {
+    issues.push(`${label}: missing ${foreground} or ${background} for the contrast check`);
+    return;
+  }
+  if (!isValidHex(fg) || !isValidHex(bg)) {
+    issues.push(`${label}: contrast pair ${foreground} / ${background} is not hex (${fg} / ${bg})`);
+    return;
+  }
+  const ratio = contrast(fg, bg);
+  if (ratio < min) {
+    issues.push(`${label}: ${foreground} on ${background} is ${ratio.toFixed(2)}:1 (min ${min}:1)`);
+  } else if (max !== undefined && ratio > max) {
+    issues.push(`${label}: ${foreground} on ${background} is ${ratio.toFixed(2)}:1 (max ${max}:1)`);
+  }
+}
+
+/** Exercise the generated browser bundle in a sandbox: registration, plugin shape, override call. */
+function checkDshBundle(
+  source: string,
+  packageName: string,
+  tokens: Record<string, { light: string; dark: string }>,
+  label: string,
+  issues: string[],
+): void {
+  const registrations: DshRegistration[] = [];
+  const sandbox = {
+    window: {
+      __ModuleLoader__: {
+        load(registration: DshRegistration): void {
+          registrations.push(registration);
+        },
+      },
+    },
+  };
+  try {
+    runInNewContext(source, sandbox, { filename: `${label}/lib/client.js` });
+  } catch (error) {
+    issues.push(`${label}: client bundle throws — ${(error as Error).message}`);
+    return;
+  }
+  if (registrations.length !== 1) {
+    issues.push(`${label}: client bundle registered ${registrations.length} times (expected exactly 1)`);
+    return;
+  }
+  const registration = registrations[0]!;
+  if (registration.id !== packageName) {
+    issues.push(`${label}: client bundle id is ${String(registration.id)}, expected ${packageName}`);
+  }
+  if (typeof registration.factory !== 'function') {
+    issues.push(`${label}: client bundle factory is not a function`);
+    return;
+  }
+
+  let exported: Record<string, unknown>;
+  try {
+    exported = (registration.factory as () => Record<string, unknown>)();
+  } catch (error) {
+    issues.push(`${label}: client bundle factory throws — ${(error as Error).message}`);
+    return;
+  }
+  if (typeof exported.apply !== 'function') {
+    issues.push(`${label}: client bundle does not export apply`);
+    return;
+  }
+  const inject = exported.inject;
+  if (!Array.isArray(inject) || !inject.includes('theme')) {
+    issues.push(`${label}: client bundle does not inject the "theme" service`);
+  }
+
+  const calls: Array<{ source: unknown; tokens: Record<string, { light: string; dark: string }> }> = [];
+  const fakeCtx = {
+    effect: (effect: () => unknown) => effect(),
+    theme: {
+      overrideTokens(from: unknown, map: Record<string, { light: string; dark: string }>) {
+        calls.push({ source: from, tokens: map });
+        return () => {};
+      },
+    },
+  };
+  try {
+    (exported.apply as (ctx: unknown) => void)(fakeCtx);
+  } catch (error) {
+    issues.push(`${label}: apply() throws in the sandbox — ${(error as Error).message}`);
+    return;
+  }
+  if (calls.length !== 1) {
+    issues.push(`${label}: apply() called theme.overrideTokens ${calls.length} times (expected exactly 1)`);
+    return;
+  }
+  const call = calls[0]!;
+  if (call.source !== packageName) {
+    issues.push(`${label}: overrideTokens layer source is ${String(call.source)}, expected ${packageName}`);
+  }
+
+  const generated = Object.keys(call.tokens);
+  if (generated.length !== DSH_TOKENS.length) {
+    issues.push(`${label}: bundle carries ${generated.length} tokens, expected ${DSH_TOKENS.length}`);
+  }
+  for (const token of DSH_TOKENS) {
+    const modes = call.tokens[token];
+    if (!modes || typeof modes.light !== 'string' || typeof modes.dark !== 'string') {
+      issues.push(`${label}: bundle token ${token} is not a { light, dark } pair`);
+      continue;
+    }
+    if (modes.light !== tokens[token]!.light || modes.dark !== tokens[token]!.dark) {
+      issues.push(`${label}: bundle token ${token} drifted from buildDshTokens()`);
+    }
+  }
+}
+
+/**
+ * DSH package checks.
+ *
+ * Deliberately in-memory: `pnpm validate` runs before (and without) the build,
+ * so reading `dist/dsh/` would either fail on a clean checkout or bless a stale
+ * directory. Every check renders the same files the build will write.
+ */
+function checkDsh(issues: string[]): void {
+  const root = fileURLToPath(new URL('..', import.meta.url));
+  const version = (JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as {
+    version: string;
+  }).version;
+  const license = readFileSync(join(root, 'LICENSE'), 'utf8');
+  const requiredFiles = [
+    'package.json',
+    'cordis.patch.yml',
+    'lib/index.js',
+    'lib/client.js',
+    'README.md',
+    'LICENSE',
+  ];
+
+  for (const pair of DSH_PAIRS) {
+    const packageName = dshPackageName(pair.id);
+    const label = `dsh ${packageName}`;
+    const dir = `dist/dsh/${packageName}`;
+    const files = renderDshPackage(pair, version, license);
+    const contents = new Map(files.map((file) => [file.path, file.content]));
+
+    if (files.length !== requiredFiles.length) {
+      issues.push(`${label}: generated ${files.length} files, expected ${requiredFiles.length}`);
+    }
+    for (const name of requiredFiles) {
+      if (!contents.has(`${dir}/${name}`)) issues.push(`${label}: missing ${name}`);
+    }
+
+    const manifestText = contents.get(`${dir}/package.json`);
+    if (manifestText === undefined) continue;
+    let manifest: Record<string, any>;
+    try {
+      manifest = JSON.parse(manifestText) as Record<string, any>;
+    } catch (error) {
+      issues.push(`${label}: invalid package.json — ${(error as Error).message}`);
+      continue;
+    }
+
+    const fields: Array<[string, boolean]> = [
+      ['name', manifest.name === packageName],
+      ['version', manifest.version === version],
+      ['main', manifest.main === 'lib/index.js'],
+      ['exports["."]', manifest.exports?.['.'] === './lib/index.js'],
+      ['exports["./client"]', manifest.exports?.['./client'] === './lib/client.js'],
+      ['dsh.bundle.patch', manifest.dsh?.bundle?.patch === './cordis.patch.yml'],
+      ['dsh.client.platform', manifest.dsh?.client?.platform === 'web'],
+      ['engines.dsh', manifest.engines?.dsh === '>=0.2.1-rc.3 <0.3.0'],
+    ];
+    for (const [field, ok] of fields) {
+      if (!ok) issues.push(`${label}: package.json ${field} is missing or wrong`);
+    }
+    const filesField = manifest.files;
+    if (
+      !Array.isArray(filesField) ||
+      !['lib', 'cordis.patch.yml', 'README.md', 'LICENSE'].every((entry) => filesField.includes(entry))
+    ) {
+      issues.push(`${label}: package.json "files" does not ship lib, patch, README and LICENSE`);
+    }
+    const inject = manifest.dsh?.client?.inject;
+    if (!Array.isArray(inject) || !inject.includes('@deepseek-ai/dsh-client-ui-theme')) {
+      issues.push(`${label}: package.json dsh.client.inject misses @deepseek-ai/dsh-client-ui-theme`);
+    }
+
+    const patch = contents.get(`${dir}/cordis.patch.yml`) ?? '';
+    if (
+      !patch.includes('- insert:') ||
+      !patch.includes(`id: ${dshRowId(pair.id)}`) ||
+      !patch.includes(`name: ${packageName}`)
+    ) {
+      issues.push(`${label}: cordis.patch.yml does not insert row ${dshRowId(pair.id)}`);
+    }
+
+    const host = contents.get(`${dir}/lib/index.js`) ?? '';
+    if (!host.includes('export function apply')) {
+      issues.push(`${label}: lib/index.js does not export apply`);
+    }
+
+    const readme = contents.get(`${dir}/README.md`) ?? '';
+    if (!readme.includes(`dsh plugin --profile web remove ${packageName}`)) {
+      issues.push(`${label}: README misses the remove command`);
+    }
+
+    const tokens = buildDshTokens(pair);
+    const frozen = [...DSH_TOKENS].sort();
+    const generated = Object.keys(tokens).sort();
+    const missing = frozen.filter((token) => !generated.includes(token));
+    const extra = generated.filter((token) => !frozen.includes(token as (typeof frozen)[number]));
+    if (missing.length > 0 || extra.length > 0) {
+      issues.push(
+        `${label}: token coverage mismatch — ` +
+          `${missing.length} missing${missing.length ? ` (${missing.slice(0, 10).join(', ')})` : ''}, ` +
+          `${extra.length} extra${extra.length ? ` (${extra.slice(0, 10).join(', ')})` : ''}`,
+      );
+    }
+
+    for (const token of DSH_TOKENS) {
+      for (const mode of ['light', 'dark'] as const) {
+        const value = tokens[token][mode];
+        if (!isDshColorValue(value)) {
+          issues.push(`${label}: ${token} (${mode}) has an unsupported value ${value}`);
+        }
+      }
+    }
+
+    const light: Record<string, string> = {};
+    const dark: Record<string, string> = {};
+    for (const token of DSH_TOKENS) {
+      light[token] = tokens[token].light;
+      dark[token] = tokens[token].dark;
+    }
+    for (const [mode, values] of [
+      ['light', light],
+      ['dark', dark],
+    ] as const) {
+      checkDshModeContrast(values, issues, `${label} ${mode}`);
+    }
+
+    const client = contents.get(`${dir}/lib/client.js`);
+    if (client !== undefined) checkDshBundle(client, packageName, tokens, label, issues);
+  }
+
+  checkDshMenu(issues, version, license);
+}
+
+/** Contrast bands every generated mode (pair half or registered flavour) must hold. */
+function checkDshModeContrast(values: Record<string, string>, issues: string[], scope: string): void {
+  checkDshContrast(values, issues, scope, '--dsw-alias-label-primary', '--dsw-alias-bg-base', 7, 12.5);
+  checkDshContrast(values, issues, scope, '--dsw-alias-label-secondary', '--dsw-alias-bg-base', 4.5, 8);
+  checkDshContrast(values, issues, scope, '--dsw-alias-label-tertiary', '--dsw-alias-bg-base', 4.5);
+  checkDshContrast(values, issues, scope, '--dsw-alias-toast-label', '--dsw-alias-toast-bg', 4.5);
+  checkDshContrast(
+    values,
+    issues,
+    scope,
+    '--dsw-alias-label-primary-foreground',
+    '--dsw-alias-brand-primary',
+    4.5,
+  );
+  checkDshContrast(values, issues, scope, '--dsw-static-neutral-bluish-00', '--dsw-alias-tooltip-bg', 4.5);
+  for (const token of [
+    '--shiki-token-keyword',
+    '--shiki-token-string',
+    '--shiki-token-string-expression',
+    '--shiki-token-comment',
+    '--shiki-token-function',
+    '--shiki-token-constant',
+    '--shiki-token-parameter',
+  ]) {
+    checkDshContrast(values, issues, `${scope} syntax`, token, '--dsw-alias-markdown-code-block', 4.5, 9);
+  }
+  checkDshContrast(values, issues, `${scope} syntax`, '--shiki-token-punctuation', '--dsw-alias-markdown-code-block', 4, 9);
+}
+
+/** One registered theme as the menu bundle declares it. */
+interface DshMenuThemeDefinition {
+  id: string;
+  colorScheme: string;
+  tokens: Record<string, string>;
+}
+
+/** The menu bundle's Settings row registration. */
+interface DshMenuRowRegistration {
+  options: {
+    name: string;
+    id?: string;
+    inject: () => Record<string, unknown>;
+  };
+  component: unknown;
+}
+
+/** Exercise the menu bundle: every registered theme, the Settings row, and both switch paths. */
+function checkDshMenuBundle(source: string, packageName: string, issues: string[]): void {
+  const label = `dsh ${packageName}`;
+  const registrations: DshRegistration[] = [];
+  const sandbox = {
+    window: {
+      __ModuleLoader__: {
+        load(registration: DshRegistration): void {
+          registrations.push(registration);
+        },
+      },
+      localStorage: {
+        store: new Map<string, string>(),
+        getItem(key: string): string | null {
+          return this.store.get(key) ?? null;
+        },
+        setItem(key: string, value: string): void {
+          this.store.set(key, value);
+        },
+      },
+    },
+  };
+  try {
+    runInNewContext(source, sandbox, { filename: `${label}/lib/client.js` });
+  } catch (error) {
+    issues.push(`${label}: menu client bundle throws — ${(error as Error).message}`);
+    return;
+  }
+  if (registrations.length !== 1) {
+    issues.push(`${label}: menu client bundle registered ${registrations.length} times (expected exactly 1)`);
+    return;
+  }
+  const registration = registrations[0]!;
+  if (registration.id !== packageName) {
+    issues.push(`${label}: menu client bundle id is ${String(registration.id)}, expected ${packageName}`);
+  }
+  if (typeof registration.factory !== 'function') {
+    issues.push(`${label}: menu client bundle factory is not a function`);
+    return;
+  }
+
+  const fakeReact = {
+    createElement: (type: unknown, props: unknown, ...children: unknown[]) => ({ type, props, children }),
+    useState<T>(value: T): [T, () => void] {
+      return [value, () => {}];
+    },
+    useEffect: () => {},
+  };
+  let exported: Record<string, unknown>;
+  try {
+    exported = (registration.factory as (require: (specifier: string) => unknown) => Record<string, unknown>)(
+      (specifier) => {
+        if (specifier === 'react') return fakeReact;
+        throw new Error(`unexpected module request ${specifier}`);
+      },
+    );
+  } catch (error) {
+    issues.push(`${label}: menu client bundle factory throws — ${(error as Error).message}`);
+    return;
+  }
+  if (typeof exported.apply !== 'function') {
+    issues.push(`${label}: menu client bundle does not export apply`);
+    return;
+  }
+  const inject = exported.inject;
+  if (!Array.isArray(inject) || !inject.includes('theme') || !inject.includes('slots')) {
+    issues.push(`${label}: menu client bundle does not inject theme and slots`);
+  }
+
+  const themes: DshMenuThemeDefinition[] = [];
+  const rows: DshMenuRowRegistration[] = [];
+  const layers = new Map<string, Record<string, { light: string; dark: string }>>();
+  const listeners = new Set<() => void>();
+  let preference = 'system';
+  const runtime = {
+    register(definition: DshMenuThemeDefinition): () => void {
+      themes.push(definition);
+      return () => {};
+    },
+    getTheme(): { preference: string } {
+      return { preference };
+    },
+    setTheme(id: string): void {
+      preference = id;
+      for (const listener of listeners) listener();
+    },
+    overrideTokens(
+      from: string,
+      tokens: Record<string, { light: string; dark: string }>,
+    ): () => void {
+      layers.set(from, tokens);
+      return () => {
+        layers.delete(from);
+      };
+    },
+  };
+  const fakeCtx = {
+    effect(effect: () => unknown): () => void {
+      const dispose = effect();
+      return typeof dispose === 'function' ? (dispose as () => void) : () => {};
+    },
+    on(_event: string, listener: () => void): () => void {
+      listeners.add(listener);
+      return () => {
+        listeners.delete(listener);
+      };
+    },
+    theme: runtime,
+    slots: {
+      inject(_name: string, callback: () => unknown): () => void {
+        callback();
+        return () => {};
+      },
+      register(options: DshMenuRowRegistration['options'], component: unknown): () => void {
+        rows.push({ options, component });
+        return () => {};
+      },
+    },
+  };
+  try {
+    (exported.apply as (ctx: unknown) => void)(fakeCtx);
+  } catch (error) {
+    issues.push(`${label}: menu apply() throws in the sandbox — ${(error as Error).message}`);
+    return;
+  }
+
+  if (themes.length !== DSH_MENU_FLAVORS.length) {
+    issues.push(`${label}: menu registers ${themes.length} themes, expected ${DSH_MENU_FLAVORS.length}`);
+  }
+  for (const flavor of DSH_MENU_FLAVORS) {
+    const theme = themes.find((candidate) => candidate.id === flavor.themeId);
+    if (!theme) {
+      issues.push(`${label}: menu does not register ${flavor.themeId}`);
+      continue;
+    }
+    if (theme.colorScheme !== flavor.appearance) {
+      issues.push(`${label}: ${flavor.themeId} declares ${theme.colorScheme}, expected ${flavor.appearance}`);
+    }
+    const expected = buildFlavorTokens(flavor.id);
+    const keys = Object.keys(theme.tokens);
+    if (keys.length !== DSH_TOKENS.length) {
+      issues.push(`${label}: ${flavor.themeId} carries ${keys.length} tokens, expected ${DSH_TOKENS.length}`);
+    }
+    for (const token of DSH_TOKENS) {
+      if (theme.tokens[token] !== expected[token]) {
+        issues.push(`${label}: ${flavor.themeId} token ${token} drifted from buildFlavorTokens()`);
+        break;
+      }
+    }
+  }
+
+  if (rows.length !== 1) {
+    issues.push(`${label}: menu registered ${rows.length} settings rows, expected exactly 1`);
+    return;
+  }
+  const row = rows[0]!;
+  if (row.options.name !== 'settings.general.item') {
+    issues.push(`${label}: menu row targets ${row.options.name}, expected settings.general.item`);
+  }
+  if (row.options.id !== 'inkstone') {
+    issues.push(`${label}: menu row id is ${String(row.options.id)}, expected "inkstone"`);
+  }
+  const face = row.options.inject();
+  if (typeof face.select !== 'function' || typeof face.current !== 'function' || typeof face.subscribe !== 'function') {
+    issues.push(`${label}: menu row face is missing select/current/subscribe`);
+    return;
+  }
+  if (typeof row.component !== 'function') {
+    issues.push(`${label}: menu row component is not a function`);
+  } else {
+    // Render once with the framework-free props so a broken row fails here
+    // instead of blanking the user's Settings page.
+    let tree: unknown;
+    try {
+      tree = (row.component as (props: Record<string, unknown>) => unknown)({ ...face });
+    } catch (error) {
+      issues.push(`${label}: menu row throws while rendering — ${(error as Error).message}`);
+    }
+    const texts: string[] = [];
+    const walk = (node: unknown): void => {
+      if (typeof node === 'string') {
+        texts.push(node);
+      } else if (Array.isArray(node)) {
+        node.forEach(walk);
+      } else if (node !== null && typeof node === 'object') {
+        const children = (node as { children?: unknown[] }).children;
+        if (Array.isArray(children)) children.forEach(walk);
+      }
+    };
+    walk(tree);
+    if (!texts.some((text) => text.includes('墨观 Inkstone'))) {
+      issues.push(`${label}: menu row does not render its title`);
+    }
+    for (const flavor of DSH_MENU_FLAVORS) {
+      if (!texts.some((text) => text.includes(flavor.zh))) {
+        issues.push(`${label}: menu row does not render the ${flavor.zh} option`);
+      }
+    }
+  }
+  if (!layers.has(packageName)) {
+    issues.push(`${label}: menu did not apply the 跟随 DSH pair layer on boot`);
+  }
+
+  const select = face.select as (choice: string) => void;
+  const current = face.current as () => string;
+  const first = DSH_MENU_FLAVORS[0]!;
+  select(first.themeId);
+  if (preference !== first.themeId) {
+    issues.push(`${label}: selecting ${first.themeId} left the preference at ${preference}`);
+  }
+  if (layers.has(packageName)) {
+    issues.push(`${label}: selecting a named theme kept the pair layer stacked on top`);
+  }
+  if (current() !== first.themeId) {
+    issues.push(`${label}: current() reports ${current()} after selecting ${first.themeId}`);
+  }
+  select('auto');
+  if (preference !== 'system') {
+    issues.push(`${label}: selecting auto did not restore the built-in preference (got ${preference})`);
+  }
+  if (!layers.has(packageName)) {
+    issues.push(`${label}: selecting auto did not re-apply the pair layer`);
+  }
+  runtime.setTheme('dark');
+  if (layers.size === 0) {
+    issues.push(`${label}: an external Appearance change dropped the pair layer`);
+  }
+  if (current() !== 'auto') {
+    issues.push(`${label}: current() reports ${current()} after an external Appearance change`);
+  }
+}
+
+/** Menu-edition package checks: structure, per-flavour tokens, and the live switch behaviour. */
+function checkDshMenu(issues: string[], version: string, license: string): void {
+  const packageName = dshMenuPackageName();
+  const label = `dsh ${packageName}`;
+  const dir = `dist/dsh/${packageName}`;
+  const files = renderDshMenuPackage(version, license);
+  const contents = new Map(files.map((file) => [file.path, file.content]));
+  const requiredFiles = ['package.json', 'cordis.patch.yml', 'lib/index.js', 'lib/client.js', 'README.md', 'LICENSE'];
+
+  if (files.length !== requiredFiles.length) {
+    issues.push(`${label}: generated ${files.length} files, expected ${requiredFiles.length}`);
+  }
+  for (const name of requiredFiles) {
+    if (!contents.has(`${dir}/${name}`)) issues.push(`${label}: missing ${name}`);
+  }
+
+  const manifestText = contents.get(`${dir}/package.json`);
+  if (manifestText === undefined) return;
+  let manifest: Record<string, any>;
+  try {
+    manifest = JSON.parse(manifestText) as Record<string, any>;
+  } catch (error) {
+    issues.push(`${label}: invalid package.json — ${(error as Error).message}`);
+    return;
+  }
+  const fields: Array<[string, boolean]> = [
+    ['name', manifest.name === packageName],
+    ['version', manifest.version === version],
+    ['main', manifest.main === 'lib/index.js'],
+    ['exports["."]', manifest.exports?.['.'] === './lib/index.js'],
+    ['exports["./client"]', manifest.exports?.['./client'] === './lib/client.js'],
+    ['dsh.bundle.patch', manifest.dsh?.bundle?.patch === './cordis.patch.yml'],
+    ['dsh.client.platform', manifest.dsh?.client?.platform === 'web'],
+    ['engines.dsh', manifest.engines?.dsh === '>=0.2.1-rc.3 <0.3.0'],
+  ];
+  for (const [field, ok] of fields) {
+    if (!ok) issues.push(`${label}: package.json ${field} is missing or wrong`);
+  }
+  const injection: unknown[] = Array.isArray(manifest.dsh?.client?.inject) ? manifest.dsh.client.inject : [];
+  for (const dependency of [
+    '@deepseek-ai/dsh-client-ui-theme',
+    '@deepseek-ai/dsh-client-ui-renderer',
+    '@deepseek-ai/dsh-client-ui-settings',
+  ]) {
+    if (!injection.includes(dependency)) issues.push(`${label}: package.json dsh.client.inject misses ${dependency}`);
+  }
+  const filesField = manifest.files;
+  if (
+    !Array.isArray(filesField) ||
+    !['lib', 'cordis.patch.yml', 'README.md', 'LICENSE'].every((entry) => filesField.includes(entry))
+  ) {
+    issues.push(`${label}: package.json "files" does not ship lib, patch, README and LICENSE`);
+  }
+
+  const patch = contents.get(`${dir}/cordis.patch.yml`) ?? '';
+  if (
+    !patch.includes('- insert:') ||
+    !patch.includes(`id: ${dshMenuRowId()}`) ||
+    !patch.includes(`name: ${packageName}`)
+  ) {
+    issues.push(`${label}: cordis.patch.yml does not insert row ${dshMenuRowId()}`);
+  }
+
+  const host = contents.get(`${dir}/lib/index.js`) ?? '';
+  if (!host.includes('export function apply')) issues.push(`${label}: lib/index.js does not export apply`);
+
+  const readme = contents.get(`${dir}/README.md`) ?? '';
+  if (!readme.includes(`dsh plugin --profile web remove ${packageName}`)) {
+    issues.push(`${label}: README misses the remove command`);
+  }
+
+  for (const flavor of DSH_MENU_FLAVORS) {
+    const tokens = buildFlavorTokens(flavor.id);
+    const keys = Object.keys(tokens).sort();
+    const frozen = [...DSH_TOKENS].sort();
+    const missing = frozen.filter((token) => !keys.includes(token));
+    const extra = keys.filter((token) => !frozen.includes(token as (typeof frozen)[number]));
+    if (missing.length > 0 || extra.length > 0) {
+      issues.push(
+        `${label} ${flavor.id}: token coverage mismatch — ` +
+          `${missing.length} missing${missing.length ? ` (${missing.slice(0, 10).join(', ')})` : ''}, ` +
+          `${extra.length} extra${extra.length ? ` (${extra.slice(0, 10).join(', ')})` : ''}`,
+      );
+    }
+    for (const token of DSH_TOKENS) {
+      if (!isDshColorValue(tokens[token])) {
+        issues.push(`${label} ${flavor.id}: ${token} has an unsupported value ${tokens[token]}`);
+      }
+    }
+    checkDshModeContrast(tokens, issues, `${label} ${flavor.id}`);
+  }
+
+  const client = contents.get(`${dir}/lib/client.js`);
+  if (client !== undefined) checkDshMenuBundle(client, packageName, issues);
 }

@@ -1,30 +1,40 @@
 #!/usr/bin/env node
 /**
- * Assemble the GitHub Release assets.
+ * Assemble the GitHub Release assets for one release stream.
  *
  * Usage:
  *   pnpm build
  *   pnpm package:vscode
- *   pnpm package:release -- --tag v0.4.0
+ *   pnpm package:release --target themes --tag v0.4.0
+ *   pnpm package:release --target vscode --tag vscode-v0.3.6
  *
- * Outputs to dist/release/:
- *   inkstone-ghostty-<version>.zip
- *   inkstone-kaku-<version>.zip
- *   inkstone-opencode-<version>.zip
- *   inkstone-warp-<version>.zip
- *   inkstone-<version>.zip          (all targets + manifest)
- *   Konata9.inkstone-<version>.vsix
+ * `themes` writes to dist/release/:
+ *   inkstone-ghostty-<themeVersion>.zip
+ *   inkstone-kaku-<themeVersion>.zip
+ *   inkstone-opencode-<themeVersion>.zip
+ *   inkstone-warp-<themeVersion>.zip
+ *   inkstone-zed-<themeVersion>.zip
+ *   inkstone-dsh-<themeVersion>.tgz
+ *   inkstone-dsh-<variant>-<themeVersion>.tgz
+ *   inkstone-<themeVersion>.zip          (theme targets + manifest)
+ *   Konata9.inkstone-<vscodeVersion>.vsix
  *   manifest.json
  *   SHA256SUMS
  *
- * Release notes, when the version exists in CHANGELOG.md, are written to
- * dist/release-notes.md for `gh release create --notes-file`.
+ * `vscode` writes to dist/release/:
+ *   Konata9.inkstone-<vscodeVersion>.vsix
+ *   manifest.json
+ *   SHA256SUMS
+ *
+ * Release notes, when the version exists in the stream's changelog, are
+ * written to dist/release-notes.md for `gh release create --notes-file`.
  */
 
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import {
   copyFileSync,
+  cpSync,
   existsSync,
   mkdirSync,
   readFileSync,
@@ -36,8 +46,15 @@ import {
 import { join } from 'node:path';
 
 import { flavors } from '../src/palette/index.ts';
+import { DSH_MENU_FLAVORS, DSH_PAIRS } from '../src/targets/dsh.ts';
 import {
-  ghosttyThemeName,
+  dshDisplayName,
+  dshMenuPackageName,
+  dshMenuRowId,
+  dshPackageName,
+  dshRowId,
+  dshTarballFileName,
+  inkstoneThemeName,
   kakuFileName,
   kakuTomlFileName,
   opencodeFileName,
@@ -46,15 +63,19 @@ import {
   warpFileName,
   ZED_FILE_NAME,
 } from '../src/targets/naming.ts';
-import { argValue } from './args.ts';
+import { createFail, parseArgs } from './args.ts';
+import type { Fail } from './args.ts';
 import { extractReleaseNotes, hasUnreleasedEntries } from './changelog.ts';
 import { repoUrl, vsixFileName } from './packaging.ts';
 import {
   assertTagMatchesVersion,
+  changelogLabel,
+  changelogPath,
   readRootPkg,
   readVscodePkg,
   root,
 } from './versioning.ts';
+import type { ReleaseTarget } from './versioning.ts';
 
 interface ThemeManifest {
   id: string;
@@ -73,10 +94,7 @@ interface ThemeManifest {
   };
 }
 
-function fail(message: string): never {
-  console.error(`\nRelease packaging failed: ${message}\n`);
-  process.exit(1);
-}
+const fail: Fail = createFail('Release packaging failed');
 
 function assertFile(path: string): void {
   if (!existsSync(path) || !statSync(path).isFile()) {
@@ -92,31 +110,114 @@ function zipCommand(): void {
   }
 }
 
+const parsedArgs = parseArgs(process.argv.slice(2), { valueFlags: ['--tag', '--target'] }, fail);
+const target = (parsedArgs.values.get('--target') ?? 'themes') as ReleaseTarget;
+if (target !== 'themes' && target !== 'vscode') {
+  fail('--target must be "themes" or "vscode"');
+}
+
 const releaseDir = join(root, 'dist', 'release');
 const stagingDir = join(root, 'dist', '.release-staging');
 const notesPath = join(root, 'dist', 'release-notes.md');
 
 const rootPkg = readRootPkg();
 const vscodePkg = readVscodePkg();
-const version = String(rootPkg.version);
-const tag = argValue('--tag', fail);
+const themeVersion = String(rootPkg.version);
+const vscodeVersion = String(vscodePkg.version);
+const version = target === 'vscode' ? vscodeVersion : themeVersion;
+const tag = parsedArgs.values.get('--tag');
 
 if (tag) {
   try {
-    assertTagMatchesVersion(tag, version);
+    assertTagMatchesVersion(tag, version, target);
   } catch (error) {
     fail((error as Error).message);
   }
 }
-
-zipCommand();
 
 rmSync(releaseDir, { recursive: true, force: true });
 rmSync(stagingDir, { recursive: true, force: true });
 rmSync(notesPath, { force: true });
 mkdirSync(releaseDir, { recursive: true });
 
-const ghosttyFiles = flavors.map(ghosttyThemeName);
+const vsixName = vsixFileName(vscodePkg);
+const vsixPath = join(root, 'dist', vsixName);
+
+function writeNotes(): void {
+  const changelog = readFileSync(changelogPath(target), 'utf8');
+  const label = changelogLabel(target);
+  const notes = extractReleaseNotes(changelog, version);
+  if (notes) {
+    writeFileSync(notesPath, notes, 'utf8');
+    console.log(`  ✓ dist/release-notes.md (from ${label} ${version})`);
+  } else {
+    console.warn(
+      `  ! ${label} has no "## ${version}" section; the workflow will use generated notes`,
+    );
+  }
+
+  if (notes && hasUnreleasedEntries(changelog)) {
+    console.warn(
+      `  ! ${label} still has an "## Unreleased" section; ` +
+        `those entries are not in the ${version} release notes. ` +
+        'Rename it to the release version or move the entries before tagging.',
+    );
+  }
+}
+
+function writeChecksums(): void {
+  const assets = readdirSync(releaseDir)
+    .filter((name) => name !== 'SHA256SUMS' && statSync(join(releaseDir, name)).isFile())
+    .sort();
+
+  writeFileSync(
+    join(releaseDir, 'SHA256SUMS'),
+    `${assets.map((name) => `${sha256(join(releaseDir, name))}  ${name}`).join('\n')}\n`,
+    'utf8',
+  );
+
+  console.log(`\nRelease assets for ${target} ${version}:`);
+  for (const name of [...assets, 'SHA256SUMS']) {
+    console.log(`  ✓ dist/release/${name}`);
+  }
+  console.log();
+}
+
+function sha256(path: string): string {
+  return createHash('sha256').update(readFileSync(path)).digest('hex');
+}
+
+if (target === 'vscode') {
+  assertFile(vsixPath);
+  copyFileSync(vsixPath, join(releaseDir, vsixName));
+
+  const manifest = {
+    schemaVersion: 2,
+    name: 'inkstone',
+    displayName: '墨观 Inkstone',
+    license: rootPkg.license ?? 'MIT',
+    repository: repoUrl(rootPkg),
+    versions: { vscode: vscodeVersion },
+    vscode: {
+      id: `${vscodePkg.publisher}.${vscodePkg.name}`,
+      version: vscodeVersion,
+      archive: vsixName,
+    },
+  };
+  writeFileSync(
+    join(releaseDir, 'manifest.json'),
+    `${JSON.stringify(manifest, null, 2)}\n`,
+    'utf8',
+  );
+
+  writeNotes();
+  writeChecksums();
+  process.exit(0);
+}
+
+zipCommand();
+
+const ghosttyFiles = flavors.map(inkstoneThemeName);
 const kakuFiles = flavors.map(kakuFileName);
 const kakuTomlFiles = flavors.map(kakuTomlFileName);
 const opencodeFiles = flavors.map(opencodeFileName);
@@ -129,16 +230,35 @@ for (const file of opencodeFiles) assertFile(join(root, 'dist', 'opencode', file
 for (const file of warpFiles) assertFile(join(root, 'dist', 'warp', file));
 assertFile(join(root, 'dist', 'zed', ZED_FILE_NAME));
 
-const ghosttyArchive = `inkstone-ghostty-${version}.zip`;
-const kakuArchive = `inkstone-kaku-${version}.zip`;
-const opencodeArchive = `inkstone-opencode-${version}.zip`;
-const warpArchive = `inkstone-warp-${version}.zip`;
-const zedArchive = `inkstone-zed-${version}.zip`;
-const bundleArchive = `inkstone-${version}.zip`;
-const vsixName = vsixFileName({ ...vscodePkg, version });
-const vsixPath = join(root, 'dist', vsixName);
+for (const pair of DSH_PAIRS) {
+  const packageDir = join(root, 'dist', 'dsh', dshPackageName(pair.id));
+  assertFile(join(packageDir, 'package.json'));
+  assertFile(join(packageDir, 'cordis.patch.yml'));
+  assertFile(join(packageDir, 'lib', 'client.js'));
+
+  // A drifted row id would install a package that never adds its Loader row.
+  if (!readFileSync(join(packageDir, 'cordis.patch.yml'), 'utf8').includes(dshRowId(pair.id))) {
+    fail(`${packageDir}/cordis.patch.yml is missing the ${dshRowId(pair.id)} row; run \`pnpm build\` first`);
+  }
+}
+
+const menuPackageName = dshMenuPackageName();
+const menuPackageDir = join(root, 'dist', 'dsh', menuPackageName);
+assertFile(join(menuPackageDir, 'package.json'));
+assertFile(join(menuPackageDir, 'cordis.patch.yml'));
+assertFile(join(menuPackageDir, 'lib', 'client.js'));
+if (!readFileSync(join(menuPackageDir, 'cordis.patch.yml'), 'utf8').includes(dshMenuRowId())) {
+  fail(`${menuPackageDir}/cordis.patch.yml is missing the ${dshMenuRowId()} row; run \`pnpm build\` first`);
+}
 
 assertFile(vsixPath);
+
+const ghosttyArchive = `inkstone-ghostty-${themeVersion}.zip`;
+const kakuArchive = `inkstone-kaku-${themeVersion}.zip`;
+const opencodeArchive = `inkstone-opencode-${themeVersion}.zip`;
+const warpArchive = `inkstone-warp-${themeVersion}.zip`;
+const zedArchive = `inkstone-zed-${themeVersion}.zip`;
+const bundleArchive = `inkstone-${themeVersion}.zip`;
 
 function zipFlat(archive: string, directory: string, files: string[]): void {
   execFileSync('zip', ['-j', '-X', '-q', join(releaseDir, archive), ...files], {
@@ -154,14 +274,26 @@ zipFlat(warpArchive, join(root, 'dist', 'warp'), warpFiles);
 zipFlat(zedArchive, join(root, 'dist', 'zed'), [ZED_FILE_NAME]);
 copyFileSync(vsixPath, join(releaseDir, vsixName));
 
+// DSH plugins ship as tarballs so `dsh plugin add file:<path>` works from one
+// download; the generated package directories also go into the bundle below.
+for (const pair of DSH_PAIRS) {
+  const pkg = dshPackageName(pair.id);
+  execFileSync('npm', ['pack', '--pack-destination', releaseDir, join(root, 'dist', 'dsh', pkg)], {
+    stdio: 'inherit',
+  });
+  assertFile(join(releaseDir, dshTarballFileName(pkg, version)));
+}
+execFileSync('npm', ['pack', '--pack-destination', releaseDir, menuPackageDir], { stdio: 'inherit' });
+assertFile(join(releaseDir, dshTarballFileName(menuPackageName, version)));
+
 const themes: ThemeManifest[] = flavors.map((flavor) => ({
   id: flavor.meta.id,
-  name: ghosttyThemeName(flavor),
+  name: inkstoneThemeName(flavor),
   displayName: themeDisplayName(flavor),
   mode: flavor.meta.appearance,
   family: flavor.meta.family,
   files: {
-    ghostty: ghosttyThemeName(flavor),
+    ghostty: inkstoneThemeName(flavor),
     kaku: kakuFileName(flavor),
     kakuToml: kakuTomlFileName(flavor),
     opencode: opencodeFileName(flavor),
@@ -172,10 +304,11 @@ const themes: ThemeManifest[] = flavors.map((flavor) => ({
 }));
 
 const manifest = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   name: 'inkstone',
   displayName: '墨观 Inkstone',
-  version,
+  version: themeVersion,
+  versions: { themes: themeVersion, vscode: vscodeVersion },
   license: rootPkg.license ?? 'MIT',
   repository: repoUrl(rootPkg),
   themes,
@@ -213,9 +346,31 @@ const manifest = {
       archive: zedArchive,
       format: 'json',
     },
+    dsh: {
+      menu: {
+        name: menuPackageName,
+        archive: dshTarballFileName(menuPackageName, version),
+        themes: DSH_MENU_FLAVORS.map((flavor) => ({
+          themeId: flavor.themeId,
+          flavor: flavor.id,
+          appearance: flavor.appearance,
+        })),
+      },
+      packages: DSH_PAIRS.map((pair) => {
+        const name = dshPackageName(pair.id);
+        return {
+          name,
+          pair: [pair.light, pair.dark],
+          archive: dshTarballFileName(name, version),
+        };
+      }),
+      install: 'dsh plugin --profile web add file:<absolute-path>/inkstone-dsh-<version>.tgz',
+      remove: 'dsh plugin --profile web remove inkstone-dsh',
+    },
   },
   vscode: {
     id: `${vscodePkg.publisher}.${vscodePkg.name}`,
+    version: vscodeVersion,
     archive: vsixName,
   },
   bundle: bundleArchive,
@@ -224,10 +379,25 @@ const manifest = {
 const manifestJson = `${JSON.stringify(manifest, null, 2)}\n`;
 writeFileSync(join(releaseDir, 'manifest.json'), manifestJson, 'utf8');
 
-const installDoc = `# 墨观 Inkstone ${version}
+const dshVariantRows = [
+  `| \`${menuPackageName}\` | 菜单版：宣纸 / 宣纸 Dimmed / 玄墨 / 玄墨 Dimmed / 沧海 / 青瓷（Settings → General 直接切换） |`,
+  ...DSH_PAIRS.map((pair) => {
+    const light = flavors.find((flavor) => flavor.meta.id === pair.light);
+    const dark = flavors.find((flavor) => flavor.meta.id === pair.dark);
+    if (!light || !dark) {
+      fail(`DSH pair "${pair.id}" points at an unknown flavour; check src/targets/dsh.ts`);
+    }
+    return `| \`${dshPackageName(pair.id)}\` | ${dshDisplayName(light, dark)} |`;
+  }),
+].join('\n');
 
-This bundle contains every theme file for the ${version} release.
+const installDoc = `# 墨观 Inkstone ${themeVersion}
+
+This bundle contains every theme file for the ${themeVersion} release.
 The machine-readable index is \`manifest.json\`.
+
+The VS Code extension is versioned separately: this release ships
+\`${vsixName}\` (extension ${vscodeVersion}), which may be older than ${themeVersion}.
 
 ## Ghostty
 
@@ -327,6 +497,37 @@ code --install-extension ${vsixName}
 \`\`\`
 
 Then run **Preferences: Color Theme** and pick an Inkstone variant.
+
+## DeepSeek Harness (DSH)
+
+Download \`inkstone-dsh-<version>.tgz\` (menu edition) and install it:
+
+\`\`\`bash
+dsh plugin --profile web add file:/absolute/path/to/inkstone-dsh-<version>.tgz
+\`\`\`
+
+Restart \`dsh web\`, then open **Settings → General** and pick 宣纸 / 宣纸 Dimmed /
+玄墨 / 玄墨 Dimmed / 沧海 / 青瓷 from the Inkstone row; the choice applies
+immediately and is remembered.
+"跟随 DSH" hands control back to Appearance (Light → 宣纸, Dark → 玄墨). Remove
+the plugin with:
+
+\`\`\`bash
+dsh plugin --profile web remove inkstone-dsh
+\`\`\`
+
+The two-variant pair packages are still available for Appearance-driven use;
+install exactly one DSH theme package at a time because they all override the
+same tokens, and any other DSH theme plugin (for example Catppuccin) is
+mutually exclusive with them.
+
+| Package | Variants |
+| --- | --- |
+${dshVariantRows}
+
+The packages declare \`engines.dsh: ">=0.2.1-rc.3 <0.3.0"\`; a pre-release DSH
+outside that range refuses the install. Terminal ANSI colours are chosen by the
+terminal itself and are out of scope here.
 `;
 
 mkdirSync(join(stagingDir, 'ghostty'), { recursive: true });
@@ -352,6 +553,12 @@ for (const file of warpFiles) {
 }
 copyFileSync(join(root, 'dist', 'zed', ZED_FILE_NAME), join(stagingDir, 'zed', ZED_FILE_NAME));
 
+for (const pair of DSH_PAIRS) {
+  const pkg = dshPackageName(pair.id);
+  cpSync(join(root, 'dist', 'dsh', pkg), join(stagingDir, 'dsh', pkg), { recursive: true });
+}
+cpSync(menuPackageDir, join(stagingDir, 'dsh', menuPackageName), { recursive: true });
+
 writeFileSync(join(stagingDir, 'manifest.json'), manifestJson, 'utf8');
 writeFileSync(join(stagingDir, 'INSTALL.md'), installDoc, 'utf8');
 copyFileSync(join(root, 'LICENSE'), join(stagingDir, 'LICENSE'));
@@ -359,45 +566,11 @@ copyFileSync(join(root, 'CHANGELOG.md'), join(stagingDir, 'CHANGELOG.md'));
 
 execFileSync(
   'zip',
-  ['-r', '-X', '-q', join(releaseDir, bundleArchive), 'ghostty', 'kaku', 'opencode', 'warp', 'zed', 'manifest.json', 'INSTALL.md', 'LICENSE', 'CHANGELOG.md'],
+  ['-r', '-X', '-q', join(releaseDir, bundleArchive), 'ghostty', 'kaku', 'opencode', 'warp', 'zed', 'dsh', 'manifest.json', 'INSTALL.md', 'LICENSE', 'CHANGELOG.md'],
   { cwd: stagingDir, stdio: 'inherit' },
 );
 
 rmSync(stagingDir, { recursive: true, force: true });
 
-const changelog = readFileSync(join(root, 'CHANGELOG.md'), 'utf8');
-const notes = extractReleaseNotes(changelog, version);
-if (notes) {
-  writeFileSync(notesPath, notes, 'utf8');
-  console.log(`  ✓ dist/release-notes.md (from CHANGELOG.md ${version})`);
-} else {
-  console.warn(`  ! CHANGELOG.md has no "## ${version}" section; the workflow will use generated notes`);
-}
-
-if (notes && hasUnreleasedEntries(changelog)) {
-  console.warn(
-    '  ! CHANGELOG.md still has an "## Unreleased" section; ' +
-      `those entries are not in the ${version} release notes. ` +
-      'Rename it to the release version or move the entries before tagging.',
-  );
-}
-
-function sha256(path: string): string {
-  return createHash('sha256').update(readFileSync(path)).digest('hex');
-}
-
-const assets = readdirSync(releaseDir)
-  .filter((name) => name !== 'SHA256SUMS' && statSync(join(releaseDir, name)).isFile())
-  .sort();
-
-writeFileSync(
-  join(releaseDir, 'SHA256SUMS'),
-  `${assets.map((name) => `${sha256(join(releaseDir, name))}  ${name}`).join('\n')}\n`,
-  'utf8',
-);
-
-console.log(`\nRelease assets for ${version}:`);
-for (const name of [...assets, 'SHA256SUMS']) {
-  console.log(`  ✓ dist/release/${name}`);
-}
-console.log();
+writeNotes();
+writeChecksums();

@@ -1,0 +1,127 @@
+# 墨观 Inkstone · 发布
+
+> 本文件由 `pnpm build:docs` 自动生成，请勿手动修改。
+
+项目有两条独立版本线，各自打 tag、各自跑 workflow。主题发版不会自动提升扩展版本，扩展也可以长期停在旧版本。
+
+## 两条发布线
+
+| 发布线 | 版本源 | tag | 产物 |
+| --- | --- | --- | --- |
+| 主题 / 项目 | 根 `package.json` | `v0.5.0` | Ghostty / Kaku / Warp / OpenCode / Zed / DSH / bundle，并附带当前 VSIX（仅打包，不发布市场） |
+| VS Code 扩展 | `packages/vscode/package.json` | `vscode-v0.3.6` | VSIX，发布到 VS Code Marketplace 与 Open VSX |
+
+## 发布前
+
+1. 在对应 CHANGELOG 的 `## Unreleased` 下写本次改动。
+2. 确认工作区干净、当前在 `main`。
+3. 如果改了色板或文档，先运行 `pnpm build`、`pnpm build:docs`、`pnpm capture:preview` 并提交生成物。
+4. 运行 `pnpm release:check`（或带 `--tag` / `--target`）确认 tag、CHANGELOG 与生成物一致。
+
+根 `package.json` 的 version 是主题版本源；`packages/vscode/package.json` 的 version 是扩展版本源。两个 CHANGELOG 分别维护：根 `CHANGELOG.md` 与 `packages/vscode/CHANGELOG.md`。
+
+## 一键发布
+
+```bash
+pnpm release minor                  # 主题：v<version>
+pnpm release patch --target vscode  # 扩展：vscode-v<version>
+pnpm release 0.5.0                  # 指定主题版本
+```
+
+`pnpm release` 会依次：
+
+1. 检查工作区干净、当前在 `main`、目标 tag 未被占用。
+2. 检查 `## Unreleased` 非空，且目标版本小节尚不存在。
+3. 写版本号，把 `## Unreleased` 改名为 `## <version>`。
+4. 运行 `pnpm build` 与 `pnpm typecheck`。
+5. 提交 `chore: release v<version>`，创建 annotated tag，推送 `main` 与 tag。
+
+构建或类型检查失败时会回滚版本号与 CHANGELOG。常用选项：
+
+```bash
+pnpm release patch --dry-run   # 只打印计划，不写文件、不提交
+pnpm release patch --no-push   # 只提交和打 tag，稍后手动推送
+pnpm release patch --force     # 允许在非 main 分支发布
+```
+
+## CI workflow
+
+| tag | workflow | 行为 |
+| --- | --- | --- |
+| `v*` | `.github/workflows/release.yml` | 校验 tag → 构建 → typecheck → 打包 VSIX（仅附带）→ 生成主题资产 → 创建或更新 GitHub Release |
+| `vscode-v*` | `.github/workflows/release-vscode.yml` | 校验 tag → 构建 → typecheck → 打包 VSIX → 发布 Marketplace / Open VSX → 创建或更新 GitHub Release |
+
+`.github/workflows/build.yml` 会在普通 push / PR 上运行 `pnpm build`、`pnpm build:site`、`pnpm build:docs`，并检查生成物是否已提交。
+
+## VS Code Marketplace
+
+在仓库 **Settings → Secrets and variables → Actions** 添加 `VSCE_PAT`：
+
+- PAT 需要 Marketplace 的 **Manage** 权限，并绑定到发布者 `Konata9`。
+- 建议使用组织范围的 PAT；全局 PAT 逐步退役。
+- 创建 PAT 的账号必须是 `Konata9` 发布者的所有者。
+
+workflow 使用 `vsce publish --packagePath ... --skip-duplicate`，重复版本不会让发布失败。
+
+## Open VSX
+
+Open VSX 使用 GitHub Actions 的 OIDC trusted publishing，无需 `OVSX_PAT`：
+
+1. 登录 [open-vsx.org](https://open-vsx.org/) 并进入发布者 `Konata9` 的设置。
+2. 在 Trusted Publishers 中登记仓库 `Konata9/inkstone`、workflow 文件 `release-vscode.yml`。
+3. 首次发布（bootstrap）如果还没有任何版本，需要先用 PAT 手动发布一次，之后 OIDC 才能接替。
+
+如果修改了 workflow 文件名，必须同步更新 Open VSX 的登记，否则 OIDC 校验会失败。
+
+## 预发布
+
+版本号带后缀的 tag 只创建 GitHub prerelease，不发布市场：
+
+- `v0.5.0-beta.1`（主题）
+- `vscode-v0.3.6-beta.1`（扩展）
+
+workflow 判断的是去掉 `vscode-v` 前缀后的版本号，因此 `vscode-v` 里的连字符不会把稳定版误判为预发布。
+
+## 重试与恢复
+
+两个 workflow 都是幂等的：
+
+- GitHub Release 已存在时使用 `gh release upload --clobber` 更新附件。
+- Marketplace / Open VSX 使用 `--skip-duplicate`，重复发布同一版本会被忽略。
+- 只失败在市场发布步骤时，重新运行 workflow 即可，不需要重新打 tag。
+
+`pnpm release` 在推送阶段失败时，本地已经生成 commit 和 tag，直接重推：
+
+```bash
+git push origin main
+git push origin v0.5.0
+```
+
+版本号和 CHANGELOG 已提交、只差打 tag 时：
+
+```bash
+pnpm release:tag
+pnpm release:tag --dry-run   # 只检查
+```
+
+本地预览发布产物：
+
+```bash
+pnpm package:vscode
+pnpm package:release -- --tag v0.5.0
+pnpm release:check --tag v0.5.0
+```
+
+产物在 `dist/release/`：`inkstone-ghostty-<version>.zip`、`inkstone-kaku-<version>.zip`、`inkstone-opencode-<version>.zip`、`inkstone-warp-<version>.zip`、`inkstone-zed-<version>.zip`、`inkstone-dsh-<version>.tgz`、`inkstone-<version>.zip`、VSIX、`manifest.json` 与 `SHA256SUMS`。
+
+## 致谢
+
+外部贡献会在发版时自动追加 `### Acknowledgements` 并 @ 贡献者（从 merged PR 的 `Merge pull request #N from <login>/...` 识别）；如果版本小节里已经有手写的 `### Acknowledgements`，则保留手写内容。
+
+## DSH 版本范围
+
+DSH 插件声明 `engines.dsh: ">=0.2.1-rc.3 <0.3.0"`。DSH 仍在预发布期，超出区间会拒绝安装；升级 DSH token ladder 时，需要同步更新 `src/targets/dsh-tokens.ts` 与 `src/targets/dsh.ts`，再重新打包。
+
+---
+
+[返回仓库 README](../README.md) · [文档首页](README.md) · [官网](https://konata9.github.io/inkstone/)

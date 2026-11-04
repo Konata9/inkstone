@@ -9,8 +9,9 @@
 import { alpha, darken, lighten, mix } from '../color.ts';
 import { flavors } from '../palette/index.ts';
 import type { Flavor } from '../palette/types.ts';
+import { zedAnsiKey, zedDimAnsiKey } from './ansi.ts';
 import { themeDisplayName, ZED_FAMILY_NAME, ZED_FILE_NAME } from './naming.ts';
-import type { GeneratedFile } from './vscode.ts';
+import type { GeneratedFile } from './types.ts';
 
 export interface ZedHighlightStyle {
   color?: string | null;
@@ -266,30 +267,14 @@ function buildStyle(f: Flavor): Record<string, unknown> {
     'terminal.foreground': t.primary,
     'terminal.bright_foreground': dark ? lighten(t.primary, 0.1) : darken(t.primary, 0.1),
     'terminal.dim_foreground': t.secondary,
-    'terminal.ansi.black': f.ansi[0],
-    'terminal.ansi.red': f.ansi[1],
-    'terminal.ansi.green': f.ansi[2],
-    'terminal.ansi.yellow': f.ansi[3],
-    'terminal.ansi.blue': f.ansi[4],
-    'terminal.ansi.magenta': f.ansi[5],
-    'terminal.ansi.cyan': f.ansi[6],
-    'terminal.ansi.white': f.ansi[7],
-    'terminal.ansi.bright_black': f.ansi[8],
-    'terminal.ansi.bright_red': f.ansi[9],
-    'terminal.ansi.bright_green': f.ansi[10],
-    'terminal.ansi.bright_yellow': f.ansi[11],
-    'terminal.ansi.bright_blue': f.ansi[12],
-    'terminal.ansi.bright_magenta': f.ansi[13],
-    'terminal.ansi.bright_cyan': f.ansi[14],
-    'terminal.ansi.bright_white': f.ansi[15],
-    'terminal.ansi.dim_black': mix(f.ansi[0], s.sunken, 0.5),
-    'terminal.ansi.dim_red': mix(f.ansi[1], s.sunken, 0.5),
-    'terminal.ansi.dim_green': mix(f.ansi[2], s.sunken, 0.5),
-    'terminal.ansi.dim_yellow': mix(f.ansi[3], s.sunken, 0.5),
-    'terminal.ansi.dim_blue': mix(f.ansi[4], s.sunken, 0.5),
-    'terminal.ansi.dim_magenta': mix(f.ansi[5], s.sunken, 0.5),
-    'terminal.ansi.dim_cyan': mix(f.ansi[6], s.sunken, 0.5),
-    'terminal.ansi.dim_white': mix(f.ansi[7], s.sunken, 0.5),
+    ...Object.fromEntries(
+      f.ansi.map((hex, slot): [string, string] => [zedAnsiKey(slot), hex]),
+    ),
+    ...Object.fromEntries(
+      f.ansi
+        .slice(0, 8)
+        .map((hex, slot): [string, string] => [zedDimAnsiKey(slot), mix(hex, s.sunken, 0.5)]),
+    ),
 
     // ------------------------------------------------------------------ syntax
     syntax: buildSyntax(f),
@@ -326,7 +311,7 @@ export function buildExtensionToml(version: string): string {
   ].join('\n');
 }
 
-export function generateZed(version = '0.3.5'): GeneratedFile[] {
+export function generateZed(version: string): GeneratedFile[] {
   const familyContent = `${JSON.stringify(buildZedFamily(), null, 2)}\n`;
   return [
     {

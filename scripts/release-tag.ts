@@ -3,19 +3,21 @@
  * Validate release invariants and create the annotated release tag.
  *
  * Usage:
- *   pnpm release:tag            # check, then `git tag -a v<version>`
- *   pnpm release:tag --dry-run  # check only
- *   pnpm release:tag --force    # allow tagging a branch other than main
+ *   pnpm release:tag                        # theme release, tag v<version>
+ *   pnpm release:tag --target vscode        # extension release, tag vscode-v<version>
+ *   pnpm release:tag --dry-run              # check only
+ *   pnpm release:tag --force                # allow tagging a branch other than main
  *
- * The root package.json version is the source of truth; the tag name must be
- * `v<version>` because the release workflow packages with
- * `--tag "$GITHUB_REF_NAME"`.
+ * Theme tags are `v<root package.json version>` and extension tags are
+ * `vscode-v<packages/vscode version>`; each workflow packages only its own
+ * stream with `--tag "$GITHUB_REF_NAME"`.
  */
 
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 
 import { hasUnreleasedEntries, hasVersionSection } from './changelog.ts';
+import { createFail, parseArgs } from './args.ts';
+import type { Fail } from './args.ts';
 import {
   branchName,
   git,
@@ -23,23 +25,41 @@ import {
   remoteTagExists,
   workingTreeStatus,
 } from './git.ts';
-import { findGeneratedDrift, readRootPkg, releaseTag, root } from './versioning.ts';
+import {
+  changelogLabel,
+  changelogPath,
+  expectedReleaseTag,
+  findGeneratedDrift,
+  readRootPkg,
+  readVscodePkg,
+} from './versioning.ts';
+import type { ReleaseTarget } from './versioning.ts';
 
-const args = new Set(process.argv.slice(2));
-const dryRun = args.has('--dry-run');
-const force = args.has('--force');
-
-function fail(message: string): never {
-  console.error(`\nRelease tag check failed: ${message}\n`);
-  process.exit(1);
-}
+const fail: Fail = createFail('Release tag check failed');
 
 function warn(message: string): void {
   console.warn(`  ! ${message}`);
 }
 
-const version = String(readRootPkg().version);
-const tag = releaseTag(version);
+const parsedArgs = parseArgs(
+  process.argv.slice(2),
+  { valueFlags: ['--target'], knownFlags: ['--dry-run', '--force'] },
+  fail,
+);
+const dryRun = parsedArgs.flags.has('--dry-run');
+const force = parsedArgs.flags.has('--force');
+const targetArg = parsedArgs.values.get('--target');
+
+const target: ReleaseTarget = (targetArg ?? 'themes') as ReleaseTarget;
+if (target !== 'themes' && target !== 'vscode') {
+  fail('--target must be "themes" or "vscode"');
+}
+
+const version = String(
+  target === 'vscode' ? readVscodePkg().version : readRootPkg().version,
+);
+const tag = expectedReleaseTag(target, version);
+const changelogLabelText = changelogLabel(target);
 
 const status = workingTreeStatus();
 if (status.length > 0) {
@@ -51,14 +71,13 @@ if (branch !== 'main' && !force) {
   fail(`refusing to tag on branch "${branch}"; switch to main or pass --force`);
 }
 
-const changelogPath = join(root, 'CHANGELOG.md');
-const changelog = readFileSync(changelogPath, 'utf8');
+const changelog = readFileSync(changelogPath(target), 'utf8');
 if (!hasVersionSection(changelog, version)) {
-  fail(`CHANGELOG.md has no "## ${version}" section; rename "## Unreleased" or add one`);
+  fail(`${changelogLabelText} has no "## ${version}" section; rename "## Unreleased" or add one`);
 }
 if (hasUnreleasedEntries(changelog)) {
   fail(
-    'CHANGELOG.md still has entries under "## Unreleased"; ' +
+    `${changelogLabelText} still has entries under "## Unreleased"; ` +
       'move them into the release section before tagging',
   );
 }
@@ -75,14 +94,14 @@ if (remoteTag === undefined) {
   warn('could not query origin for existing tags; continuing (a push will still fail on a conflict)');
 }
 
-const drift = findGeneratedDrift(version, changelog);
+const drift = findGeneratedDrift();
 if (drift.length > 0) {
   fail(`${drift.join('; ')}. Run \`pnpm build\` and commit the generated files`);
 }
 
 console.log(`  ✓ working tree clean, on ${branch}`);
-console.log(`  ✓ CHANGELOG.md has a ${version} section with no Unreleased entries`);
-console.log('  ✓ packages/vscode/package.json and CHANGELOG.md match the root files');
+console.log(`  ✓ ${changelogLabelText} has a ${version} section with no Unreleased entries`);
+console.log('  ✓ generated files are in sync with the palette');
 console.log(`  ✓ tag ${tag} is unused`);
 
 if (dryRun) {
@@ -90,7 +109,7 @@ if (dryRun) {
   process.exit(0);
 }
 
-git('tag', '-a', tag, '-m', `墨观 Inkstone ${tag}`);
+git('tag', '-a', tag, '-m', `墨观 Inkstone ${target === 'vscode' ? 'VS Code ' : ''}${tag}`);
 
 console.log(`\nCreated annotated tag ${tag}.`);
 console.log('\nPush the release commit and tag together:\n');

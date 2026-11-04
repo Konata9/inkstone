@@ -1,11 +1,14 @@
 /**
- * Product site generator.
+ * Product site outputs.
  *
- * Renders `templates/site/page.liquid` (LiquidJS) into static HTML under site/
- * for GitHub Pages. The template owns structure, CSS and client script; this
- * module only supplies locale copy, version, support lists, flavor
- * tokens/panels and SEO companions so the site cannot drift from the six
- * flavor palettes.
+ * Renders `showcase/site/templates/page.liquid` (LiquidJS) into static HTML
+ * under `site/` for GitHub Pages. The template owns structure, CSS and client
+ * script; this module only supplies locale copy, version, support lists,
+ * flavor tokens/panels and SEO companions so the site cannot drift from the
+ * six flavor palettes.
+ *
+ * The site is a consumer of the theme: it reads palettes and specimen markup
+ * from `src/` and `showcase/specimen.ts`, and nothing under `src/` imports it.
  */
 
 import { readFileSync } from 'node:fs';
@@ -14,7 +17,7 @@ import { join } from 'node:path';
 
 import { Liquid } from 'liquidjs';
 
-import { flavors, flavorName } from '../palette/index.ts';
+import { flavors, flavorName } from '../../src/palette/index.ts';
 import {
   accents,
   cssVars,
@@ -22,17 +25,34 @@ import {
   editorStyles,
   galleryTsLines,
   surfaces,
-} from './preview.ts';
-import { siteCopy, type SiteLocale } from './site-copy.ts';
+} from '../specimen.ts';
+import { siteCopy, type SiteLocale } from './copy.ts';
 
-const root = fileURLToPath(new URL('../..', import.meta.url));
-const templateRoot = join(root, 'templates', 'site');
+/** One text file the site build writes. */
+export interface SiteOutput {
+  path: string;
+  content: string;
+}
+
+/** A committed site asset copied rather than rendered. */
+export interface SiteBinaryOutput {
+  /** Destination, relative to the repository root. */
+  path: string;
+  /** Source file, relative to the repository root. */
+  source: string;
+}
+
+const siteRoot = fileURLToPath(new URL('.', import.meta.url));
+const templateRoot = join(siteRoot, 'templates');
 
 /** Public origin for canonical / hreflang / sitemap. Change when a custom domain is attached. */
 export const SITE_ORIGIN = 'https://konata9.github.io/inkstone';
 
-/** Favicon source copied into `site/` by the build step. */
-export const SITE_FAVICON_SOURCE = join(root, 'packages', 'vscode', 'icon.png');
+/** Site assets that are copied into `site/` rather than rendered. */
+export const SITE_BINARY_OUTPUTS: SiteBinaryOutput[] = [
+  { path: 'site/favicon.png', source: 'packages/vscode/icon.png' },
+  { path: 'site/og.jpg', source: 'showcase/site/assets/og.jpg' },
+];
 
 const RELEASES_URL = 'https://github.com/Konata9/inkstone/releases';
 const REPO_URL = 'https://github.com/Konata9/inkstone';
@@ -112,16 +132,6 @@ const bootJs = `(function () {
   root.dataset.appearance = c.appearance[id] || 'dark';
   root.style.colorScheme = root.dataset.appearance;
 })();`;
-
-export interface GeneratedSiteFile {
-  path: string;
-  content: string;
-}
-
-function readVersion(): string {
-  const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as { version: string };
-  return pkg.version;
-}
 
 /** One flavor row shared by the rail, hero stage, and specimen panels. */
 function buildFlavors(locale: SiteLocale) {
@@ -249,19 +259,16 @@ function sitemapAlternates(): string {
 }
 
 function sitemapXml(): string {
-  const today = new Date().toISOString().slice(0, 10);
   const alternates = sitemapAlternates();
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>${SITE_ORIGIN}/</loc>
-    <lastmod>${today}</lastmod>
 ${alternates}
   </url>
   <url>
     <loc>${SITE_ORIGIN}/zh/</loc>
-    <lastmod>${today}</lastmod>
 ${alternates}
   </url>
 </urlset>
@@ -361,8 +368,7 @@ Terminal themes: use the Ghostty / Kaku / Warp zip assets from the same release,
 }
 
 /** All text files for the static site (HTML + SEO companions). */
-export function generateSite(): GeneratedSiteFile[] {
-  const version = readVersion();
+export function collectSiteOutputs(version: string): SiteOutput[] {
   return [
     { path: 'site/index.html', content: renderPage('en', version) },
     { path: 'site/zh/index.html', content: renderPage('zh', version) },
@@ -370,5 +376,6 @@ export function generateSite(): GeneratedSiteFile[] {
     { path: 'site/sitemap.xml', content: sitemapXml() },
     { path: 'site/llms.txt', content: llmsTxt(version) },
     { path: 'site/llms-full.txt', content: llmsFullTxt(version) },
+    { path: 'site/.nojekyll', content: '' },
   ];
 }

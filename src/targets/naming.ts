@@ -9,8 +9,8 @@
 import { flavorName } from '../palette/index.ts';
 import type { Flavor } from '../palette/types.ts';
 
-/** Ghostty theme name, which is also its file name: `Inkstone Xuanmo Dimmed`. */
-export function ghosttyThemeName(flavor: Flavor): string {
+/** Theme name shared by Ghostty files, Kaku schemes and Warp themes: `Inkstone Xuanmo Dimmed`. */
+export function inkstoneThemeName(flavor: Flavor): string {
   return `Inkstone ${flavorName(flavor, 'en')}`;
 }
 
@@ -24,19 +24,9 @@ export function kakuTomlFileName(flavor: Flavor): string {
   return `inkstone-${flavor.meta.id}.toml`;
 }
 
-/** Scheme name inside the Lua and TOML files: `Inkstone Xuanmo`. */
-export function kakuSchemeName(flavor: Flavor): string {
-  return `Inkstone ${flavorName(flavor, 'en')}`;
-}
-
 /** Warp theme YAML file name: `inkstone-xuanmo.yaml`. */
 export function warpFileName(flavor: Flavor): string {
   return `inkstone-${flavor.meta.id}.yaml`;
-}
-
-/** Name shown in Warp's theme picker: `Inkstone Xuanmo`. */
-export function warpThemeName(flavor: Flavor): string {
-  return `Inkstone ${flavorName(flavor, 'en')}`;
 }
 
 /** VS Code theme JSON file name: `xuanmo-color-theme.json`. */
@@ -64,3 +54,38 @@ export const ZED_FAMILY_NAME = 'Inkstone';
 
 /** Zed theme family file name. */
 export const ZED_FILE_NAME = 'inkstone.json';
+
+/** DSH plugin package name for a light/dark pair: `inkstone-dsh-ink`. */
+export function dshPackageName(pairId: string): string {
+  return `inkstone-dsh-${pairId}`;
+}
+
+/** DSH Loader row id: `inkstone-theme-ink`. */
+export function dshRowId(pairId: string): string {
+  return `inkstone-theme-${pairId}`;
+}
+
+/** DSH package display name: `墨观 · 宣纸 + 玄墨`. */
+export function dshDisplayName(light: Flavor, dark: Flavor): string {
+  return `墨观 · ${flavorName(light, 'zh')} + ${flavorName(dark, 'zh')}`;
+}
+
+/** DSH release tarball name: `inkstone-dsh-ink-0.3.5.tgz`. */
+export function dshTarballFileName(packageName: string, version: string): string {
+  return `${packageName}-${version}.tgz`;
+}
+
+/** DSH menu-edition package name: `inkstone-dsh`. */
+export function dshMenuPackageName(): string {
+  return 'inkstone-dsh';
+}
+
+/** DSH menu-edition Loader row id: `inkstone-theme`. */
+export function dshMenuRowId(): string {
+  return 'inkstone-theme';
+}
+
+/** DSH registered theme id for a flavour: `inkstone-xuanzhi`. */
+export function dshThemeId(flavorId: string): string {
+  return `inkstone-${flavorId}`;
+}

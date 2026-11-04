@@ -2,7 +2,7 @@
 
 > Traditional Chinese color themes for editors and terminals, built from the 526-color zhongguose palette.
 
-- Version: 0.3.5
+- Version: 0.5.0
 - Extension ID: Konata9.inkstone
 - License: MIT
 - Site: https://konata9.github.io/inkstone/
