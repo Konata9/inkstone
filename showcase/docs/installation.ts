@@ -260,7 +260,7 @@ export function renderInstallationDoc(): string {
         `dsh plugin --profile web add "$PWD/dist/dsh/${dshMenuPackageName()}"`,
         '```',
         '',
-        '重启 `dsh web`，打开 **Settings → General**，在「墨观 Inkstone」一行点选宣纸 / 宣纸 Dimmed / 玄墨 / 玄墨 Dimmed / 沧海 / 青瓷：选择立即生效并记住。「跟随 DSH」把控制权交回 **Appearance** 的 Light / Dark / System —— Light 用宣纸，Dark 用玄墨。卸载：',
+        '重启 `dsh web`，打开 **Settings → General**，在「墨观 Inkstone」一行点选宣纸 / 宣纸 Dimmed / 玄墨 / 玄墨 Dimmed / 沧海 / 青瓷：选择立即生效并记住。「跟随 DSH」把控制权交回 **Appearance** 的 Light / Dark / System —— Light 用宣纸，Dark 用玄墨；「原生 DSH」不叠加任何 Inkstone 样式，便于和 DSH 原生主题对比。卸载：',
         '',
         '```bash',
         `dsh plugin --profile web remove ${dshMenuPackageName()}`,
