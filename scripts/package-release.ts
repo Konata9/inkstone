@@ -485,7 +485,8 @@ dsh plugin --profile web add file:/absolute/path/to/inkstone-dsh-<version>.tgz
 Restart \`dsh web\`, then open **Settings → General** and pick 宣纸 / 宣纸 Dimmed /
 玄墨 / 玄墨 Dimmed / 沧海 / 青瓷 from the Inkstone row; the choice applies
 immediately and is remembered.
-"跟随 DSH" hands control back to Appearance (Light → 宣纸, Dark → 玄墨). Remove
+"跟随 DSH" hands control back to Appearance (Light → 宣纸, Dark → 玄墨);
+"原生 DSH" removes the Inkstone layer entirely for an A/B comparison. Remove
 the plugin with:
 
 \`\`\`bash
