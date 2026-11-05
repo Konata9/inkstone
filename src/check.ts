@@ -16,7 +16,7 @@ import { parse as parseToml } from 'smol-toml';
 
 import { contrast, isValidHex } from './color.ts';
 import { flavors } from './palette/index.ts';
-import { buildDshTokens, buildFlavorTokens, DSH_MENU_FLAVORS, DSH_PAIRS, renderDshMenuPackage, renderDshPackage } from './targets/dsh.ts';
+import { buildDshTokens, buildFlavorTokens, dshMenuHoverAttribute, DSH_MENU_FLAVORS, DSH_PAIRS, renderDshMenuPackage, renderDshPackage } from './targets/dsh.ts';
 import { DSH_TOKENS } from './targets/dsh-tokens.ts';
 import { vscodeAnsiKey, zedAnsiKey } from './targets/ansi.ts';
 import { generateGhostty } from './targets/ghostty.ts';
@@ -626,6 +626,13 @@ interface DshRegistration {
   factory?: unknown;
 }
 
+/** Minimal style element the DSH bundles create for the menu hover rule. */
+interface DshFakeStyle {
+  textContent: string;
+  removed: boolean;
+  remove(): void;
+}
+
 /** Generated values accepted by the DSH token legality check. */
 function isDshColorValue(value: string): boolean {
   if (/^#[0-9a-f]{6}([0-9a-f]{2})?$/i.test(value)) return true;
@@ -674,12 +681,39 @@ function checkDshBundle(
   label: string,
   issues: string[],
 ): void {
+  const hoverAttribute = dshMenuHoverAttribute(packageName);
   const registrations: DshRegistration[] = [];
+  const styles: DshFakeStyle[] = [];
+  const attributes = new Map<string, string>();
   const sandbox = {
     window: {
       __ModuleLoader__: {
         load(registration: DshRegistration): void {
           registrations.push(registration);
+        },
+      },
+    },
+    document: {
+      documentElement: {
+        setAttribute(name: string, value: string): void {
+          attributes.set(name, value);
+        },
+        removeAttribute(name: string): void {
+          attributes.delete(name);
+        },
+      },
+      createElement(): DshFakeStyle {
+        return {
+          textContent: '',
+          removed: false,
+          remove(): void {
+            this.removed = true;
+          },
+        };
+      },
+      head: {
+        appendChild(style: DshFakeStyle): void {
+          styles.push(style);
         },
       },
     },
@@ -720,8 +754,13 @@ function checkDshBundle(
   }
 
   const calls: Array<{ source: unknown; tokens: Record<string, { light: string; dark: string }> }> = [];
+  const cleanups: Array<() => void> = [];
   const fakeCtx = {
-    effect: (effect: () => unknown) => effect(),
+    effect: (effect: () => unknown) => {
+      const cleanup = effect();
+      if (typeof cleanup === 'function') cleanups.push(cleanup as () => void);
+      return cleanup;
+    },
     theme: {
       overrideTokens(from: unknown, map: Record<string, { light: string; dark: string }>) {
         calls.push({ source: from, tokens: map });
@@ -744,6 +783,17 @@ function checkDshBundle(
     issues.push(`${label}: overrideTokens layer source is ${String(call.source)}, expected ${packageName}`);
   }
 
+  if (
+    styles.length !== 1 ||
+    !styles[0]!.textContent.includes('[data-menu-material]') ||
+    !styles[0]!.textContent.includes(`html[${hoverAttribute}]`)
+  ) {
+    issues.push(`${label}: bundle does not inject the gated menu hover contrast rule`);
+  }
+  if (!attributes.has(hoverAttribute)) {
+    issues.push(`${label}: bundle did not activate the menu hover rule while installed`);
+  }
+
   const generated = Object.keys(call.tokens);
   if (generated.length !== DSH_TOKENS.length) {
     issues.push(`${label}: bundle carries ${generated.length} tokens, expected ${DSH_TOKENS.length}`);
@@ -757,6 +807,115 @@ function checkDshBundle(
     if (modes.light !== tokens[token]!.light || modes.dark !== tokens[token]!.dark) {
       issues.push(`${label}: bundle token ${token} drifted from buildDshTokens()`);
     }
+  }
+  for (const cleanup of cleanups.reverse()) cleanup();
+  if (attributes.has(hoverAttribute)) {
+    issues.push(`${label}: teardown left the menu hover rule active`);
+  }
+}
+
+/** Two bundles may be active at once (for example a pair edition and the menu edition); each owns its own gate attribute. */
+function checkDshHoverCoexistence(
+  bundles: Array<{ packageName: string; source: string }>,
+  issues: string[],
+): void {
+  const label = 'dsh menu hover coexistence';
+  const registrations: DshRegistration[] = [];
+  const styles: DshFakeStyle[] = [];
+  const attributes = new Map<string, string>();
+  const sandbox = {
+    window: {
+      __ModuleLoader__: {
+        load(registration: DshRegistration): void {
+          registrations.push(registration);
+        },
+      },
+    },
+    document: {
+      documentElement: {
+        setAttribute(name: string, value: string): void {
+          attributes.set(name, value);
+        },
+        removeAttribute(name: string): void {
+          attributes.delete(name);
+        },
+      },
+      createElement(): DshFakeStyle {
+        return {
+          textContent: '',
+          removed: false,
+          remove(): void {
+            this.removed = true;
+          },
+        };
+      },
+      head: {
+        appendChild(style: DshFakeStyle): void {
+          styles.push(style);
+        },
+      },
+    },
+  };
+  for (const bundle of bundles) {
+    try {
+      runInNewContext(bundle.source, sandbox, { filename: `${bundle.packageName}/lib/client.js (coexistence)` });
+    } catch (error) {
+      issues.push(`${label}: ${bundle.packageName} throws — ${(error as Error).message}`);
+      return;
+    }
+  }
+  if (registrations.length !== bundles.length) {
+    issues.push(`${label}: loaded ${registrations.length} bundles, expected ${bundles.length}`);
+    return;
+  }
+  const cleanups: Array<() => void> = [];
+  for (const registration of registrations) {
+    if (typeof registration.factory !== 'function') {
+      issues.push(`${label}: a bundle did not register a factory`);
+      return;
+    }
+    const module = (registration.factory as () => Record<string, unknown>)();
+    const ctx = {
+      effect(effect: () => unknown): () => void {
+        const dispose = effect();
+        if (typeof dispose === 'function') cleanups.push(dispose as () => void);
+        return typeof dispose === 'function' ? (dispose as () => void) : () => {};
+      },
+      theme: {
+        overrideTokens(): () => void {
+          return () => {};
+        },
+      },
+    };
+    try {
+      (module.apply as (ctx: unknown) => void)(ctx);
+    } catch (error) {
+      issues.push(`${label}: apply() throws — ${(error as Error).message}`);
+      return;
+    }
+  }
+  const first = dshMenuHoverAttribute(bundles[0]!.packageName);
+  const second = dshMenuHoverAttribute(bundles[1]!.packageName);
+  if (styles.length !== bundles.length) {
+    issues.push(`${label}: injected ${styles.length} styles, expected ${bundles.length}`);
+  }
+  if (!attributes.has(first) || !attributes.has(second)) {
+    issues.push(`${label}: both active bundles must own their hover attribute`);
+    return;
+  }
+  // Each bundle contributes a style effect followed by a token effect.
+  cleanups[0]?.();
+  cleanups[1]?.();
+  if (attributes.has(first)) {
+    issues.push(`${label}: the first bundle's teardown left its own hover attribute active`);
+  }
+  if (!attributes.has(second)) {
+    issues.push(`${label}: the first bundle's teardown disabled the second bundle's hover rule`);
+  }
+  cleanups[2]?.();
+  cleanups[3]?.();
+  if (attributes.has(second)) {
+    issues.push(`${label}: the second bundle's teardown left its hover attribute active`);
   }
 }
 
@@ -781,6 +940,8 @@ function checkDsh(issues: string[]): void {
     'README.md',
     'LICENSE',
   ];
+
+  const hoverBundles: Array<{ packageName: string; source: string }> = [];
 
   for (const pair of DSH_PAIRS) {
     const packageName = dshPackageName(pair.id);
@@ -886,8 +1047,13 @@ function checkDsh(issues: string[]): void {
     }
 
     const client = contents.get(`${dir}/lib/client.js`);
-    if (client !== undefined) checkDshBundle(client, packageName, tokens, label, issues);
+    if (client !== undefined) {
+      checkDshBundle(client, packageName, tokens, label, issues);
+      hoverBundles.push({ packageName, source: client });
+    }
   }
+
+  if (hoverBundles.length >= 2) checkDshHoverCoexistence(hoverBundles.slice(0, 2), issues);
 
   checkDshMenu(issues, version, license);
 }
@@ -941,7 +1107,10 @@ interface DshMenuRowRegistration {
 /** Exercise the menu bundle: every registered theme, the Settings row, and both switch paths. */
 function checkDshMenuBundle(source: string, packageName: string, issues: string[]): void {
   const label = `dsh ${packageName}`;
+  const hoverAttribute = dshMenuHoverAttribute(packageName);
   const registrations: DshRegistration[] = [];
+  const styles: DshFakeStyle[] = [];
+  const attributes = new Map<string, string>();
   const sandbox = {
     window: {
       __ModuleLoader__: {
@@ -956,6 +1125,30 @@ function checkDshMenuBundle(source: string, packageName: string, issues: string[
         },
         setItem(key: string, value: string): void {
           this.store.set(key, value);
+        },
+      },
+    },
+    document: {
+      documentElement: {
+        setAttribute(name: string, value: string): void {
+          attributes.set(name, value);
+        },
+        removeAttribute(name: string): void {
+          attributes.delete(name);
+        },
+      },
+      createElement(): DshFakeStyle {
+        return {
+          textContent: '',
+          removed: false,
+          remove(): void {
+            this.removed = true;
+          },
+        };
+      },
+      head: {
+        appendChild(style: DshFakeStyle): void {
+          styles.push(style);
         },
       },
     },
@@ -1034,9 +1227,11 @@ function checkDshMenuBundle(source: string, packageName: string, issues: string[
       };
     },
   };
+  const cleanups: Array<() => void> = [];
   const fakeCtx = {
     effect(effect: () => unknown): () => void {
       const dispose = effect();
+      if (typeof dispose === 'function') cleanups.push(dispose as () => void);
       return typeof dispose === 'function' ? (dispose as () => void) : () => {};
     },
     on(_event: string, listener: () => void): () => void {
@@ -1062,6 +1257,16 @@ function checkDshMenuBundle(source: string, packageName: string, issues: string[
   } catch (error) {
     issues.push(`${label}: menu apply() throws in the sandbox — ${(error as Error).message}`);
     return;
+  }
+  if (
+    styles.length !== 1 ||
+    !styles[0]!.textContent.includes('[data-menu-material]') ||
+    !styles[0]!.textContent.includes(`html[${hoverAttribute}]`)
+  ) {
+    issues.push(`${label}: menu bundle does not inject the gated menu hover contrast rule`);
+  }
+  if (!attributes.has(hoverAttribute)) {
+    issues.push(`${label}: menu did not activate the menu hover rule on boot`);
   }
 
   if (themes.length !== DSH_MENU_FLAVORS.length) {
@@ -1167,6 +1372,17 @@ function checkDshMenuBundle(source: string, packageName: string, issues: string[
   }
   if (current() !== 'auto') {
     issues.push(`${label}: current() reports ${current()} after an external Appearance change`);
+  }
+  runtime.setTheme('other-theme');
+  if (attributes.has(hoverAttribute)) {
+    issues.push(`${label}: the menu hover rule stayed active on another plugin's theme`);
+  }
+  for (const cleanup of cleanups.reverse()) cleanup();
+  if (attributes.has(hoverAttribute)) {
+    issues.push(`${label}: teardown left the menu hover rule active`);
+  }
+  if (styles.length !== 1 || !styles[0]!.removed) {
+    issues.push(`${label}: teardown did not remove the menu hover style`);
   }
 }
 
