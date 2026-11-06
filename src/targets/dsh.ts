@@ -3,7 +3,7 @@
  *
  * What it produces: three installable DSH plugin packages, one per Inkstone
  * light/dark pair. Each package carries a browser bundle whose plugin body
- * calls `ctx.theme.overrideTokens()` with the frozen DSH 0.2.1 token ladder, so
+ * calls `ctx.theme.overrideTokens()` with the frozen DSH 0.2.2 token ladder, so
  * the DSH Web GUI — and Desktop, which renders through the same client tree —
  * paints Inkstone under DSH's own Appearance Light / Dark / System switch.
  *
@@ -14,12 +14,12 @@
  * what a light/dark pair supplies.
  *
  * Maintenance: DSH is pre-stable. `src/targets/dsh-tokens.ts` freezes the
- * 0.2.1 ladder, `engines.dsh` caps the supported range, and the build fails
+ * 0.2.2 ladder, `engines.dsh` caps the supported range, and the build fails
  * loudly when the mapping stops covering the frozen list. A DSH token change is
  * therefore one edit to that list plus this mapping, not a silent partial theme.
  */
 
-import { alpha, contrast, darken, lighten, mix } from '../color.ts';
+import { alpha, contrast, darken, lighten, mix, toOklch } from '../color.ts';
 import { flavorName, flavors } from '../palette/index.ts';
 import type { Flavor } from '../palette/types.ts';
 import { DSH_TOKENS } from './dsh-tokens.ts';
@@ -58,13 +58,16 @@ const RAMP_POSITION: Record<string, number> = {
   '00': 0,
   '50': 0.02,
   '50p': 0.03,
+  '55': 0.035,
   '60': 0.04,
   '75': 0.06,
+  '90': 0.09,
   '100': 0.12,
   '150': 0.18,
   '200': 0.24,
   '250': 0.3,
   '300': 0.36,
+  '310': 0.41,
   '400': 0.5,
   '450': 0.56,
   '500': 0.62,
@@ -81,8 +84,8 @@ const RAMP_POSITION: Record<string, number> = {
 };
 
 /** Longest prefix first: `neutral-bluish-*` must not match as `neutral`. */
-const STATIC_FAMILIES = ['neutral-bluish', 'neutral', 'blue', 'deepseek', 'green', 'red', 'amber'] as const;
-const HUE_FAMILIES = ['blue', 'deepseek', 'green', 'red', 'amber'] as const;
+const STATIC_FAMILIES = ['neutral-bluish', 'neutral', 'blue', 'deepseek', 'green', 'red', 'amber', 'violet'] as const;
+const HUE_FAMILIES = ['blue', 'deepseek', 'green', 'red', 'amber', 'violet'] as const;
 
 /**
  * Mix `color` into `base`; t=0 is all base, t=1 is all color. `mix` takes the
@@ -95,6 +98,23 @@ function tint(base: string, color: string, t: number): string {
 /** Pick the candidate with the highest contrast against `bg`. */
 function pickOn(bg: string, candidates: string[]): string {
   return candidates.reduce((best, color) => (contrast(color, bg) > contrast(best, bg) ? color : best));
+}
+
+/** Hue distance in degrees, wrapping at 360. */
+function hueDistance(a: number, b: number): number {
+  const distance = Math.abs(a - b) % 360;
+  return distance > 180 ? 360 - distance : distance;
+}
+
+/**
+ * The palette's violet role behind DSH's "done" mark and violet ramps.
+ *
+ * Five flavours carry it in `syntax.type`. 玄墨 Dimmed moved types to 土黄 and
+ * kept 萝兰紫 on decorators, so when the type colour is no longer near violet
+ * the decorator takes over; that keeps "done" out of the warning amber.
+ */
+function violetColor(f: Flavor): string {
+  return hueDistance(toOklch(f.syntax.type).h, 300) <= 45 ? f.syntax.type : f.syntax.decorator;
 }
 
 /** Position of a DSH step name; unknown names fail instead of guessing. */
@@ -148,6 +168,8 @@ function hueBase(f: Flavor, family: string): string {
       return f.status.error;
     case 'amber':
       return f.status.warning;
+    case 'violet':
+      return violetColor(f);
     default:
       throw new Error(`unknown DSH static hue family "${family}"`);
   }
@@ -204,7 +226,9 @@ function tokenValues(f: Flavor): Record<DshToken, string> {
   const tooltipBg = dark ? s.overlay : tint(t.primary, '#000000', 0.35);
   const menuSurface = `color-mix(in srgb, ${s.overlay} ${dark ? 45 : 58}%, transparent)`;
   const deepDiving = tint(a, t.primary, 0.35);
-  const violetStops = tint(a, y.type, 0.55);
+  /** DSH layers illustration shapes background → backing → surface → detail in both schemes. */
+  const illustrationBacking = dark ? tint(s.alt, s.raised, 0.5) : b.normal;
+  const violetStops = tint(a, violetColor(f), 0.55);
   const cyanStops = tint(a, y.string, 0.5);
 
   const aliases: Record<AliasToken, string> = {
@@ -274,7 +298,13 @@ function tokenValues(f: Flavor): Record<DshToken, string> {
     '--dsw-alias-button-tool-bar-fill-invisible': alpha(s.overlay, 0.36),
     '--dsw-alias-button-tool-bar-hover': alpha(s.overlay, 0.6),
 
-    // ------------------------------------------------------ interactive/states
+    // ------------------------------------------------------ illustration/states
+    '--dsw-alias-illustration-background': s.alt,
+    '--dsw-alias-illustration-backing': illustrationBacking,
+    '--dsw-alias-illustration-detail': b.strong,
+    '--dsw-alias-illustration-inset': dark ? illustrationBacking : s.raised,
+    '--dsw-alias-illustration-shadow': dark ? illustrationBacking : s.raised,
+    '--dsw-alias-illustration-surface': s.raised,
     '--dsw-alias-interactive-bg-active': s.active,
     '--dsw-alias-interactive-bg-hover': s.hover,
     '--dsw-alias-interactive-bg-hover-accent': alpha(a, 0.14),
@@ -282,6 +312,7 @@ function tokenValues(f: Flavor): Record<DshToken, string> {
     '--dsw-alias-interactive-bg-hover-solid': s.hover,
     '--dsw-alias-state-business-primary': a,
     '--dsw-alias-state-business-tertiary': tint(s.base, a, 0.15),
+    '--dsw-alias-state-done-primary': violetColor(f),
     '--dsw-alias-state-error-primary': st.error,
     '--dsw-alias-state-error-secondary': tint(s.base, st.error, 0.3),
     '--dsw-alias-state-idle-primary': b.strong,
@@ -338,7 +369,6 @@ function tokenValues(f: Flavor): Record<DshToken, string> {
     '--dsw-specific-sidebar-fill': s.alt,
     '--dsw-specific-sidebar-nav-item-active': s.active,
     '--dsw-specific-sidebar-nav-item-active-accent': tint(s.alt, a, 0.18),
-    '--dsw-specific-sidebar-nav-item-hover': s.hover,
     '--dsw-specific-tip': s.alt,
 
     // ------------------------------------------------- onboarding / gradients
@@ -532,7 +562,7 @@ function clientBundle(pair: DshPair, tokens: DshTokenModes): string {
 window.__ModuleLoader__.load({
   id: ${JSON.stringify(name)},
   factory: () => {
-    /** Every --dsw-* / --shiki-* colour token of DSH 0.2.1, per colour scheme. */
+    /** Every --dsw-* / --shiki-* colour token of DSH 0.2.2, per colour scheme. */
     const TOKENS = ${tokenJson}
     const inject = ['theme']
     const apply = (ctx) => {
