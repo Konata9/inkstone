@@ -897,6 +897,9 @@ function checkDshModeContrast(values: Record<string, string>, issues: string[], 
   checkDshContrast(values, issues, scope, '--dsw-alias-label-primary', '--dsw-alias-bg-base', 7, 12.5);
   checkDshContrast(values, issues, scope, '--dsw-alias-label-secondary', '--dsw-alias-bg-base', 4.5, 8);
   checkDshContrast(values, issues, scope, '--dsw-alias-label-tertiary', '--dsw-alias-bg-base', 4.5);
+  // "Done" is an icon/status mark, not body copy: 3:1 keeps the violet visible
+  // without demanding the contrast of a text token.
+  checkDshContrast(values, issues, `${scope} done`, '--dsw-alias-state-done-primary', '--dsw-alias-bg-base', 3);
   checkDshContrast(values, issues, scope, '--dsw-alias-toast-label', '--dsw-alias-toast-bg', 4.5);
   checkDshContrast(
     values,

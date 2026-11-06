@@ -56,7 +56,7 @@ src/                        主题 + 各端软件 target
     opencode.ts             OpenCode V2 主题（base + hue scale）
     zed.ts                  Zed 主题（ThemeFamily + extension.toml）
     dsh.ts                  DSH 主题插件（菜单版 + 三对明暗变体）
-    dsh-tokens.ts           DSH 0.2.1 颜色 token 冻结清单
+    dsh-tokens.ts           DSH 0.2.2 颜色 token 冻结清单
 showcase/                   展示层源码（与 src/ 平级）
   specimen.ts               CSS 变量、色卡、编辑器示意（官网与截图共用）
   outputs.ts                展示层产物清单（供 drift check）

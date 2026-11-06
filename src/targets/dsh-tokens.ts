@@ -1,18 +1,22 @@
 /**
- * Every colour token of the DSH 0.2.1 token ladder, frozen here on purpose.
+ * Every colour token of the DSH 0.2.2 token ladder, frozen here on purpose.
  *
  * DSH is pre-stable: a new release may add or rename a token. The build fails
  * when `buildDshTokens()` stops producing exactly this set, which turns an
  * upstream change into one edit here instead of a silent partial theme.
  *
- * Source: DSH 0.2.1-rc.3, packages/client/ui-theme/src/styles/*.css. Only
+ * Source: DSH 0.2.2-rc.1, packages/client/ui-theme/src/styles/*.css. Only
  * colour-valued custom properties are listed: fonts, sizes, radii, shadows,
  * motion and the pointer-modality-only `--dsw-focus-ring-color` are out of
  * scope.
+ *
+ * 0.2.2 diff: +6 `--dsw-alias-illustration-*`, +`--dsw-alias-state-done-primary`,
+ * +5 static steps (3 neutral-bluish, 2 violet), and
+ * `--dsw-specific-sidebar-nav-item-hover` was removed.
  */
 
 export const DSH_TOKENS = [
-  // --dsw-alias-* (107)
+  // --dsw-alias-* (114)
   '--dsw-alias-bg-base',
   '--dsw-alias-bg-document-preview',
   '--dsw-alias-bg-document-selection',
@@ -62,6 +66,12 @@ export const DSH_TOKENS = [
   '--dsw-alias-file-diff-deleted-bg',
   '--dsw-alias-file-diff-deleted-gutter',
   '--dsw-alias-file-diff-deleted-marker',
+  '--dsw-alias-illustration-background',
+  '--dsw-alias-illustration-backing',
+  '--dsw-alias-illustration-detail',
+  '--dsw-alias-illustration-inset',
+  '--dsw-alias-illustration-shadow',
+  '--dsw-alias-illustration-surface',
   '--dsw-alias-interactive-bg-active',
   '--dsw-alias-interactive-bg-hover',
   '--dsw-alias-interactive-bg-hover-accent',
@@ -103,6 +113,7 @@ export const DSH_TOKENS = [
   '--dsw-alias-settings-card-stroke',
   '--dsw-alias-state-business-primary',
   '--dsw-alias-state-business-tertiary',
+  '--dsw-alias-state-done-primary',
   '--dsw-alias-state-error-primary',
   '--dsw-alias-state-error-secondary',
   '--dsw-alias-state-idle-primary',
@@ -120,7 +131,7 @@ export const DSH_TOKENS = [
   '--dsw-alias-tooltip-key-bg',
   '--dsw-alias-turn-trigger-bg',
   '--dsw-alias-turn-trigger-bg-hover',
-  // --dsw-specific-* (11)
+  // --dsw-specific-* (10)
   '--dsw-specific-bubble',
   '--dsw-specific-bubble-highlight',
   '--dsw-specific-input-major',
@@ -130,9 +141,8 @@ export const DSH_TOKENS = [
   '--dsw-specific-sidebar-fill',
   '--dsw-specific-sidebar-nav-item-active',
   '--dsw-specific-sidebar-nav-item-active-accent',
-  '--dsw-specific-sidebar-nav-item-hover',
   '--dsw-specific-tip',
-  // --dsw-static-* (77)
+  // --dsw-static-* (82)
   '--dsw-static-amber-100',
   '--dsw-static-amber-400',
   '--dsw-static-amber-500',
@@ -189,9 +199,11 @@ export const DSH_TOKENS = [
   '--dsw-static-neutral-bluish-150',
   '--dsw-static-neutral-bluish-200',
   '--dsw-static-neutral-bluish-300',
+  '--dsw-static-neutral-bluish-310',
   '--dsw-static-neutral-bluish-400',
   '--dsw-static-neutral-bluish-50',
   '--dsw-static-neutral-bluish-500',
+  '--dsw-static-neutral-bluish-55',
   '--dsw-static-neutral-bluish-60',
   '--dsw-static-neutral-bluish-600',
   '--dsw-static-neutral-bluish-700',
@@ -200,6 +212,7 @@ export const DSH_TOKENS = [
   '--dsw-static-neutral-bluish-800',
   '--dsw-static-neutral-bluish-850',
   '--dsw-static-neutral-bluish-875',
+  '--dsw-static-neutral-bluish-90',
   '--dsw-static-neutral-bluish-900',
   '--dsw-static-neutral-bluish-950',
   '--dsw-static-red-100',
@@ -210,6 +223,8 @@ export const DSH_TOKENS = [
   '--dsw-static-red-600',
   '--dsw-static-red-600-a08',
   '--dsw-static-red-900',
+  '--dsw-static-violet-400',
+  '--dsw-static-violet-600',
   // --shiki-* (11)
   '--shiki-background',
   '--shiki-foreground',
