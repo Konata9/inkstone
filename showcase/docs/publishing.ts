@@ -157,7 +157,7 @@ export function renderPublishingDoc(): string {
       [
         '## DSH 版本范围',
         '',
-        'DSH 插件声明 `engines.dsh: ">=0.2.1-rc.3 <0.3.0"`。DSH 仍在预发布期，超出区间会拒绝安装；升级 DSH token ladder 时，需要同步更新 `src/targets/dsh-tokens.ts` 与 `src/targets/dsh.ts`，再重新打包。',
+        'DSH 插件声明 `engines.dsh: ">=0.2.1-rc.3 <0.3.0"`，当前冻结清单对应 DSH 0.2.2-rc.2。DSH 仍在预发布期，超出区间会拒绝安装；升级 DSH token ladder 时，需要同步更新 `src/targets/dsh-tokens.ts` 与 `src/targets/dsh.ts`，再重新打包。',
       ].join('\n'),
     ],
   );

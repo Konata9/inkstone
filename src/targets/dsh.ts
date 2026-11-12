@@ -3,7 +3,7 @@
  *
  * What it produces: three installable DSH plugin packages, one per Inkstone
  * light/dark pair. Each package carries a browser bundle whose plugin body
- * calls `ctx.theme.overrideTokens()` with the frozen DSH 0.2.1 token ladder, so
+ * calls `ctx.theme.overrideTokens()` with the frozen DSH 0.2.2 token ladder, so
  * the DSH Web GUI — and Desktop, which renders through the same client tree —
  * paints Inkstone under DSH's own Appearance Light / Dark / System switch.
  *
@@ -14,12 +14,12 @@
  * what a light/dark pair supplies.
  *
  * Maintenance: DSH is pre-stable. `src/targets/dsh-tokens.ts` freezes the
- * 0.2.1 ladder, `engines.dsh` caps the supported range, and the build fails
+ * 0.2.2 ladder, `engines.dsh` caps the supported range, and the build fails
  * loudly when the mapping stops covering the frozen list. A DSH token change is
  * therefore one edit to that list plus this mapping, not a silent partial theme.
  */
 
-import { alpha, contrast, darken, lighten, mix } from '../color.ts';
+import { alpha, contrast, darken, lighten, mix, toOklch } from '../color.ts';
 import { flavorName, flavors } from '../palette/index.ts';
 import type { Flavor } from '../palette/types.ts';
 import { DSH_TOKENS } from './dsh-tokens.ts';
@@ -58,13 +58,16 @@ const RAMP_POSITION: Record<string, number> = {
   '00': 0,
   '50': 0.02,
   '50p': 0.03,
+  '55': 0.035,
   '60': 0.04,
   '75': 0.06,
+  '90': 0.09,
   '100': 0.12,
   '150': 0.18,
   '200': 0.24,
   '250': 0.3,
   '300': 0.36,
+  '310': 0.41,
   '400': 0.5,
   '450': 0.56,
   '500': 0.62,
@@ -81,8 +84,8 @@ const RAMP_POSITION: Record<string, number> = {
 };
 
 /** Longest prefix first: `neutral-bluish-*` must not match as `neutral`. */
-const STATIC_FAMILIES = ['neutral-bluish', 'neutral', 'blue', 'deepseek', 'green', 'red', 'amber'] as const;
-const HUE_FAMILIES = ['blue', 'deepseek', 'green', 'red', 'amber'] as const;
+const STATIC_FAMILIES = ['neutral-bluish', 'neutral', 'blue', 'deepseek', 'green', 'red', 'amber', 'violet'] as const;
+const HUE_FAMILIES = ['blue', 'deepseek', 'green', 'red', 'amber', 'violet'] as const;
 
 /**
  * Mix `color` into `base`; t=0 is all base, t=1 is all color. `mix` takes the
@@ -95,6 +98,23 @@ function tint(base: string, color: string, t: number): string {
 /** Pick the candidate with the highest contrast against `bg`. */
 function pickOn(bg: string, candidates: string[]): string {
   return candidates.reduce((best, color) => (contrast(color, bg) > contrast(best, bg) ? color : best));
+}
+
+/** Hue distance in degrees, wrapping at 360. */
+function hueDistance(a: number, b: number): number {
+  const distance = Math.abs(a - b) % 360;
+  return distance > 180 ? 360 - distance : distance;
+}
+
+/**
+ * The palette's violet role behind DSH's "done" mark and violet ramps.
+ *
+ * Five flavours carry it in `syntax.type`. 玄墨 Dimmed moved types to 土黄 and
+ * kept 萝兰紫 on decorators, so when the type colour is no longer near violet
+ * the decorator takes over; that keeps "done" out of the warning amber.
+ */
+function violetColor(f: Flavor): string {
+  return hueDistance(toOklch(f.syntax.type).h, 300) <= 45 ? f.syntax.type : f.syntax.decorator;
 }
 
 /** Position of a DSH step name; unknown names fail instead of guessing. */
@@ -148,6 +168,8 @@ function hueBase(f: Flavor, family: string): string {
       return f.status.error;
     case 'amber':
       return f.status.warning;
+    case 'violet':
+      return violetColor(f);
     default:
       throw new Error(`unknown DSH static hue family "${family}"`);
   }
@@ -204,8 +226,19 @@ function tokenValues(f: Flavor): Record<DshToken, string> {
   const tooltipBg = dark ? s.overlay : tint(t.primary, '#000000', 0.35);
   const menuSurface = `color-mix(in srgb, ${s.overlay} ${dark ? 45 : 58}%, transparent)`;
   const deepDiving = tint(a, t.primary, 0.35);
-  const violetStops = tint(a, y.type, 0.55);
+  /** DSH layers illustration shapes background → backing → surface → detail in both schemes. */
+  const illustrationBacking = dark ? tint(s.alt, s.raised, 0.5) : b.normal;
+  const violetStops = tint(a, violetColor(f), 0.55);
   const cyanStops = tint(a, y.string, 0.5);
+  /** Hover cards sit on the tooltip surface, which is dark in both schemes. */
+  const hovercardBg = tooltipBg;
+  /** A card tile is a translucent wash lighter than the card it sits on. */
+  const cardTile = dark ? alpha(t.primary, 0.06) : alpha(s.base, 0.55);
+  /** macOS vibrancy sidebar: glass control fills, translucent in both schemes. */
+  const glassFill = dark ? alpha(t.primary, 0.15) : alpha(s.base, 0.55);
+  const glassHover = dark ? alpha(t.primary, 0.2) : alpha(s.base, 0.3);
+  /** Toast actions are links on the toast surface: light flavours darken toward ink. */
+  const toastAction = dark ? a : tint(a, t.primary, 0.3);
 
   const aliases: Record<AliasToken, string> = {
     // ---------------------------------------------------------------- surfaces
@@ -226,6 +259,9 @@ function tokenValues(f: Flavor): Record<DshToken, string> {
     '--dsw-alias-bg-skeleton': alpha(t.primary, dark ? 0.09 : 0.05),
     '--dsw-alias-settings-card-fill': s.raised,
     '--dsw-alias-settings-card-stroke': b.strong,
+    '--dsw-alias-card-fill': s.raised,
+    '--dsw-alias-card-fill-hover': s.hover,
+    '--dsw-alias-card-tile-fill': cardTile,
 
     // ----------------------------------------------------------------- borders
     '--dsw-alias-border-inverted': dark ? alpha(t.primary, 0.06) : 'transparent',
@@ -235,6 +271,7 @@ function tokenValues(f: Flavor): Record<DshToken, string> {
     '--dsw-alias-border-l2-darkmode-thin': b.normal,
     '--dsw-alias-border-l3': tint(b.normal, b.strong, 0.5),
     '--dsw-alias-border-l4': b.strong,
+    '--dsw-alias-border-selected': tint(b.strong, a, 0.5),
 
     // ------------------------------------------------------------------ labels
     '--dsw-alias-label-caption': t.faint,
@@ -246,6 +283,7 @@ function tokenValues(f: Flavor): Record<DshToken, string> {
     '--dsw-alias-label-primary-bluish': t.primary,
     '--dsw-alias-label-primary-dimmed': tint(t.primary, s.base, 0.15),
     '--dsw-alias-label-primary-foreground': pickOn(a, [t.inverse, s.base]),
+    '--dsw-alias-label-on-color': pickOn(a, [t.inverse, s.base]),
     '--dsw-alias-label-primary-inverted': t.inverse,
     '--dsw-alias-label-secondary': t.secondary,
     '--dsw-alias-label-shimmer': alpha(t.primary, dark ? 0.45 : 0.3),
@@ -274,7 +312,16 @@ function tokenValues(f: Flavor): Record<DshToken, string> {
     '--dsw-alias-button-tool-bar-fill-invisible': alpha(s.overlay, 0.36),
     '--dsw-alias-button-tool-bar-hover': alpha(s.overlay, 0.6),
 
-    // ------------------------------------------------------ interactive/states
+    // ------------------------------------------------------ illustration/states
+    '--dsw-alias-illustration-background': s.alt,
+    '--dsw-alias-illustration-backing': illustrationBacking,
+    '--dsw-alias-illustration-detail': b.strong,
+    '--dsw-alias-illustration-inset': dark ? illustrationBacking : s.raised,
+    '--dsw-alias-illustration-shadow': dark ? illustrationBacking : s.raised,
+    '--dsw-alias-illustration-surface': s.raised,
+    '--dsw-alias-chart-messages': a,
+    '--dsw-alias-chart-system': bluishRamp(f, 0.5),
+    '--dsw-alias-chart-tools': violetColor(f),
     '--dsw-alias-interactive-bg-active': s.active,
     '--dsw-alias-interactive-bg-hover': s.hover,
     '--dsw-alias-interactive-bg-hover-accent': alpha(a, 0.14),
@@ -282,6 +329,7 @@ function tokenValues(f: Flavor): Record<DshToken, string> {
     '--dsw-alias-interactive-bg-hover-solid': s.hover,
     '--dsw-alias-state-business-primary': a,
     '--dsw-alias-state-business-tertiary': tint(s.base, a, 0.15),
+    '--dsw-alias-state-done-primary': violetColor(f),
     '--dsw-alias-state-error-primary': st.error,
     '--dsw-alias-state-error-secondary': tint(s.base, st.error, 0.3),
     '--dsw-alias-state-idle-primary': b.strong,
@@ -315,13 +363,29 @@ function tokenValues(f: Flavor): Record<DshToken, string> {
     '--dsw-alias-markdown-inline-code': s.alt,
     '--dsw-alias-markdown-placeholder': s.alt,
     '--dsw-alias-markdown-tag': s.alt,
+    '--dsw-alias-json-tree-hover': alpha(t.primary, dark ? 0.05 : 0.04),
+    '--dsw-alias-json-tree-icon': t.muted,
+    '--dsw-alias-json-tree-keyword': y.keyword,
+    '--dsw-alias-json-tree-number': y.number,
+    '--dsw-alias-json-tree-property': y.property,
+    '--dsw-alias-json-tree-punctuation': y.punctuation,
+    '--dsw-alias-json-tree-string': y.string,
 
     // --------------------------------------------------------------- overlays
     '--dsw-alias-menu-group-header-fill': `color-mix(in srgb, ${s.overlay} 94%, transparent)`,
+    '--dsw-alias-hovercard-bg': hovercardBg,
+    '--dsw-alias-hovercard-label-primary': bluishRamp(f, 0),
+    '--dsw-alias-hovercard-label-secondary': bluishRamp(f, 0.3),
+    '--dsw-alias-hovercard-label-tertiary': bluishRamp(f, 0.41),
+    '--dsw-alias-hovercard-state-done': dark ? violetColor(f) : lighten(violetColor(f), 0.3),
+    '--dsw-alias-hovercard-state-error': dark ? st.error : lighten(st.error, 0.3),
+    '--dsw-alias-toast-action': toastAction,
     '--dsw-alias-toast-bg': s.overlay,
     '--dsw-alias-toast-label': t.primary,
     '--dsw-alias-tooltip-bg': tooltipBg,
     '--dsw-alias-tooltip-key-bg': tint(tooltipBg, '#ffffff', 0.18),
+    '--dsw-alias-tooltip-label': bluishRamp(f, 0),
+    '--dsw-alias-trajectory-accent': a,
     '--dsw-menu-surface-fill': menuSurface,
 
     // -------------------------------------------------------- sidebar/input/scroll
@@ -331,14 +395,33 @@ function tokenValues(f: Flavor): Record<DshToken, string> {
     '--dsw-alias-scrollbar-hover-l2': b.strong,
     '--dsw-specific-bubble': s.raised,
     '--dsw-specific-bubble-highlight': tint(s.raised, a, 0.12),
+    '--dsw-specific-file-upload-track': alpha(t.primary, dark ? 0.12 : 0.08),
+    '--dsw-specific-guide-hero': s.alt,
     '--dsw-specific-input-major': s.input,
     '--dsw-specific-login-input': s.sunken,
     '--dsw-specific-menu': menuSurface,
     '--dsw-specific-selector': s.alt,
     '--dsw-specific-sidebar-fill': s.alt,
+    /*
+     * macOS defines the vibrancy sidebar tokens under `html[data-platform='darwin'] body`,
+     * but the presenter writes every theme token as a body inline custom property, which
+     * outranks that selector — so the overrides apply on darwin without platform branching
+     * and are inert elsewhere.
+     */
+    '--dsw-specific-sidebar-glass-fill': glassFill,
+    '--dsw-specific-sidebar-glass-hover': glassHover,
+    '--dsw-specific-sidebar-glass-collapsed-fill': dark ? glassFill : 'transparent',
+    '--dsw-specific-sidebar-glass-collapsed-hover': dark ? glassHover : s.hover,
     '--dsw-specific-sidebar-nav-item-active': s.active,
     '--dsw-specific-sidebar-nav-item-active-accent': tint(s.alt, a, 0.18),
-    '--dsw-specific-sidebar-nav-item-hover': s.hover,
+    '--dsw-specific-sidebar-right-flash': a,
+    '--dsw-specific-sidebar-tint': dark
+      ? `color-mix(in srgb, ${s.alt} 50%, transparent)`
+      : `color-mix(in srgb, ${tint(s.alt, a, 0.06)} 40%, transparent)`,
+    '--dsw-specific-sidebar-wash-top': alpha(a, dark ? 0.08 : 0.1),
+    '--dsw-specific-sidebar-wash-top-clear': alpha(a, 0),
+    '--dsw-specific-sidebar-wash-bottom': alpha(violetColor(f), dark ? 0.07 : 0.09),
+    '--dsw-specific-sidebar-wash-bottom-clear': alpha(violetColor(f), 0),
     '--dsw-specific-tip': s.alt,
 
     // ------------------------------------------------- onboarding / gradients
@@ -532,7 +615,7 @@ function clientBundle(pair: DshPair, tokens: DshTokenModes): string {
 window.__ModuleLoader__.load({
   id: ${JSON.stringify(name)},
   factory: () => {
-    /** Every --dsw-* / --shiki-* colour token of DSH 0.2.1, per colour scheme. */
+    /** Every --dsw-* / --shiki-* colour token of DSH 0.2.2, per colour scheme. */
     const TOKENS = ${tokenJson}
     const inject = ['theme']
     const apply = (ctx) => {
