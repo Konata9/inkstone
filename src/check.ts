@@ -743,7 +743,6 @@ function checkDshBundle(
   if (call.source !== packageName) {
     issues.push(`${label}: overrideTokens layer source is ${String(call.source)}, expected ${packageName}`);
   }
-
   const generated = Object.keys(call.tokens);
   if (generated.length !== DSH_TOKENS.length) {
     issues.push(`${label}: bundle carries ${generated.length} tokens, expected ${DSH_TOKENS.length}`);
@@ -965,6 +964,16 @@ interface DshMenuRowRegistration {
 function checkDshMenuBundle(source: string, packageName: string, issues: string[]): void {
   const label = `dsh ${packageName}`;
   const registrations: DshRegistration[] = [];
+  const timers = new Map<number, () => void>();
+  let nextTimer = 0;
+  /** Drain the bundle's deferred restore tasks (bounded so a loop fails the check instead of hanging). */
+  const settle = (): void => {
+    for (let pass = 0; pass < 20 && timers.size > 0; pass += 1) {
+      const pending = [...timers.values()];
+      timers.clear();
+      for (const task of pending) task();
+    }
+  };
   const sandbox = {
     window: {
       __ModuleLoader__: {
@@ -981,6 +990,14 @@ function checkDshMenuBundle(source: string, packageName: string, issues: string[
           this.store.set(key, value);
         },
       },
+    },
+    setTimeout(callback: () => void): number {
+      nextTimer += 1;
+      timers.set(nextTimer, callback);
+      return nextTimer;
+    },
+    clearTimeout(id: number): void {
+      timers.delete(id);
     },
   };
   try {
@@ -1047,13 +1064,22 @@ function checkDshMenuBundle(source: string, packageName: string, issues: string[
       preference = id;
       for (const listener of listeners) listener();
     },
+    /** Model `ThemeRuntime.adopt()`: the host writes the preference without calling `setTheme`. */
+    adopt(id: string): void {
+      preference = id;
+      for (const listener of listeners) listener();
+    },
     overrideTokens(
       from: string,
       tokens: Record<string, { light: string; dark: string }>,
     ): () => void {
       layers.set(from, tokens);
+      // The real runtime publishes synchronously from overrideTokens; the
+      // bundle must survive that re-entrant notification.
+      for (const listener of listeners) listener();
       return () => {
         layers.delete(from);
+        for (const listener of listeners) listener();
       };
     },
   };
@@ -1086,7 +1112,6 @@ function checkDshMenuBundle(source: string, packageName: string, issues: string[
     issues.push(`${label}: menu apply() throws in the sandbox — ${(error as Error).message}`);
     return;
   }
-
   if (themes.length !== DSH_MENU_FLAVORS.length) {
     issues.push(`${label}: menu registers ${themes.length} themes, expected ${DSH_MENU_FLAVORS.length}`);
   }
@@ -1159,7 +1184,11 @@ function checkDshMenuBundle(source: string, packageName: string, issues: string[
         issues.push(`${label}: menu row does not render the ${flavor.zh} option`);
       }
     }
+    if (!texts.some((text) => text.includes('原生 DSH'))) {
+      issues.push(`${label}: menu row does not render the native DSH option`);
+    }
   }
+  settle();
   if (!layers.has(packageName)) {
     issues.push(`${label}: menu did not apply the 跟随 DSH pair layer on boot`);
   }
@@ -1168,6 +1197,7 @@ function checkDshMenuBundle(source: string, packageName: string, issues: string[
   const current = face.current as () => string;
   const first = DSH_MENU_FLAVORS[0]!;
   select(first.themeId);
+  settle();
   if (preference !== first.themeId) {
     issues.push(`${label}: selecting ${first.themeId} left the preference at ${preference}`);
   }
@@ -1178,6 +1208,7 @@ function checkDshMenuBundle(source: string, packageName: string, issues: string[
     issues.push(`${label}: current() reports ${current()} after selecting ${first.themeId}`);
   }
   select('auto');
+  settle();
   if (preference !== 'system') {
     issues.push(`${label}: selecting auto did not restore the built-in preference (got ${preference})`);
   }
@@ -1185,11 +1216,391 @@ function checkDshMenuBundle(source: string, packageName: string, issues: string[
     issues.push(`${label}: selecting auto did not re-apply the pair layer`);
   }
   runtime.setTheme('dark');
+  settle();
   if (layers.size === 0) {
     issues.push(`${label}: an external Appearance change dropped the pair layer`);
   }
   if (current() !== 'auto') {
     issues.push(`${label}: current() reports ${current()} after an external Appearance change`);
+  }
+
+  select('native');
+  settle();
+  if (preference !== 'dark') {
+    issues.push(`${label}: selecting native did not restore the built-in preference (got ${preference})`);
+  }
+  if (layers.has(packageName)) {
+    issues.push(`${label}: selecting native kept the pair layer`);
+  }
+  if (current() !== 'native') {
+    issues.push(`${label}: current() reports ${current()} after selecting native`);
+  }
+  runtime.setTheme('system');
+  settle();
+  if (preference !== 'system') {
+    issues.push(`${label}: an Appearance change in native mode did not stick (got ${preference})`);
+  }
+  if (current() !== 'native') {
+    issues.push(`${label}: an Appearance change in native mode changed the choice to ${current()}`);
+  }
+  if (layers.size !== 0) {
+    issues.push(`${label}: an Appearance change in native mode applied a token layer`);
+  }
+}
+
+/** One menu bundle boot, with the fake runtime's timers and storage kept together. */
+interface DshMenuBoot {
+  ctx: Record<string, any>;
+  runtime: Record<string, any>;
+  storage: Map<string, string>;
+  layers: Map<string, unknown>;
+  face: { select: (choice: string) => void; current: () => string };
+  preference: () => string;
+  pendingTimers: () => number;
+  settle: () => void;
+  dispose: () => void;
+  originalSetTheme: (id: string) => void;
+}
+
+/**
+ * Exercise the persistence contract the live bundle has to survive: a named
+ * flavour must outlive the Host adopting its durable built-in preference, while
+ * an explicit Appearance pick must clear it and keep AUTO mode's pair layer.
+ * Each boot gets a fresh runtime and the same localStorage, which is exactly a
+ * browser reload.
+ */
+function checkDshMenuPersistence(source: string, packageName: string, issues: string[]): void {
+  const label = `dsh ${packageName}`;
+  const first = DSH_MENU_FLAVORS[0]!;
+
+  const boot = (savedChoice: string | null, builtinPreference: string): DshMenuBoot | undefined => {
+    const registrations: DshRegistration[] = [];
+    const timers = new Map<number, () => void>();
+    let nextTimer = 0;
+    const storage = new Map<string, string>();
+    if (savedChoice !== null) storage.set('dsh.inkstone.choice', savedChoice);
+    const settle = (): void => {
+      for (let pass = 0; pass < 20 && timers.size > 0; pass += 1) {
+        const pending = [...timers.values()];
+        timers.clear();
+        for (const task of pending) task();
+      }
+    };
+    const sandbox = {
+      window: {
+        __ModuleLoader__: {
+          load(registration: DshRegistration): void {
+            registrations.push(registration);
+          },
+        },
+        localStorage: {
+          getItem(key: string): string | null {
+            return storage.get(key) ?? null;
+          },
+          setItem(key: string, value: string): void {
+            storage.set(key, value);
+          },
+          removeItem(key: string): void {
+            storage.delete(key);
+          },
+        },
+      },
+      setTimeout(callback: () => void): number {
+        nextTimer += 1;
+        timers.set(nextTimer, callback);
+        return nextTimer;
+      },
+      clearTimeout(id: number): void {
+        timers.delete(id);
+      },
+    };
+    try {
+      runInNewContext(source, sandbox, { filename: `${label}/lib/client.js (reload)` });
+    } catch (error) {
+      issues.push(`${label}: menu bundle throws while reloading — ${(error as Error).message}`);
+      return undefined;
+    }
+    const registration = registrations[0];
+    if (!registration || typeof registration.factory !== 'function') {
+      issues.push(`${label}: reloaded menu bundle did not register a factory`);
+      return undefined;
+    }
+
+    const themes: DshMenuThemeDefinition[] = [];
+    const rows: DshMenuRowRegistration[] = [];
+    const layers = new Map<string, unknown>();
+    const listeners = new Set<() => void>();
+    const disposers: Array<() => void> = [];
+    let preference = builtinPreference;
+    const notify = (): void => {
+      for (const listener of listeners) listener();
+    };
+    const runtime: Record<string, any> = {
+      register(definition: DshMenuThemeDefinition): () => void {
+        themes.push(definition);
+        return () => {};
+      },
+      getTheme(): { preference: string } {
+        return { preference };
+      },
+      setTheme(id: string): void {
+        preference = id;
+        notify();
+      },
+      /** `adopt()` writes the preference directly, never through `setTheme`. */
+      adopt(id: string): void {
+        preference = id;
+        notify();
+      },
+      overrideTokens(
+        from: string,
+        tokens: Record<string, { light: string; dark: string }>,
+      ): () => void {
+        layers.set(from, tokens);
+        notify();
+        return () => {
+          layers.delete(from);
+          notify();
+        };
+      },
+    };
+    const ctx: Record<string, any> = {
+      effect(effect: () => unknown): () => void {
+        const dispose = effect();
+        if (typeof dispose === 'function') disposers.push(dispose as () => void);
+        return () => {};
+      },
+      on(_event: string, listener: () => void): () => void {
+        listeners.add(listener);
+        return () => {
+          listeners.delete(listener);
+        };
+      },
+      theme: runtime,
+      slots: {
+        inject(_name: string, callback: () => unknown): () => void {
+          callback();
+          return () => {};
+        },
+        register(options: DshMenuRowRegistration['options'], component: unknown): () => void {
+          rows.push({ options, component });
+          return () => {};
+        },
+      },
+    };
+    const originalSetTheme = runtime.setTheme as (id: string) => void;
+
+    let exported: Record<string, unknown>;
+    try {
+      exported = (registration.factory as (require: (specifier: string) => unknown) => Record<string, unknown>)(
+        (specifier) => {
+          if (specifier === 'react') return {};
+          throw new Error(`unexpected module request ${specifier}`);
+        },
+      );
+    } catch (error) {
+      issues.push(`${label}: reloaded menu bundle factory throws — ${(error as Error).message}`);
+      return undefined;
+    }
+    try {
+      (exported.apply as (ctx: unknown) => void)(ctx);
+    } catch (error) {
+      issues.push(`${label}: reloaded menu apply() throws — ${(error as Error).message}`);
+      return undefined;
+    }
+    const row = rows[0];
+    if (!row) {
+      issues.push(`${label}: reloaded menu bundle registered no settings row`);
+      return undefined;
+    }
+    const face = row.options.inject() as { select: (choice: string) => void; current: () => string };
+    return {
+      ctx,
+      runtime,
+      storage,
+      layers,
+      face,
+      preference: () => preference,
+      pendingTimers: () => timers.size,
+      settle,
+      dispose: () => {
+        for (const dispose of disposers.reverse()) dispose();
+      },
+      originalSetTheme,
+    };
+  };
+
+  const followed = boot(null, 'system');
+  if (followed) {
+    followed.settle();
+    followed.face.select('auto');
+    followed.settle();
+    if (!followed.layers.has(packageName)) {
+      issues.push(`${label}: 跟随 DSH left AUTO mode without the pair layer`);
+    }
+    followed.dispose();
+  }
+
+  const autoReload = boot('auto', 'system');
+  if (autoReload) {
+    autoReload.settle();
+    if (!autoReload.layers.has(packageName)) {
+      issues.push(`${label}: an AUTO reload did not apply the pair layer`);
+    }
+    if (autoReload.storage.get('dsh.inkstone.choice') !== 'auto') {
+      issues.push(`${label}: an AUTO reload changed the saved choice`);
+    }
+    autoReload.dispose();
+  }
+
+  const native = boot('native', 'system');
+  if (native) {
+    native.settle();
+    if (native.preference() !== 'system') {
+      issues.push(`${label}: a native-mode boot changed the built-in preference to ${native.preference()}`);
+    }
+    if (native.layers.has(packageName)) {
+      issues.push(`${label}: a native-mode boot applied the pair layer`);
+    }
+    if (native.storage.get('dsh.inkstone.choice') !== 'native') {
+      issues.push(`${label}: a native-mode boot changed the saved choice`);
+    }
+    if (native.face.current() !== 'native') {
+      issues.push(`${label}: current() reports ${native.face.current()} in native mode`);
+    }
+    native.ctx.theme.setTheme('dark');
+    native.settle();
+    if (native.preference() !== 'dark') {
+      issues.push(`${label}: an Appearance change in native mode did not stick (got ${native.preference()})`);
+    }
+    if (native.storage.get('dsh.inkstone.choice') !== 'native') {
+      issues.push(`${label}: an explicit Appearance change cleared native mode`);
+    }
+    if (native.layers.has(packageName)) {
+      issues.push(`${label}: an explicit Appearance change applied a layer in native mode`);
+    }
+    native.dispose();
+  }
+
+  const foreign = boot(first.themeId, 'other-theme');
+  if (foreign) {
+    foreign.settle();
+    if (foreign.preference() !== 'other-theme') {
+      issues.push(`${label}: a saved Inkstone flavour overrode another plugin's active theme`);
+    }
+    if (foreign.storage.get('dsh.inkstone.choice') !== 'auto') {
+      issues.push(`${label}: another plugin's active theme did not clear the saved Inkstone flavour`);
+    }
+    foreign.dispose();
+  }
+
+  const switched = boot(first.themeId, 'system');
+  if (switched) {
+    switched.settle();
+    switched.ctx.theme.setTheme('other-theme');
+    switched.settle();
+    if (switched.preference() !== 'other-theme') {
+      issues.push(`${label}: switching to another plugin's theme did not stick`);
+    }
+    if (switched.storage.get('dsh.inkstone.choice') !== 'auto') {
+      issues.push(`${label}: switching to another plugin's theme did not clear the saved Inkstone flavour`);
+    }
+    switched.dispose();
+  }
+
+  const named = boot(first.themeId, 'system');
+  if (named) {
+    named.settle();
+    if (named.preference() !== first.themeId) {
+      issues.push(`${label}: a saved named theme was not re-applied on boot (got ${named.preference()})`);
+    }
+    if (named.storage.get('dsh.inkstone.choice') !== first.themeId) {
+      issues.push(`${label}: boot overwrote the saved named theme with ${named.storage.get('dsh.inkstone.choice')}`);
+    }
+    if (named.layers.has(packageName)) {
+      issues.push(`${label}: a named theme boot kept the pair layer`);
+    }
+
+    // The Host re-adopts its durable built-in preference after boot and on
+    // every settings-document reload; the saved flavour must survive both.
+    named.runtime.adopt('dark');
+    named.settle();
+    if (named.preference() !== first.themeId) {
+      issues.push(`${label}: a settings adoption replaced the saved named theme (got ${named.preference()})`);
+    }
+    if (named.storage.get('dsh.inkstone.choice') !== first.themeId) {
+      issues.push(`${label}: a settings adoption cleared the saved named theme`);
+    }
+
+    // An explicit Appearance pick is newer than the saved flavour: it wins,
+    // persists as AUTO, and re-applies the pair layer.
+    named.ctx.theme.setTheme('dark');
+    named.settle();
+    if (named.preference() !== 'dark') {
+      issues.push(`${label}: an explicit Appearance pick did not stick (got ${named.preference()})`);
+    }
+    if (named.storage.get('dsh.inkstone.choice') !== 'auto') {
+      issues.push(`${label}: an explicit Appearance pick left the saved choice at ${named.storage.get('dsh.inkstone.choice')}`);
+    }
+    if (!named.layers.has(packageName)) {
+      issues.push(`${label}: an explicit Appearance pick did not apply the pair layer`);
+    }
+
+    named.dispose();
+    if (named.ctx.theme.setTheme !== named.originalSetTheme) {
+      issues.push(`${label}: teardown did not restore the theme runtime's setTheme`);
+    }
+  }
+
+  // Composition with another plugin that wraps the shared setter AFTER us:
+  // our teardown must leave that wrapper in place, and the disposed wrapper
+  // must stay a transparent pass-through in the chain.
+  const composed = boot(first.themeId, 'system');
+  if (composed) {
+    composed.settle();
+    const inkstoneSetter = composed.ctx.theme.setTheme as (id: string) => void;
+    let laterCalls = 0;
+    const laterSetter = (id: string): void => {
+      laterCalls += 1;
+      inkstoneSetter.call(composed.ctx.theme, id);
+    };
+    composed.ctx.theme.setTheme = laterSetter;
+    composed.dispose();
+    if (composed.ctx.theme.setTheme !== laterSetter) {
+      issues.push(`${label}: teardown clobbered a setter wrapped by a later plugin`);
+    }
+    if (composed.pendingTimers() !== 0 || composed.layers.has(packageName)) {
+      issues.push(`${label}: teardown left deferred theme work behind`);
+    }
+    const saved = composed.storage.get('dsh.inkstone.choice');
+    composed.ctx.theme.setTheme('light');
+    if (composed.pendingTimers() !== 0) {
+      issues.push(`${label}: a disposed Inkstone wrapper scheduled a restore`);
+    }
+    composed.settle();
+    if (composed.layers.has(packageName)) {
+      issues.push(`${label}: a disposed Inkstone wrapper re-added the pair layer`);
+    }
+    if (laterCalls !== 1 || composed.preference() !== 'light') {
+      issues.push(`${label}: a later plugin's setter stopped working after Inkstone teardown`);
+    }
+    if (composed.storage.get('dsh.inkstone.choice') !== saved) {
+      issues.push(`${label}: a disposed Inkstone wrapper still writes its saved choice`);
+    }
+    // The later plugin eventually restores the wrapper it captured (ours),
+    // which is disposed and must only delegate to the original setter.
+    composed.ctx.theme.setTheme = inkstoneSetter;
+    composed.ctx.theme.setTheme('dark');
+    composed.settle();
+    if (composed.layers.has(packageName)) {
+      issues.push(`${label}: the disposed Inkstone wrapper re-added the pair layer`);
+    }
+    if (composed.pendingTimers() !== 0) {
+      issues.push(`${label}: the disposed Inkstone wrapper scheduled a restore`);
+    }
+    if (composed.preference() !== 'dark') {
+      issues.push(`${label}: the disposed Inkstone wrapper broke the setter chain`);
+    }
   }
 }
 
@@ -1286,5 +1697,8 @@ function checkDshMenu(issues: string[], version: string, license: string): void 
   }
 
   const client = contents.get(`${dir}/lib/client.js`);
-  if (client !== undefined) checkDshMenuBundle(client, packageName, issues);
+  if (client !== undefined) {
+    checkDshMenuBundle(client, packageName, issues);
+    checkDshMenuPersistence(client, packageName, issues);
+  }
 }
