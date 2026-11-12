@@ -922,6 +922,26 @@ function checkDshModeContrast(values: Record<string, string>, issues: string[], 
     checkDshContrast(values, issues, `${scope} syntax`, token, '--dsw-alias-markdown-code-block', 4.5, 9);
   }
   checkDshContrast(values, issues, `${scope} syntax`, '--shiki-token-punctuation', '--dsw-alias-markdown-code-block', 4, 9);
+
+  // Hover cards and toasts are floating layers, not body copy: primary and
+  // secondary labels hold text contrast, tertiary and state marks hold 3:1.
+  checkDshContrast(values, issues, `${scope} hovercard`, '--dsw-alias-hovercard-label-primary', '--dsw-alias-hovercard-bg', 4.5);
+  checkDshContrast(values, issues, `${scope} hovercard`, '--dsw-alias-hovercard-label-secondary', '--dsw-alias-hovercard-bg', 4.5);
+  checkDshContrast(values, issues, `${scope} hovercard`, '--dsw-alias-hovercard-label-tertiary', '--dsw-alias-hovercard-bg', 3);
+  checkDshContrast(values, issues, `${scope} hovercard`, '--dsw-alias-hovercard-state-done', '--dsw-alias-hovercard-bg', 3);
+  checkDshContrast(values, issues, `${scope} hovercard`, '--dsw-alias-hovercard-state-error', '--dsw-alias-hovercard-bg', 3);
+  checkDshContrast(values, issues, `${scope} toast`, '--dsw-alias-toast-action', '--dsw-alias-toast-bg', 4.5);
+  checkDshContrast(values, issues, scope, '--dsw-alias-label-on-color', '--dsw-alias-brand-primary', 4.5);
+  checkDshContrast(values, issues, `${scope} tooltip`, '--dsw-alias-tooltip-label', '--dsw-alias-tooltip-bg', 4.5);
+
+  // The JSON tree renders on `bg-layer-1`; keyword and punctuation are
+  // structural marks, so they hold 4:1 and 3.5:1 instead of text contrast.
+  checkDshContrast(values, issues, `${scope} json tree`, '--dsw-alias-json-tree-icon', '--dsw-alias-bg-layer-1', 3);
+  for (const token of ['--dsw-alias-json-tree-string', '--dsw-alias-json-tree-number', '--dsw-alias-json-tree-property']) {
+    checkDshContrast(values, issues, `${scope} json tree`, token, '--dsw-alias-bg-layer-1', 4.5);
+  }
+  checkDshContrast(values, issues, `${scope} json tree`, '--dsw-alias-json-tree-keyword', '--dsw-alias-bg-layer-1', 4);
+  checkDshContrast(values, issues, `${scope} json tree`, '--dsw-alias-json-tree-punctuation', '--dsw-alias-bg-layer-1', 3.5);
 }
 
 /** One registered theme as the menu bundle declares it. */
