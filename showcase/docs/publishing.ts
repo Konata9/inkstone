@@ -11,7 +11,7 @@ const streams = table(
       '主题 / 项目',
       '根 `package.json`',
       '`v0.5.0`',
-      'Ghostty / Kaku / OpenCode / Zed / DSH / bundle，并附带当前 VSIX（仅打包，不发布市场）',
+      'Ghostty / Kaku / OpenCode / Zed / Orca / DSH / bundle，并附带当前 VSIX（仅打包，不发布市场）',
     ],
     [
       'VS Code 扩展',

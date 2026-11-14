@@ -13,6 +13,7 @@
  *   inkstone-kaku-<themeVersion>.zip
  *   inkstone-opencode-<themeVersion>.zip
  *   inkstone-zed-<themeVersion>.zip
+ *   inkstone-orca-<themeVersion>.zip      (Orca plugin folder)
  *   inkstone-dsh-<themeVersion>.tgz
  *   inkstone-dsh-<variant>-<themeVersion>.tgz
  *   inkstone-<themeVersion>.zip          (theme targets + manifest)
@@ -46,6 +47,7 @@ import { join } from 'node:path';
 
 import { flavors } from '../src/palette/index.ts';
 import { DSH_MENU_FLAVORS, DSH_PAIRS } from '../src/targets/dsh.ts';
+import { ORCA_PACKAGE_DIR, orcaAppThemePath, orcaTerminalThemePath } from '../src/targets/orca.ts';
 import {
   dshDisplayName,
   dshMenuPackageName,
@@ -224,6 +226,11 @@ for (const file of kakuFiles) assertFile(join(root, 'dist', 'kaku', file));
 for (const file of kakuTomlFiles) assertFile(join(root, 'dist', 'kaku', file));
 for (const file of opencodeFiles) assertFile(join(root, 'dist', 'opencode', file));
 assertFile(join(root, 'dist', 'zed', ZED_FILE_NAME));
+assertFile(join(root, ORCA_PACKAGE_DIR, 'orca-plugin.json'));
+for (const flavor of flavors) {
+  assertFile(join(root, ORCA_PACKAGE_DIR, orcaAppThemePath(flavor)));
+  assertFile(join(root, ORCA_PACKAGE_DIR, orcaTerminalThemePath(flavor)));
+}
 
 for (const pair of DSH_PAIRS) {
   const packageDir = join(root, 'dist', 'dsh', dshPackageName(pair.id));
@@ -252,6 +259,7 @@ const ghosttyArchive = `inkstone-ghostty-${themeVersion}.zip`;
 const kakuArchive = `inkstone-kaku-${themeVersion}.zip`;
 const opencodeArchive = `inkstone-opencode-${themeVersion}.zip`;
 const zedArchive = `inkstone-zed-${themeVersion}.zip`;
+const orcaArchive = `inkstone-orca-${themeVersion}.zip`;
 const bundleArchive = `inkstone-${themeVersion}.zip`;
 
 function zipFlat(archive: string, directory: string, files: string[]): void {
@@ -265,6 +273,13 @@ zipFlat(ghosttyArchive, join(root, 'dist', 'ghostty'), ghosttyFiles);
 zipFlat(kakuArchive, join(root, 'dist', 'kaku'), [...kakuFiles, ...kakuTomlFiles]);
 zipFlat(opencodeArchive, join(root, 'dist', 'opencode'), opencodeFiles);
 zipFlat(zedArchive, join(root, 'dist', 'zed'), [ZED_FILE_NAME]);
+
+// The Orca plugin is a folder, not a flat list: Orca reads `themes/` and
+// `terminal/` through the paths its manifest names, so the archive keeps them.
+execFileSync('zip', ['-r', '-X', '-q', join(releaseDir, orcaArchive), 'inkstone-orca'], {
+  cwd: join(root, 'dist', 'orca'),
+  stdio: 'inherit',
+});
 copyFileSync(vsixPath, join(releaseDir, vsixName));
 
 // DSH plugins ship as tarballs so `dsh plugin add file:<path>` works from one
@@ -331,6 +346,13 @@ const manifest = {
       directory: '~/.config/zed/themes',
       archive: zedArchive,
       format: 'json',
+    },
+    orca: {
+      directory: 'Settings → Plugins',
+      archive: orcaArchive,
+      format: 'orca-plugin',
+      install: 'orca plugin dev load <path>/inkstone-orca',
+      note: 'Orca installs from a release repository; this archive is the same folder for dev load.',
     },
     dsh: {
       menu: {
@@ -464,6 +486,23 @@ Pick an Inkstone variant with the theme selector (\`cmd-k cmd-t\`), or configure
   }
 }
 \`\`\`
+## Orca
+
+Orca lists themes from a plugin repository rather than from this bundle, so the
+usual path is **Settings → Plugins**, search for "Inkstone", then pick a theme
+under **Settings → Appearance**. The archive here is the same plugin folder, for
+loading it by hand:
+
+\`\`\`bash
+unzip inkstone-orca-${themeVersion}.zip
+orca plugin validate inkstone-orca
+orca plugin dev load inkstone-orca
+\`\`\`
+
+Light and dark themes are chosen separately (Light: 宣纸 / 宣纸 Dimmed / 青瓷,
+Dark: 玄墨 / 玄墨 Dimmed / 沧海), and the matching ANSI palette is picked under
+**Settings → Terminal**.
+
 ## VS Code / Cursor / Windsurf / VSCodium
 
 Install \`${vsixName}\` from the release assets:
@@ -525,6 +564,7 @@ for (const file of opencodeFiles) {
   copyFileSync(join(root, 'dist', 'opencode', file), join(stagingDir, 'opencode', file));
 }
 copyFileSync(join(root, 'dist', 'zed', ZED_FILE_NAME), join(stagingDir, 'zed', ZED_FILE_NAME));
+cpSync(join(root, ORCA_PACKAGE_DIR), join(stagingDir, 'orca'), { recursive: true });
 
 for (const pair of DSH_PAIRS) {
   const pkg = dshPackageName(pair.id);
@@ -539,7 +579,7 @@ copyFileSync(join(root, 'CHANGELOG.md'), join(stagingDir, 'CHANGELOG.md'));
 
 execFileSync(
   'zip',
-  ['-r', '-X', '-q', join(releaseDir, bundleArchive), 'ghostty', 'kaku', 'opencode', 'zed', 'dsh', 'manifest.json', 'INSTALL.md', 'LICENSE', 'CHANGELOG.md'],
+  ['-r', '-X', '-q', join(releaseDir, bundleArchive), 'ghostty', 'kaku', 'opencode', 'zed', 'orca', 'dsh', 'manifest.json', 'INSTALL.md', 'LICENSE', 'CHANGELOG.md'],
   { cwd: stagingDir, stdio: 'inherit' },
 );
 

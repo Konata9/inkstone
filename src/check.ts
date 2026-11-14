@@ -14,7 +14,7 @@ import { runInNewContext } from 'node:vm';
 import { parse as parseLua } from 'luaparse';
 import { parse as parseToml } from 'smol-toml';
 
-import { contrast, isValidHex } from './color.ts';
+import { contrast, formatRatio, isValidHex } from './color.ts';
 import { flavors } from './palette/index.ts';
 import { buildDshTokens, buildFlavorTokens, DSH_MENU_FLAVORS, DSH_PAIRS, renderDshMenuPackage, renderDshPackage } from './targets/dsh.ts';
 import { DSH_TOKENS } from './targets/dsh-tokens.ts';
@@ -29,6 +29,18 @@ import {
   OPENCODE_STEPS,
   OPENCODE_SYNTAX_KEYS,
 } from './targets/opencode.ts';
+import {
+  generateOrca,
+  ORCA_ANSI_KEYS,
+  ORCA_PACKAGE_DIR,
+  ORCA_PLUGIN_ID,
+  ORCA_PUBLISHER,
+  ORCA_THEME_LIMIT,
+  orcaAppThemePath,
+  orcaThemeId,
+  orcaTerminalThemePath,
+} from './targets/orca.ts';
+import { ORCA_APP_TOKENS, ORCA_REQUIRED_TOKENS, ORCA_TEXT_PAIRS } from './targets/orca-tokens.ts';
 import { buildTheme, vscodeThemeContribution } from './targets/vscode.ts';
 import { generateZed } from './targets/zed.ts';
 import { ZED_FAMILY_NAME } from './targets/naming.ts';
@@ -155,10 +167,204 @@ function checkVscodeManifest(issues: string[]): void {
   }
 }
 
+/**
+ * Assert the Orca plugin folder the way Orca's own loader reads it: a format 2
+ * manifest whose contributions point at files that exist, theme files under the
+ * 16 KiB cap, and no text/surface pair below the ratio Orca enforces. Orca drops
+ * a failing pair without a message, so a generator bug would otherwise ship as a
+ * theme quietly missing half its colours.
+ */
+function checkOrca(issues: string[]): void {
+  const dir = ORCA_PACKAGE_DIR;
+  const byPath = new Map(generateOrca(readRootVersion(), '').map((file) => [file.path, file.content]));
+
+  const manifestPath = `${dir}/orca-plugin.json`;
+  const manifestText = byPath.get(manifestPath);
+  if (!manifestText) {
+    issues.push(`orca: ${manifestPath} is missing`);
+    return;
+  }
+
+  let manifest: Record<string, any>;
+  try {
+    manifest = JSON.parse(manifestText) as Record<string, any>;
+  } catch (error) {
+    issues.push(`orca: ${manifestPath} does not parse — ${(error as Error).message}`);
+    return;
+  }
+
+  if (manifest.manifestVersion !== 2) {
+    issues.push(`orca: manifestVersion is ${JSON.stringify(manifest.manifestVersion)}, expected 2`);
+  }
+  if (manifest.execution !== 'data') {
+    issues.push(`orca: execution is ${JSON.stringify(manifest.execution)}, expected "data"`);
+  }
+  if (manifest.id !== ORCA_PLUGIN_ID) {
+    issues.push(`orca: id is ${JSON.stringify(manifest.id)}, expected ${JSON.stringify(ORCA_PLUGIN_ID)}`);
+  }
+  if (typeof manifest.id === 'string' && manifest.id.startsWith('orca-')) {
+    issues.push('orca: id starts with "orca-", a prefix Orca reserves for its own catalog');
+  }
+  if (manifest.publisher !== ORCA_PUBLISHER) {
+    issues.push(`orca: publisher is ${JSON.stringify(manifest.publisher)}, expected ${JSON.stringify(ORCA_PUBLISHER)}`);
+  }
+  if (!manifest.license) issues.push('orca: license is missing');
+
+  const repository = typeof manifest.repository === 'string' ? manifest.repository : '';
+  const repositoryOwner = /^https:\/\/github\.com\/([^/]+)\//.exec(repository)?.[1];
+  if (!repositoryOwner) {
+    issues.push(`orca: repository is ${JSON.stringify(manifest.repository)}, expected a GitHub URL`);
+  } else if (repositoryOwner !== manifest.publisher) {
+    issues.push(`orca: repository owner ${repositoryOwner} must match publisher ${String(manifest.publisher)}`);
+  }
+
+  const engine = /^>=(\d+)\.(\d+)\.(\d+)$/.exec(String(manifest.engines?.orca ?? ''));
+  if (!engine) {
+    issues.push(`orca: engines.orca is ${JSON.stringify(manifest.engines?.orca)}, expected ">=x.y.z"`);
+  } else {
+    const [major, minor, patch] = engine.slice(1).map(Number) as [number, number, number];
+    if (major < 1 || (major === 1 && (minor < 4 || (minor === 4 && patch < 245)))) {
+      issues.push(`orca: engines.orca is ${String(manifest.engines?.orca)}, format 2 manifests need at least 1.4.245`);
+    }
+  }
+
+  const themes: unknown[] = Array.isArray(manifest.contributes?.themes) ? manifest.contributes.themes : [];
+  const terminalThemes: unknown[] = Array.isArray(manifest.contributes?.terminalThemes)
+    ? manifest.contributes.terminalThemes
+    : [];
+  if (themes.length !== flavors.length) {
+    issues.push(`orca: contributes.themes has ${themes.length} entries, expected ${flavors.length}`);
+  }
+  if (terminalThemes.length !== flavors.length) {
+    issues.push(`orca: contributes.terminalThemes has ${terminalThemes.length} entries, expected ${flavors.length}`);
+  }
+
+  const seen = new Set<string>();
+  for (const [collection, entries] of [
+    ['themes', themes],
+    ['terminalThemes', terminalThemes],
+  ] as const) {
+    for (const [index, entry] of entries.entries()) {
+      if (!entry || typeof entry !== 'object') {
+        issues.push(`orca: contributes.${collection}[${index}] is not an object`);
+        continue;
+      }
+      const contribution = entry as { id?: unknown; title?: unknown; path?: unknown };
+      const flavor = flavors[index];
+      const wantId = flavor ? orcaThemeId(flavor) : undefined;
+      if (contribution.id !== wantId) {
+        issues.push(
+          `orca: contributes.${collection}[${index}].id is ${JSON.stringify(contribution.id)}, ` +
+            `expected ${JSON.stringify(wantId)}`,
+        );
+      }
+      if (typeof contribution.title !== 'string' || !contribution.title.startsWith('Inkstone ')) {
+        issues.push(`orca: contributes.${collection}[${index}].title is ${JSON.stringify(contribution.title)}`);
+      }
+      if (collection === 'themes') {
+        const id = String(contribution.id);
+        if (seen.has(id)) issues.push(`orca: duplicate theme id ${id}`);
+        seen.add(id);
+      }
+      if (typeof contribution.path !== 'string' || !byPath.has(`${dir}/${contribution.path}`)) {
+        issues.push(`orca: contributes.${collection}[${index}].path ${JSON.stringify(contribution.path)} does not exist`);
+      }
+    }
+  }
+
+  for (const flavor of flavors) {
+    const label = `orca ${flavor.meta.id}`;
+
+    const appPath = `${dir}/${orcaAppThemePath(flavor)}`;
+    const appText = byPath.get(appPath);
+    if (!appText) {
+      issues.push(`${label}: ${appPath} is missing`);
+    } else {
+      const bytes = Buffer.byteLength(appText, 'utf8');
+      if (bytes > ORCA_THEME_LIMIT) {
+        issues.push(`${label}: app theme is ${bytes} bytes, over the ${ORCA_THEME_LIMIT}-byte cap`);
+      }
+      const theme = JSON.parse(appText) as {
+        schemaVersion?: number;
+        base?: string;
+        tokens?: Record<string, string>;
+        tokenColors?: unknown;
+      };
+      if (theme.schemaVersion !== 1) issues.push(`${label}: schemaVersion is ${String(theme.schemaVersion)}, expected 1`);
+      if (theme.base !== flavor.meta.appearance) {
+        issues.push(`${label}: base is ${String(theme.base)}, expected ${flavor.meta.appearance}`);
+      }
+
+      const tokens = theme.tokens ?? {};
+      for (const required of ORCA_REQUIRED_TOKENS) {
+        if (!tokens[required]) issues.push(`${label}: missing required token ${required}`);
+      }
+      for (const [token, value] of Object.entries(tokens)) {
+        if (!(ORCA_APP_TOKENS as readonly string[]).includes(token)) {
+          issues.push(`${label}: unknown token ${token}`);
+        }
+        if (!isValidHex(value)) issues.push(`${label}: ${token} has invalid color ${value}`);
+      }
+      for (const pair of ORCA_TEXT_PAIRS) {
+        const text = tokens[pair.text];
+        const surface = tokens[pair.surface];
+        if (!text || !surface) continue;
+        const ratio = contrast(text, surface);
+        if (ratio < pair.ratio) {
+          issues.push(
+            `${label}: ${pair.text} on ${pair.surface} is ${formatRatio(ratio)}, below ${pair.ratio}:1`,
+          );
+        }
+      }
+
+      const expectedRules = buildTheme(flavor).tokenColors.map(({ scope, settings }) => ({
+        scope,
+        settings: { ...(settings.foreground ? { foreground: settings.foreground } : {}), ...(settings.fontStyle ? { fontStyle: settings.fontStyle } : {}) },
+      }));
+      if (JSON.stringify(theme.tokenColors) !== JSON.stringify(expectedRules)) {
+        issues.push(`${label}: tokenColors drifted from the VS Code theme`);
+      }
+    }
+
+    const terminalPath = `${dir}/${orcaTerminalThemePath(flavor)}`;
+    const terminalText = byPath.get(terminalPath);
+    if (!terminalText) {
+      issues.push(`${label}: ${terminalPath} is missing`);
+      continue;
+    }
+    const terminalTheme = JSON.parse(terminalText) as {
+      schemaVersion?: number;
+      mode?: string;
+      terminal?: Record<string, string>;
+    };
+    if (terminalTheme.schemaVersion !== 1) {
+      issues.push(`${label}: terminal schemaVersion is ${String(terminalTheme.schemaVersion)}, expected 1`);
+    }
+    if (terminalTheme.mode !== flavor.meta.appearance) {
+      issues.push(`${label}: terminal mode is ${String(terminalTheme.mode)}, expected ${flavor.meta.appearance}`);
+    }
+    const terminal = terminalTheme.terminal ?? {};
+    for (const key of ['background', 'foreground']) {
+      if (!terminal[key]) issues.push(`${label}: terminal is missing ${key}`);
+      else if (!isValidHex(terminal[key])) issues.push(`${label}: terminal ${key} has invalid color ${terminal[key]}`);
+    }
+    for (const [slot, hex] of flavor.ansi.entries()) {
+      const key = ORCA_ANSI_KEYS[slot]!;
+      if (!terminal[key]) issues.push(`${label}: terminal palette is missing ${key}`);
+      else if (terminal[key] !== hex) issues.push(`${label}: terminal ${key} drifted from the ANSI palette`);
+    }
+    for (const [key, value] of Object.entries(terminal)) {
+      if (!isValidHex(value)) issues.push(`${label}: terminal ${key} has invalid color ${value}`);
+    }
+  }
+}
+
 export function checkThemes(): string[] {
   const issues: string[] = [];
 
   checkVscodeManifest(issues);
+
+  checkOrca(issues);
 
   for (const flavor of flavors) {
     const theme = buildTheme(flavor);
