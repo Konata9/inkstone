@@ -11,6 +11,7 @@
  *   dist/opencode/*.json
  *   dist/zed/inkstone.json
  *   dist/zed/extension.toml
+ *   dist/orca/inkstone-orca/**  (one installable Orca plugin: 12 themes)
  *   dist/dsh/<package>/**  (four installable DeepSeek Harness theme plugins)
  *
  * Showcase outputs (site, palette reference, README screenshot) are built
@@ -53,5 +54,5 @@ console.log(
   `\nBuilt ${files.length} files for ${flavors.length} flavors ` +
     `(${checks.audit.checks} palette checks, ${flavors.length} VS Code themes, ` +
     `${flavors.length} Ghostty themes, ${flavors.length} Kaku schemes (Lua + TOML), ` +
-    `${flavors.length} OpenCode themes, Zed themes, DSH theme plugins).\n`,
+    `${flavors.length} OpenCode themes, Zed themes, Orca plugin, DSH theme plugins).\n`,
 );

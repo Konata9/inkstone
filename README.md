@@ -28,7 +28,7 @@
 - **六个变体，一套骨架**：色相顺序始终是朱 → 蓝 → 绿 → 橙 → 紫 → 青 → 绛，切换时只换光线与饱和度。
 - **红做记号，青做动作**：关键字、标签、错误、删除保留朱砂；按钮、徽标、进度、焦点与选中态统一用各变体的交互蓝。
 - **Dimmed 降光不降墨**：画布更沉，墨色仍 ≥ 10.5:1，强调色保留可辨识的色相，不会褪成灰雾。
-- **生成器保证一致**：一份语义色板同时生成 VS Code、Ghostty、Kaku、OpenCode、Zed 与 DSH；构建会拒绝落在对比度区间或彩度预算之外的配色。
+- **生成器保证一致**：一份语义色板同时生成 VS Code、Ghostty、Kaku、OpenCode、Zed、Orca 与 DSH；构建会拒绝落在对比度区间或彩度预算之外的配色。
 
 ## 六个变体
 
@@ -58,6 +58,7 @@
 | --- | --- |
 | VS Code / Cursor / Windsurf / VSCodium | [Marketplace](https://marketplace.visualstudio.com/items?itemName=Konata9.inkstone) · [Open VSX](https://open-vsx.org/extension/Konata9/inkstone) · [VSIX](https://github.com/Konata9/inkstone/releases) |
 | Zed | `pnpm install:zed` |
+| Orca | `pnpm install:orca` |
 
 **终端与 AI 工具**
 
@@ -91,10 +92,11 @@ pnpm install:ghostty
 pnpm install:kaku
 pnpm install:opencode
 pnpm install:zed
+pnpm install:orca
 pnpm install:dsh
 ```
 
-每个安装脚本都会先构建主题，再复制到对应软件的配置目录。Kaku 0.27.1+ 只要 TOML 色表，旧版 Kaku / WezTerm 用 Lua；DSH 默认安装六主题菜单版，也可以换成按明暗自动配对的单包。不想克隆仓库时，可从 [Releases](https://github.com/Konata9/inkstone/releases) 下载对应 zip；手动安装、OpenCode 配置、DSH 配对包与排障见 [安装详解](docs/installation.md)。
+每个安装脚本都会先构建主题，再复制到对应软件的配置目录。Kaku 0.27.1+ 只要 TOML 色表，旧版 Kaku / WezTerm 用 Lua；Orca 的脚本用 `orca plugin dev load` 把插件目录交给 Orca；DSH 默认安装六主题菜单版，也可以换成按明暗自动配对的单包。不想克隆仓库时，可从 [Releases](https://github.com/Konata9/inkstone/releases) 下载对应 zip；手动安装、OpenCode 配置、DSH 配对包与排障见 [安装详解](docs/installation.md)。
 
 ## 文档
 
