@@ -121,7 +121,7 @@ docs/                       文档产物（生成物；preview.png 由截图命�
 1. 在 `src/targets/` 新建生成器，返回 `GeneratedFile[]`，文件名走 `src/targets/naming.ts`。
 2. 在 `src/outputs.ts` 注册，让它进入 `pnpm build` 与检查流程。
 3. 在 `src/check.ts` 加产物校验：key 是否完整、语法是否可解析、必要文件是否存在。
-4. 需要安装脚本时在 `scripts/install.ts` 加一个 target：`dsh` 各平台都直接调用命令，其余目标在 POSIX 上委托 `scripts/install-<target>.sh`、在 Windows 用原生路径；并在 `package.json` 暴露 `install:<target>`。
+4. 需要安装脚本时在 `scripts/install.ts` 加一个 target，路径按平台解析（Zed 在 Windows 用 `%APPDATA%`，Kero 用 `%LOCALAPPDATA%`，`dsh` 直接调用命令），并在 `package.json` 暴露 `install:<target>`。
 5. 在 `showcase/docs/installation.ts` 与 `development.ts` 补安装和结构说明。
 6. 运行 `pnpm test`、`pnpm build`、`pnpm typecheck`，确认新产物与文档同步。
 
