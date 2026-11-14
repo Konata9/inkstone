@@ -16,6 +16,7 @@ import { generateDsh } from './targets/dsh.ts';
 import { generateGhostty } from './targets/ghostty.ts';
 import { generateKaku, generateKakuToml } from './targets/kaku.ts';
 import { generateOpencode } from './targets/opencode.ts';
+import { generateOrca } from './targets/orca.ts';
 import { generateVscode } from './targets/vscode.ts';
 import { generateZed } from './targets/zed.ts';
 
@@ -44,6 +45,7 @@ export function collectAllOutputs(version: string): GeneratedOutput[] {
     ...generateOpencode(),
     ...generateZed(version),
     ...generateDsh(version, licenseText()),
+    ...generateOrca(version, licenseText()),
   ].map((file) => ({ ...file, committed: isCommitted(file.path) }));
 }
 

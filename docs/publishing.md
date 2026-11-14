@@ -8,7 +8,7 @@
 
 | 发布线 | 版本源 | tag | 产物 |
 | --- | --- | --- | --- |
-| 主题 / 项目 | 根 `package.json` | `v0.5.0` | Ghostty / Kaku / OpenCode / Zed / DSH / bundle，并附带当前 VSIX（仅打包，不发布市场） |
+| 主题 / 项目 | 根 `package.json` | `v0.5.0` | Ghostty / Kaku / OpenCode / Zed / Orca / DSH / bundle，并附带当前 VSIX（仅打包，不发布市场） |
 | VS Code 扩展 | `packages/vscode/package.json` | `vscode-v0.3.6` | VSIX，发布到 VS Code Marketplace 与 Open VSX |
 
 ## 发布前
