@@ -40,6 +40,8 @@ jobs:
 
       - run: pnpm typecheck
 
+      - run: pnpm test:unit
+
       - name: Package VSIX
         run: pnpm package:vscode
 
