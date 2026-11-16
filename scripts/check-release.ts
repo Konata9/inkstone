@@ -77,4 +77,4 @@ console.log(`  ✓ tag ${tag} matches the ${target} version ${version}`);
 if (hasSection) {
   console.log(`  ✓ ${changelogLabelText} covers ${version}`);
 }
-console.log('  ✓ generated files are in sync with the palette\n');
+console.log('  ✓ generated files are in sync with the current build\n');

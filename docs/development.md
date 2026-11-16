@@ -14,6 +14,7 @@
 | `pnpm build` | 审计色板 → 清空 `dist/` → 生成全部主题产物 |
 | `pnpm build:site` | 清空 `site/` → 生成官网静态页（EN + ZH） |
 | `pnpm build:docs` | 生成 `docs/` 下的全部 Markdown |
+| `pnpm build:release` | 依次构建主题、官网与文档（`pnpm release` 使用） |
 | `pnpm test` | 色板审计 + 产物检查（与 `pnpm build` 的检查一致） |
 | `pnpm test:unit` | `scripts/` 下的 tsx 单元测试（`node:test`） |
 | `pnpm typecheck` | TypeScript 类型检查 |
@@ -130,8 +131,9 @@ docs/                       文档产物（生成物；preview.png 由截图命�
 `src/outputs.ts` 与 `showcase/outputs.ts` 各自维护一份生成物清单，`scripts/versioning.ts` 的 drift check 会把仓库里的文件与重新生成的结果逐字节比对。
 
 - `dist/` 被 `.gitignore` 忽略，构建前会整体清空。
-- `site/` 被 `.gitignore` 忽略，`pnpm build:site` 会整体清空。
-- `packages/vscode/themes/`、`docs/` 与 `site/favicon.png` 是已提交生成物，必须随源码更新。
+- `site/` 由 `pnpm build:site` 整体重写；即使 `.gitignore` 列出了该目录，已跟踪的页面仍参与 drift 检查。
+- `packages/vscode/themes/`、`docs/` 与 `site/` 是已提交生成物，必须随源码更新。
+- `pnpm release` 会运行 `pnpm build:release`，让内嵌版本号的 `site/`（页面、`llms.txt`）与新版本号同步。
 - 版本 tag 与生成物不一致时，`pnpm release:check` 会在构建前快速失败。
 
 ## 文档与官网

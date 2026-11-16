@@ -21,6 +21,7 @@
     "build": "tsx src/build.ts",
     "build:site": "tsx showcase/site/build.ts",
     "build:docs": "tsx showcase/docs/build.ts",
+    "build:release": "pnpm build && pnpm build:site && pnpm build:docs",
     "validate": "tsx src/validate.ts",
     "test": "pnpm validate",
     "typecheck": "tsc --noEmit",

@@ -101,7 +101,7 @@ if (drift.length > 0) {
 
 console.log(`  ✓ working tree clean, on ${branch}`);
 console.log(`  ✓ ${changelogLabelText} has a ${version} section with no Unreleased entries`);
-console.log('  ✓ generated files are in sync with the palette');
+console.log('  ✓ generated files are in sync with the current build');
 console.log(`  ✓ tag ${tag} is unused`);
 
 if (dryRun) {

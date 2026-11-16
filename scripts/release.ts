@@ -170,7 +170,9 @@ if (dryRun) {
   if (acknowledgements.length > 0) {
     console.log(`  • acknowledgements: ${acknowledgements.length} contributor(s)`);
   }
-  console.log(`  • build + typecheck, commit "chore: release ${tag}", tag ${tag}`);
+  console.log(
+    `  • build themes, site and docs + typecheck, commit "chore: release ${tag}", tag ${tag}`,
+  );
   console.log(noPush ? '  • no push (--no-push)' : `  • push origin ${branch} and ${tag}`);
   console.log('\nDry run: no files changed.\n');
   process.exit(0);
@@ -180,7 +182,7 @@ writeFileSync(pkgPath, `${JSON.stringify({ ...pkg, version: next }, null, 2)}\n`
 writeFileSync(changelogFile, finalChangelog, 'utf8');
 
 try {
-  run('pnpm', ['build']);
+  run('pnpm', ['build:release']);
   run('pnpm', ['typecheck']);
   const drift = findGeneratedDrift();
   if (drift.length > 0) throw new Error(drift.join('; '));

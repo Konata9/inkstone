@@ -108,7 +108,7 @@ export function findGeneratedDrift(): string[] {
     if (!existsSync(path)) {
       drift.push(`${file.path} is missing`);
     } else if (readFileSync(path, 'utf8') !== file.content) {
-      drift.push(`${file.path} is out of sync with the current palette`);
+      drift.push(`${file.path} is out of sync with the current build (palette or version)`);
     }
   }
 
