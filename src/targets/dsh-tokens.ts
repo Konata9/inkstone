@@ -1,18 +1,26 @@
 /**
- * Every colour token of the DSH 0.2.1 token ladder, frozen here on purpose.
+ * Every colour token of the DSH 0.2.2 token ladder, frozen here on purpose.
  *
  * DSH is pre-stable: a new release may add or rename a token. The build fails
  * when `buildDshTokens()` stops producing exactly this set, which turns an
  * upstream change into one edit here instead of a silent partial theme.
  *
- * Source: DSH 0.2.1-rc.3, packages/client/ui-theme/src/styles/*.css. Only
+ * Source: DSH 0.2.2-rc.2, packages/client/ui-theme/src/styles/*.css. Only
  * colour-valued custom properties are listed: fonts, sizes, radii, shadows,
  * motion and the pointer-modality-only `--dsw-focus-ring-color` are out of
  * scope.
+ *
+ * 0.2.2 diff, cumulative from 0.2.1: +6 `--dsw-alias-illustration-*`,
+ * +`--dsw-alias-state-done-primary`, +5 static steps (3 neutral-bluish,
+ * 2 violet), rc.2's +24 aliases and +12 specific tokens (cards, charts,
+ * hovercard, JSON tree, toast action, tooltip label, selected border,
+ * on-color label, trajectory accent, upload track, guide hero, macOS sidebar
+ * glass/tint/washes, right-sidebar flash), and
+ * `--dsw-specific-sidebar-nav-item-hover` was removed.
  */
 
 export const DSH_TOKENS = [
-  // --dsw-alias-* (107)
+  // --dsw-alias-* (138)
   '--dsw-alias-bg-base',
   '--dsw-alias-bg-document-preview',
   '--dsw-alias-bg-document-selection',
@@ -35,6 +43,7 @@ export const DSH_TOKENS = [
   '--dsw-alias-border-l2-darkmode-thin',
   '--dsw-alias-border-l3',
   '--dsw-alias-border-l4',
+  '--dsw-alias-border-selected',
   '--dsw-alias-brand-primary',
   '--dsw-alias-brand-primary-invert',
   '--dsw-alias-brand-primary-new-colorprimary-new-color',
@@ -54,6 +63,12 @@ export const DSH_TOKENS = [
   '--dsw-alias-button-tool-bar-fill',
   '--dsw-alias-button-tool-bar-fill-invisible',
   '--dsw-alias-button-tool-bar-hover',
+  '--dsw-alias-card-fill',
+  '--dsw-alias-card-fill-hover',
+  '--dsw-alias-card-tile-fill',
+  '--dsw-alias-chart-messages',
+  '--dsw-alias-chart-system',
+  '--dsw-alias-chart-tools',
   '--dsw-alias-code-diff-added',
   '--dsw-alias-code-diff-deleted',
   '--dsw-alias-file-diff-added-bg',
@@ -62,16 +77,36 @@ export const DSH_TOKENS = [
   '--dsw-alias-file-diff-deleted-bg',
   '--dsw-alias-file-diff-deleted-gutter',
   '--dsw-alias-file-diff-deleted-marker',
+  '--dsw-alias-hovercard-bg',
+  '--dsw-alias-hovercard-label-primary',
+  '--dsw-alias-hovercard-label-secondary',
+  '--dsw-alias-hovercard-label-tertiary',
+  '--dsw-alias-hovercard-state-done',
+  '--dsw-alias-hovercard-state-error',
+  '--dsw-alias-illustration-background',
+  '--dsw-alias-illustration-backing',
+  '--dsw-alias-illustration-detail',
+  '--dsw-alias-illustration-inset',
+  '--dsw-alias-illustration-shadow',
+  '--dsw-alias-illustration-surface',
   '--dsw-alias-interactive-bg-active',
   '--dsw-alias-interactive-bg-hover',
   '--dsw-alias-interactive-bg-hover-accent',
   '--dsw-alias-interactive-bg-hover-danger',
   '--dsw-alias-interactive-bg-hover-solid',
+  '--dsw-alias-json-tree-hover',
+  '--dsw-alias-json-tree-icon',
+  '--dsw-alias-json-tree-keyword',
+  '--dsw-alias-json-tree-number',
+  '--dsw-alias-json-tree-property',
+  '--dsw-alias-json-tree-punctuation',
+  '--dsw-alias-json-tree-string',
   '--dsw-alias-label-caption',
   '--dsw-alias-label-deep-diving',
   '--dsw-alias-label-deep-diving-shimmer',
   '--dsw-alias-label-dimmed',
   '--dsw-alias-label-document-preview',
+  '--dsw-alias-label-on-color',
   '--dsw-alias-label-primary',
   '--dsw-alias-label-primary-bluish',
   '--dsw-alias-label-primary-dimmed',
@@ -103,6 +138,7 @@ export const DSH_TOKENS = [
   '--dsw-alias-settings-card-stroke',
   '--dsw-alias-state-business-primary',
   '--dsw-alias-state-business-tertiary',
+  '--dsw-alias-state-done-primary',
   '--dsw-alias-state-error-primary',
   '--dsw-alias-state-error-secondary',
   '--dsw-alias-state-idle-primary',
@@ -114,25 +150,39 @@ export const DSH_TOKENS = [
   '--dsw-alias-state-warn-secondary',
   '--dsw-alias-state-warn-tertiary',
   '--dsw-alias-switch-thumb',
+  '--dsw-alias-toast-action',
   '--dsw-alias-toast-bg',
   '--dsw-alias-toast-label',
   '--dsw-alias-tooltip-bg',
   '--dsw-alias-tooltip-key-bg',
+  '--dsw-alias-tooltip-label',
+  '--dsw-alias-trajectory-accent',
   '--dsw-alias-turn-trigger-bg',
   '--dsw-alias-turn-trigger-bg-hover',
-  // --dsw-specific-* (11)
+  // --dsw-specific-* (22)
   '--dsw-specific-bubble',
   '--dsw-specific-bubble-highlight',
+  '--dsw-specific-file-upload-track',
+  '--dsw-specific-guide-hero',
   '--dsw-specific-input-major',
   '--dsw-specific-login-input',
   '--dsw-specific-menu',
   '--dsw-specific-selector',
   '--dsw-specific-sidebar-fill',
+  '--dsw-specific-sidebar-glass-collapsed-fill',
+  '--dsw-specific-sidebar-glass-collapsed-hover',
+  '--dsw-specific-sidebar-glass-fill',
+  '--dsw-specific-sidebar-glass-hover',
   '--dsw-specific-sidebar-nav-item-active',
   '--dsw-specific-sidebar-nav-item-active-accent',
-  '--dsw-specific-sidebar-nav-item-hover',
+  '--dsw-specific-sidebar-right-flash',
+  '--dsw-specific-sidebar-tint',
+  '--dsw-specific-sidebar-wash-bottom',
+  '--dsw-specific-sidebar-wash-bottom-clear',
+  '--dsw-specific-sidebar-wash-top',
+  '--dsw-specific-sidebar-wash-top-clear',
   '--dsw-specific-tip',
-  // --dsw-static-* (77)
+  // --dsw-static-* (82)
   '--dsw-static-amber-100',
   '--dsw-static-amber-400',
   '--dsw-static-amber-500',
@@ -189,9 +239,11 @@ export const DSH_TOKENS = [
   '--dsw-static-neutral-bluish-150',
   '--dsw-static-neutral-bluish-200',
   '--dsw-static-neutral-bluish-300',
+  '--dsw-static-neutral-bluish-310',
   '--dsw-static-neutral-bluish-400',
   '--dsw-static-neutral-bluish-50',
   '--dsw-static-neutral-bluish-500',
+  '--dsw-static-neutral-bluish-55',
   '--dsw-static-neutral-bluish-60',
   '--dsw-static-neutral-bluish-600',
   '--dsw-static-neutral-bluish-700',
@@ -200,6 +252,7 @@ export const DSH_TOKENS = [
   '--dsw-static-neutral-bluish-800',
   '--dsw-static-neutral-bluish-850',
   '--dsw-static-neutral-bluish-875',
+  '--dsw-static-neutral-bluish-90',
   '--dsw-static-neutral-bluish-900',
   '--dsw-static-neutral-bluish-950',
   '--dsw-static-red-100',
@@ -210,6 +263,8 @@ export const DSH_TOKENS = [
   '--dsw-static-red-600',
   '--dsw-static-red-600-a08',
   '--dsw-static-red-900',
+  '--dsw-static-violet-400',
+  '--dsw-static-violet-600',
   // --shiki-* (11)
   '--shiki-background',
   '--shiki-foreground',
