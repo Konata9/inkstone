@@ -11,7 +11,9 @@ const commands = table(
     ['`pnpm build`', '审计色板 → 清空 `dist/` → 生成全部主题产物'],
     ['`pnpm build:site`', '清空 `site/` → 生成官网静态页（EN + ZH）'],
     ['`pnpm build:docs`', '生成 `docs/` 下的全部 Markdown'],
+    ['`pnpm build:release`', '依次构建主题、官网与文档（`pnpm release` 使用）'],
     ['`pnpm test`', '色板审计 + 产物检查（与 `pnpm build` 的检查一致）'],
+    ['`pnpm test:unit`', '`scripts/` 下的 tsx 单元测试（`node:test`）'],
     ['`pnpm typecheck`', 'TypeScript 类型检查'],
     ['`pnpm capture:preview`', '内存渲染 3×2 编辑器总览并截图到 `docs/preview.png`（需 Playwright）'],
     ['`pnpm site`', '构建官网并在浏览器打开 `site/index.html`'],
@@ -79,7 +81,7 @@ showcase/                   展示层源码（与 src/ 平级）
   preview/
     gallery.ts              3×2 编辑器总览（内存渲染）
     capture.ts              Playwright 截图入口
-scripts/                    安装脚本、VSIX 与 Release 打包、发布辅助
+scripts/                    安装入口（install.ts）、VSIX 与 Release 打包、发布辅助
 packages/vscode/            VS Code 扩展（VSIX 源码与生成的主题 JSON）
 dist/                       生成物：Ghostty、Kaku、OpenCode、Zed、DSH、VSIX
 site/                       官网产物（生成物，GitHub Pages）
@@ -132,7 +134,7 @@ export function renderDevelopmentDoc(): string {
         '1. 在 `src/targets/` 新建生成器，返回 `GeneratedFile[]`，文件名走 `src/targets/naming.ts`。',
         '2. 在 `src/outputs.ts` 注册，让它进入 `pnpm build` 与检查流程。',
         '3. 在 `src/check.ts` 加产物校验：key 是否完整、语法是否可解析、必要文件是否存在。',
-        '4. 需要安装脚本时在 `scripts/` 添加脚本，并在 `package.json` 暴露 `install:<target>`。',
+        '4. 需要安装脚本时在 `scripts/install.ts` 加一个 target：`dsh` 各平台都直接调用命令，其余目标在 POSIX 上委托 `scripts/install-<target>.sh`、在 Windows 用原生路径；并在 `package.json` 暴露 `install:<target>`。',
         '5. 在 `showcase/docs/installation.ts` 与 `development.ts` 补安装和结构说明。',
         '6. 运行 `pnpm test`、`pnpm build`、`pnpm typecheck`，确认新产物与文档同步。',
       ].join('\n'),
@@ -142,8 +144,9 @@ export function renderDevelopmentDoc(): string {
         '`src/outputs.ts` 与 `showcase/outputs.ts` 各自维护一份生成物清单，`scripts/versioning.ts` 的 drift check 会把仓库里的文件与重新生成的结果逐字节比对。',
         '',
         '- `dist/` 被 `.gitignore` 忽略，构建前会整体清空。',
-        '- `site/` 被 `.gitignore` 忽略，`pnpm build:site` 会整体清空。',
-        '- `packages/vscode/themes/`、`docs/` 与 `site/favicon.png` 是已提交生成物，必须随源码更新。',
+        '- `site/` 由 `pnpm build:site` 整体重写；即使 `.gitignore` 列出了该目录，已跟踪的页面仍参与 drift 检查。',
+        '- `packages/vscode/themes/`、`docs/` 与 `site/` 是已提交生成物，必须随源码更新。',
+        '- `pnpm release` 会运行 `pnpm build:release`，让内嵌版本号的 `site/`（页面、`llms.txt`）与新版本号同步。',
         '- 版本 tag 与生成物不一致时，`pnpm release:check` 会在构建前快速失败。',
       ].join('\n'),
       [
