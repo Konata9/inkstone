@@ -869,7 +869,9 @@ window.__ModuleLoader__.load({
       let layer
       let layerPending = false
       let lastBuiltin = 'system'
-      let switching = false
+      let liveBuiltinPick = null
+      let restoreTimer
+      let disposed = false
       const menuHoverAttribute = ${JSON.stringify(hoverAttribute)}
       const listeners = new Set()
 
@@ -904,8 +906,6 @@ window.__ModuleLoader__.load({
           layerPending = false
         }
       }
-
-      const notify = () => { for (const listener of listeners) listener() }
 
       const current = () => {
         const preference = ctx.theme.getTheme().preference
@@ -1043,6 +1043,8 @@ window.__ModuleLoader__.load({
       }, InkstoneRow))
 
       ctx.effect(() => () => {
+        disposed = true
+        if (restoreTimer !== undefined) clearTimeout(restoreTimer)
         menuStyle.remove()
         document.documentElement.removeAttribute(menuHoverAttribute)
         offThemeChange()
