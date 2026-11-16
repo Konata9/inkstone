@@ -1217,13 +1217,22 @@ function checkDshMenuBundle(source: string, packageName: string, issues: string[
       preference = id;
       for (const listener of listeners) listener();
     },
+    /** Model `ThemeRuntime.adopt()`: the host writes the preference without calling `setTheme`. */
+    adopt(id: string): void {
+      preference = id;
+      for (const listener of listeners) listener();
+    },
     overrideTokens(
       from: string,
       tokens: Record<string, { light: string; dark: string }>,
     ): () => void {
       layers.set(from, tokens);
+      // The real runtime publishes synchronously from overrideTokens; the
+      // bundle must survive that re-entrant notification.
+      for (const listener of listeners) listener();
       return () => {
         layers.delete(from);
+        for (const listener of listeners) listener();
       };
     },
   };
@@ -1341,7 +1350,11 @@ function checkDshMenuBundle(source: string, packageName: string, issues: string[
         issues.push(`${label}: menu row does not render the ${flavor.zh} option`);
       }
     }
+    if (!texts.some((text) => text.includes('原生 DSH'))) {
+      issues.push(`${label}: menu row does not render the native DSH option`);
+    }
   }
+  settle();
   if (!layers.has(packageName)) {
     issues.push(`${label}: menu did not apply the 跟随 DSH pair layer on boot`);
   }
@@ -1350,6 +1363,7 @@ function checkDshMenuBundle(source: string, packageName: string, issues: string[
   const current = face.current as () => string;
   const first = DSH_MENU_FLAVORS[0]!;
   select(first.themeId);
+  settle();
   if (preference !== first.themeId) {
     issues.push(`${label}: selecting ${first.themeId} left the preference at ${preference}`);
   }
@@ -1360,6 +1374,7 @@ function checkDshMenuBundle(source: string, packageName: string, issues: string[
     issues.push(`${label}: current() reports ${current()} after selecting ${first.themeId}`);
   }
   select('auto');
+  settle();
   if (preference !== 'system') {
     issues.push(`${label}: selecting auto did not restore the built-in preference (got ${preference})`);
   }
@@ -1367,6 +1382,7 @@ function checkDshMenuBundle(source: string, packageName: string, issues: string[
     issues.push(`${label}: selecting auto did not re-apply the pair layer`);
   }
   runtime.setTheme('dark');
+  settle();
   if (layers.size === 0) {
     issues.push(`${label}: an external Appearance change dropped the pair layer`);
   }
@@ -1479,5 +1495,8 @@ function checkDshMenu(issues: string[], version: string, license: string): void 
   }
 
   const client = contents.get(`${dir}/lib/client.js`);
-  if (client !== undefined) checkDshMenuBundle(client, packageName, issues);
+  if (client !== undefined) {
+    checkDshMenuBundle(client, packageName, issues);
+    checkDshMenuPersistence(client, packageName, issues);
+  }
 }
